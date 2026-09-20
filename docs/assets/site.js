@@ -1,7 +1,7 @@
 // Fills in the latest release version and direct download link. The page works without it:
 // every download link already points at the releases page.
 (function () {
-  var repo = "kramsey458/PersistentWorkAreas";
+  var repo = "timbermods/PersistentWorkAreas";
   var key = "pwa-latest-release";
 
   function apply(release) {
