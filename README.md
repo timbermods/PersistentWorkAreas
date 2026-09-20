@@ -2,7 +2,7 @@
 
 Keep a building's working-area outline visible after deselecting it, including while painting crops, planting trees, or using other tools.
 
-**Website:** <https://kramsey458.github.io/PersistentWorkAreas/> has the feature overview, an install guide, troubleshooting, and an FAQ.
+**Website:** <https://timbermods.github.io/PersistentWorkAreas/> has the feature overview, an install guide, troubleshooting, and an FAQ.
 
 ## New in 0.1.3
 
