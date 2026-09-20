@@ -55,3 +55,7 @@ Install the .NET 8 SDK and have Timberborn installed, then run:
 ```
 
 The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v0.1.3.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
