@@ -3,6 +3,6 @@
   "Version": "0.1.3",
   "Id": "kyler.persistentworkareas",
   "MinimumGameVersion": "1.1.2.4",
-  "Description": "Pin farm, forester, lumberjack and other navigation-based working-area outlines. Clear all pins from the top-right button or a configurable key binding. Local display only; designed for BeaverBuddies Stability Preview 6.",
+  "Description": "Pin farm, forester, lumberjack and other navigation-based working-area outlines. Clear all pins from the top-right button or a configurable key binding. Local display only; designed for compatibility with the BeaverBuddies Stability Fork.",
   "RequiredMods": []
 }

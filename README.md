@@ -24,7 +24,7 @@ The pin control now has a clearly drawn checkbox, an ON/OFF badge, a bordered da
 
 Requires Timberborn **1.1.2.4** or a compatible 1.1 build. Built and checked against the installed 1.1.2.4 assemblies. Later versions may change the internal renderer API.
 
-No extra dependency is required. Keep your existing BeaverBuddies Preview 6 installation as it is. Installing this mod on both players' computers is recommended for the first co-op test; pins are always local to each player. The code does not require the other player to install it, but asymmetric installation has not been playtested.
+No extra dependency is required. Keep your existing BeaverBuddies Stability Fork installation as it is. Installing this mod on both players' computers is recommended for the first co-op test; pins are always local to each player. The code does not require the other player to install it, but asymmetric installation has not been playtested.
 
 ## Use
 
@@ -42,7 +42,7 @@ This preview supports navigation-based working areas. It does not pin district r
 
 ## Compatibility and validation
 
-Designed for **BeaverBuddies Stability Preview 6** (`1.1.0-stability.6`). The mod does not patch game methods, change simulation or building data, send multiplayer events, or modify saves. It uses the same navigation queries as the game's selected-building visualizer and a separate instance of its outline renderer.
+Designed for compatibility with the **BeaverBuddies Stability Fork**. The mod does not patch game methods, change simulation or building data, send multiplayer events, or modify saves. It uses the same navigation queries as the game's selected-building visualizer and a separate instance of its outline renderer.
 
 Release build and 37 automated lifecycle/API checks passed. **Unity rendering, checkbox placement, and two-player operation have not yet been tested in-game.** See `VALIDATION.md` for scope and the short playtest checklist.
 
