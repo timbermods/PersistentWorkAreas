@@ -26,6 +26,6 @@ These are compiled API and logic checks, not Unity rendering tests or an actual 
 ## References
 
 - [Timberborn official modding tools](https://github.com/mechanistry/timberborn-modding)
-- [BeaverBuddies Preview 6](https://github.com/kramsey458/BeaverBuddies/releases/tag/v1.1.0-stability.6)
+- [BeaverBuddies Stability Fork](https://github.com/timbermods/BeaverBuddies-Stability-Fork)
 
 The exact API decisions were verified against the user's installed game assemblies and local Preview 6 source, rather than assuming the latest online API matches their installation.
