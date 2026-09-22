@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
-  <ItemGroup><Compile Include="../source/PinSet.cs" Link="PinSet.cs" /><Compile Include="../source/PinRefreshPlanner.cs" Link="PinRefreshPlanner.cs" /><Compile Include="../source/PlantingRanges.cs" Link="PlantingRanges.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../source/PinSet.cs" Link="PinSet.cs" /><Compile Include="../source/PinRefreshPlanner.cs" Link="PinRefreshPlanner.cs" /><Compile Include="../source/PlantingRanges.cs" Link="PlantingRanges.cs" /><Compile Include="../source/PinStore.cs" Link="PinStore.cs" /></ItemGroup>
 </Project>
