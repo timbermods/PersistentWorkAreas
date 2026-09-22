@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Runtime.CompilerServices;
@@ -104,6 +105,46 @@ Check(twins.Add(new EqualBuilding()) && twins.Add(new EqualBuilding()) && twins.
 planner.Clear(); NavigationChange(CellBox.Point(0, 0, 5));
 Check(planner.Count == 0 && planner.Cells.Count == 0 && !planner.Pending, "Clearing forgets every pin and cached range");
 
+// The planting tool shows the ranges of the buildings that plant the selected crop or tree, alongside the pins.
+Check(PlantingRanges.Shows("Farmhouse", "Farmhouse") && PlantingRanges.Shows("Forester", "Forester") && PlantingRanges.Shows("AquaticFarmhouse", "AquaticFarmhouse"),
+    "The planting tool shows the planter buildings of the plant's resource group");
+Check(!PlantingRanges.Shows("Farmhouse", "Forester") && !PlantingRanges.Shows("Forester", "Farmhouse") && !PlantingRanges.Shows("AquaticFarmhouse", "Farmhouse"),
+    "Crops never show foresters, trees never show farmhouses, and aquatic crops show only aquatic farmhouses");
+Check(!PlantingRanges.Shows("Farmhouse", null) && !PlantingRanges.Shows(null, null) && !PlantingRanges.Shows("", ""),
+    "Buildings that plant nothing, and plants without a group, show nothing");
+Check(!PlantingRanges.Shows("farmhouse", "Farmhouse"), "Groups match exactly, as the game compares them");
+var farmA = new FakePin(0, 0, 5); var farmB = new FakePin(100, 0, 5); var grove = new FakePin(0, 100, 5); var kept = new FakePin(200, 0, 5);
+planner.Add(kept); Pass();
+planner.Show(new[] { farmA, farmB });
+Check(Pass() == (2, 1) && planner.Cells.Count == 3 * 13 && planner.Cells.Contains((100, 0, 5)) && planner.Cells.Contains((200, 0, 5)),
+    "Opening the planting tool for a crop: 1 query per farmhouse and 1 rebuild, drawn with the pins");
+planner.Show(new[] { farmB, farmA });
+Check(!planner.Pending && Pass() == (0, 0), "Switching to another crop for the same farmhouses reuses their ranges: 0 queries and 0 rebuilds");
+NavigationChange(CellBox.Point(15, 0, 5));
+Check(Pass() == (1, 0), "A navigation change near one shown farmhouse re-queries only that farmhouse");
+planner.Select(farmB);
+Check(Pass() == (0, 1) && !planner.Cells.Contains((100, 0, 5)), "A shown building that is selected is left to the game's own outline");
+planner.Select(null); Pass();
+planner.InvalidateAll();
+Check(Pass() == (3, 1), "Construction-mode toggle re-queries pins and shown buildings alike");
+planner.Show(new[] { grove });
+Check(Pass() == (1, 1) && planner.Count == 2 && planner.Cells.Contains((0, 100, 5)) && !planner.Cells.Contains((0, 0, 5)),
+    "Switching to a tree: the forester is queried and the farmhouses are dropped with their ranges");
+planner.Show(Array.Empty<FakePin>());
+Check(Pass() == (0, 1) && planner.Count == 1 && planner.Cells.Count == 13 && planner.Cells.Contains((200, 0, 5)),
+    "Closing the planting tool: 0 queries and 1 rebuild back to the pinned outline");
+planner.Show(new FakePin[] { null });
+Check(!planner.Pending && Pass() == (0, 0) && planner.Count == 1, "Closing it again does no work");
+planner.Show(new[] { kept, farmA });
+Check(Pass() == (1, 1), "A pinned building the tool also shows keeps its cached range: only the other farmhouse is queried");
+Check(planner.Remove(kept) && !planner.Remove(kept) && Pass() == (0, 0) && planner.Cells.Contains((200, 0, 5)),
+    "Unpinning a building the tool shows keeps its range drawn while the tool is open");
+Check(planner.Add(farmA) && !planner.Add(farmA) && Pass() == (0, 0), "Pinning a building the tool shows reuses its range");
+planner.Show(Array.Empty<FakePin>());
+Check(Pass() == (0, 1) && planner.Count == 1 && planner.Cells.Contains((0, 0, 5)) && !planner.Cells.Contains((200, 0, 5)),
+    "Closing the tool keeps the ranges that are pinned and drops the rest");
+planner.Clear();
+
 var game = Path.GetFullPath(args[0]);
 var modPath = Path.GetFullPath(args[1]);
 var managed = Path.Combine(game, "Timberborn_Data", "Managed");
@@ -199,6 +240,68 @@ Check(Handle("OnInstantNavMeshUpdated", Update(11, 5, 5)) == (true, false, false
 Set(livePlanner, "_selected", livePin);
 Check(Handle("OnUnselected", null) == (true, false, false, true) && Get<object>(livePlanner, "_selected") == null,
     "Deselecting a pinned building rebuilds the pinned outline from the cache");
+
+// Planting tool events, with the game's own tool types. The handlers only record the plant's group; the next update finds the buildings.
+var plantableSpec = GameType("Timberborn.Planting", "Timberborn.Planting.PlantableSpec");
+var plantingTool = GameType("Timberborn.PlantingUI", "Timberborn.PlantingUI.PlantingTool");
+object Planting(string group)
+{
+    var spec = RuntimeHelpers.GetUninitializedObject(plantableSpec);
+    Set(spec, "<ResourceGroup>k__BackingField", group);
+    var tool = RuntimeHelpers.GetUninitializedObject(plantingTool);
+    Set(tool, "<PlantableSpec>k__BackingField", spec);
+    return tool;
+}
+var cancelPlanting = RuntimeHelpers.GetUninitializedObject(GameType("Timberborn.PlantingUI", "Timberborn.PlantingUI.CancelPlantingTool"));
+var toolEntered = GameType("Timberborn.ToolSystem", "Timberborn.ToolSystem.ToolEnteredEvent");
+var toolExited = GameType("Timberborn.ToolSystem", "Timberborn.ToolSystem.ToolExitedEvent");
+// What a tool switch leaves behind: the plant group shown, and whether the next update scans for its buildings.
+// ToolService.SwitchTool posts the old tool's exit and then the new tool's entry within one call.
+(string Group, bool Scan) Switch(object from, object to)
+{
+    Set(live, "_plantersChanged", false);
+    if (from != null) service.GetMethod("OnToolExited")!.Invoke(live, new[] { Activator.CreateInstance(toolExited, from) });
+    service.GetMethod("OnToolEntered")!.Invoke(live, new[] { Activator.CreateInstance(toolEntered, to, false) });
+    return (Get<string>(live, "_planting"), Get<bool>(live, "_plantersChanged"));
+}
+var crops = Planting("Farmhouse"); var trees = Planting("Forester");
+Check(Switch(null, crops) == ("Farmhouse", true), "Opening a crop's planting tool shows the farmhouses from the next update");
+Check(Switch(crops, trees) == ("Forester", true), "Switching from a crop to a tree shows the foresters instead");
+Check(Switch(trees, cancelPlanting) == (null, true), "Leaving the planting tools, even for the cancel-planting tool beside them, hides the planters");
+Check(Switch(null, cancelPlanting) == (null, false), "Other tools show no planter ranges and cause no scan");
+Check(GameType("Timberborn.WorkSystem", "Timberborn.WorkSystem.Workplace").GetInterfaces().Any(x => x.FullName == "Timberborn.EntitySystem.IRegisteredComponent"),
+    "Workplaces are registered components, so the entity registry lists every planter building");
+
+// The planting tool's rule on the game's own blueprints: crops show farmhouses, trees and bushes show foresters.
+var plantables = new List<(string Name, string Group, bool Crop, bool Tree)>();
+var planters = new List<(string Name, string Group, bool FarmHouse, bool Forester, bool Outlined)>();
+using (var blueprints = ZipFile.OpenRead(Path.Combine(game, "Timberborn_Data", "StreamingAssets", "Modding", "Blueprints.zip")))
+    foreach (var entry in blueprints.Entries.Where(x => x.FullName.EndsWith(".blueprint.json", StringComparison.OrdinalIgnoreCase)))
+    {
+        using var stream = entry.Open();
+        using var blueprint = JsonDocument.Parse(stream, new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
+        var root = blueprint.RootElement;
+        if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("TemplateSpec", out var template)) continue;
+        var name = template.GetProperty("TemplateName").GetString()!;
+        bool Has(string spec) => root.TryGetProperty(spec, out _);
+        if (root.TryGetProperty("PlantableSpec", out var plantable))
+            plantables.Add((name, plantable.GetProperty("ResourceGroup").GetString()!, Has("CropSpec"), Has("TreeComponentSpec") || Has("BushSpec")));
+        if (root.TryGetProperty("PlanterBuildingSpec", out var planter))
+            planters.Add((name, planter.GetProperty("PlantableResourceGroup").GetString()!, Has("FarmHouseSpec"), Has("ForesterSpec"),
+                Has("WorkplaceSpec") && Has("BuildingAccessibleSpec")));
+    }
+string[] ShownFor(string plant) => planters.Where(p => PlantingRanges.Shows(plantables.Single(x => x.Name == plant).Group, p.Group))
+    .Select(p => p.Name).OrderBy(x => x, StringComparer.Ordinal).ToArray();
+Check(planters.Count >= 4 && planters.All(p => p.Outlined),
+    "Every planter building is a workplace with an access point, so the planting tool finds and outlines it");
+Check(plantables.Count >= 20 && plantables.All(x => x.Crop != x.Tree && ShownFor(x.Name).Length > 0), "Every plantable in the game shows at least one planter building");
+Check(plantables.All(x => ShownFor(x.Name).All(n => x.Crop ? planters.Single(p => p.Name == n).FarmHouse : planters.Single(p => p.Name == n).Forester)),
+    "Crops show only farmhouses; trees and bushes show only foresters");
+Check(ShownFor("Carrot").SequenceEqual(new[] { "EfficientFarmHouse.Folktails", "FarmHouse.IronTeeth" }) &&
+    ShownFor("Cattail").SequenceEqual(new[] { "AquaticFarmhouse.Folktails" }) &&
+    ShownFor("Pine").SequenceEqual(new[] { "Forester.Folktails", "Forester.IronTeeth" }) &&
+    ShownFor("BlueberryBush").SequenceEqual(new[] { "Forester.Folktails", "Forester.IronTeeth" }),
+    "Carrots show both factions' farmhouses, cattails only the aquatic farmhouse, pines and blueberries only foresters");
 var interfaces = service.GetInterfaces().Select(x => x.FullName).ToArray();
 Check(interfaces.Contains("Timberborn.SingletonSystem.IPostLoadableSingleton"), "Game post-load lifecycle");
 Check(interfaces.Contains("Timberborn.SingletonSystem.IUpdatableSingleton"), "Display refresh lifecycle");
@@ -208,7 +311,7 @@ Check(!mod.GetReferencedAssemblies().Any(x => x.Name.Contains("BeaverBuddies") |
 Check(mod.GetTypes().All(t => !t.GetCustomAttributesData().Any(a => a.AttributeType.Name.StartsWith("HarmonyPatch"))), "No method patches");
 var fragment = mod.GetType("PersistentWorkAreas.WorkAreaFragment", true)!;
 Check(fragment.GetInterfaces().Any(x => x.FullName == "Timberborn.EntityPanelSystem.IEntityPanelFragment"), "Building checkbox fragment contract");
-foreach (var method in new[] { "OnVisibleLevel", "OnConstruction", "OnSelected", "OnUnselected", "OnDeleted" })
+foreach (var method in new[] { "OnVisibleLevel", "OnConstruction", "OnSelected", "OnUnselected", "OnDeleted", "OnInitialized", "OnToolEntered", "OnToolExited" })
     Check(service.GetMethod(method)!.GetCustomAttributesData().Any(x => x.AttributeType.Name == "OnEventAttribute"), method + " event subscription");
 
 var packaging = Path.GetFullPath(args[2]);

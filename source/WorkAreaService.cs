@@ -14,10 +14,14 @@ using Timberborn.InputSystem;
 using Timberborn.LevelVisibilitySystem;
 using Timberborn.MapStateSystem;
 using Timberborn.Navigation;
+using Timberborn.Planting;
+using Timberborn.PlantingUI;
 using Timberborn.SceneLoading;
 using Timberborn.SelectionSystem;
 using Timberborn.SingletonSystem;
+using Timberborn.ToolSystem;
 using Timberborn.UILayoutSystem;
+using Timberborn.WorkSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -31,6 +35,7 @@ namespace PersistentWorkAreas
         private readonly PinSet<EntityComponent> _pins = new PinSet<EntityComponent>();
         private readonly PinRefreshPlanner<EntityComponent, (Vector3? Center, bool Preview, bool Terrain), Vector3Int> _planner;
         private readonly List<EntityComponent> _removed = new List<EntityComponent>();
+        private readonly List<EntityComponent> _planters = new List<EntityComponent>();
         private readonly float _reach;
         private readonly INavigationRangeService _navigation;
         private readonly ConstructionModeService _construction;
@@ -39,6 +44,7 @@ namespace PersistentWorkAreas
         private readonly ILevelVisibilityService _visibility;
         private readonly MapSize _mapSize;
         private readonly ISpecService _specs;
+        private readonly EntityComponentRegistry _registry;
         private readonly EventBus _events;
         private readonly LoadingScreen _loading;
         private readonly UILayout _layout;
@@ -48,18 +54,21 @@ namespace PersistentWorkAreas
         private bool _active;
         private float _nextRefresh;
         private bool _rendererFailed;
+        // The resource group of the plant whose planting tool is open, or null.
+        private string _planting;
+        private bool _plantersChanged;
         public event Action Changed;
         public int Count => _pins.Count;
         public bool Available => _active && !_rendererFailed;
 
         public WorkAreaService(INavigationRangeService navigation, NavigationDistance distance, ConstructionModeService construction,
             IBlockService blocks, PreviewBlockService previews, ILevelVisibilityService visibility,
-            MapSize mapSize, ISpecService specs, EventBus events, LoadingScreen loading,
+            MapSize mapSize, ISpecService specs, EntityComponentRegistry registry, EventBus events, LoadingScreen loading,
             UILayout layout, InputService input)
         {
             _navigation = navigation; _construction = construction; _blocks = blocks;
             _previews = previews; _visibility = visibility; _mapSize = mapSize; _specs = specs;
-            _events = events; _loading = loading; _layout = layout; _input = input;
+            _registry = registry; _events = events; _loading = loading; _layout = layout; _input = input;
             // BuildingTerrainRange's own margin for deciding whether a navigation change can alter a range.
             _reach = distance.ResourceBuildings + 2f;
             _planner = new PinRefreshPlanner<EntityComponent, (Vector3? Center, bool Preview, bool Terrain), Vector3Int>(
@@ -100,15 +109,18 @@ namespace PersistentWorkAreas
             {
                 if (value) _planner.Add(pin); else _planner.Remove(pin);
                 _nextRefresh = 0;
-                if (_pins.Count == 0) ReleaseOutline();
+                if (_planner.Count == 0) ReleaseOutline();
                 Notify();
             }
         }
 
+        // Clears the player's pins. An open planting tool keeps showing its buildings.
         public void ClearAll()
         {
+            foreach (var pin in _pins.Items) _planner.Remove(pin);
             _pins.Clear();
-            ReleaseOutline();
+            _nextRefresh = 0;
+            if (_planner.Count == 0) ReleaseOutline();
             Notify();
         }
 
@@ -121,9 +133,11 @@ namespace PersistentWorkAreas
 
         public void UpdateSingleton()
         {
-            if (!Available || Count == 0) return;
+            if (!Available) return;
             try
             {
+                if (_plantersChanged) ShowPlanters();
+                if (_planner.Count == 0) return;
                 if (_planner.Pending && Time.unscaledTime >= _nextRefresh)
                 {
                     RefreshCells();
@@ -136,23 +150,42 @@ namespace PersistentWorkAreas
                 // Fail only this cosmetic feature if a later game update changes an internal API.
                 _rendererFailed = true;
                 Debug.LogError("[PersistentWorkAreas] Outline disabled for this map: " + error);
-                ClearAll();
+                Reset();
             }
+        }
+
+        // The planting tool shows the working areas of the buildings that plant its crop or tree, finished or not.
+        private void ShowPlanters()
+        {
+            _plantersChanged = false;
+            _planters.Clear();
+            if (_planting != null)
+                foreach (var workplace in _registry.GetAll<Workplace>())
+                {
+                    var planter = workplace.GetComponent<PlanterBuildingSpec>();
+                    if (planter != null && PlantingRanges.Shows(_planting, planter.PlantableResourceGroup) && Supports(workplace))
+                        _planters.Add(workplace.GetComponent<EntityComponent>());
+                }
+            _planner.Show(_planters);
+            _planters.Clear();
+            _nextRefresh = 0;
+            if (_planner.Count == 0) ReleaseOutline();
         }
 
         private void RefreshCells()
         {
             _removed.Clear();
             bool redraw = _planner.Refresh(_removed);
-            foreach (var entity in _removed) _pins.Set(entity, false);
-            if (_removed.Count > 0) Notify();
+            bool unpinned = false;
+            foreach (var entity in _removed) unpinned |= _pins.Set(entity, false);
+            if (unpinned) Notify();
             var cells = _planner.Cells;
             if ((redraw || _outline == null) && cells.Count > 0)
             {
                 if (_outline == null) _outline = new NativeOutline(_blocks, _previews, _visibility, _mapSize, _specs);
                 _outline.Update(cells);
             }
-            if (Count == 0) ReleaseOutline();
+            if (_planner.Count == 0) ReleaseOutline();
         }
 
         private bool Describe(EntityComponent entity, out (Vector3? Center, bool Preview, bool Terrain) key, out CellBox reach)
@@ -208,14 +241,36 @@ namespace PersistentWorkAreas
         }
         [OnEvent] public void OnDeleted(EntityDeletedEvent e)
         {
+            // The game has already taken a deleted building out of the entity registry, so the next scan drops it.
+            if (_planting != null && e.Entity.GetComponent<PlanterBuildingSpec>() != null) _plantersChanged = true;
             var pin = e.Entity.GetComponent<EntityComponent>();
             if (_pins.Set(pin, false))
             {
                 _planner.Remove(pin);
                 _nextRefresh = 0;
-                if (Count == 0) ReleaseOutline();
+                if (_planner.Count == 0) ReleaseOutline();
                 Notify();
             }
+        }
+        // A planter loaded, or placed by another co-op player, while the planting tool is open.
+        [OnEvent] public void OnInitialized(EntityInitializedEvent e)
+        {
+            if (_planting != null && e.Entity.GetComponent<PlanterBuildingSpec>() != null) _plantersChanged = true;
+        }
+        // ToolService.SwitchTool exits the old tool and enters the new one in the same call, so the buildings are found
+        // on the next update: switching between crops of the same planters keeps their cached ranges.
+        [OnEvent] public void OnToolEntered(ToolEnteredEvent e)
+        {
+            if (e.Tool is PlantingTool tool) Plant(tool.PlantableSpec?.ResourceGroup);
+        }
+        [OnEvent] public void OnToolExited(ToolExitedEvent e)
+        {
+            if (e.Tool is PlantingTool) Plant(null);
+        }
+        private void Plant(string group)
+        {
+            _planting = group;
+            _plantersChanged = true;
         }
 
         private void Notify()
@@ -235,6 +290,15 @@ namespace PersistentWorkAreas
             catch (Exception error) { Debug.LogError("[PersistentWorkAreas] Renderer cleanup failed: " + error); }
             _planner.Clear();
         }
+        // Forgets the pins and the planting tool's buildings, and releases the renderer.
+        private void Reset()
+        {
+            _planting = null;
+            _plantersChanged = false;
+            _pins.Clear();
+            ReleaseOutline();
+            Notify();
+        }
         private void OnLoading(object sender, EventArgs e) => Dispose();
         public void Dispose()
         {
@@ -243,7 +307,7 @@ namespace PersistentWorkAreas
             _loading.LoadingScreenEnabled -= OnLoading;
             _input.RemoveInputProcessor(this);
             _events.Unregister(this);
-            ClearAll();
+            Reset();
             _planner.Select(null);
             _clearButton?.RemoveFromHierarchy();
             _clearButton = null;

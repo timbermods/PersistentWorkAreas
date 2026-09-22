@@ -30,8 +30,9 @@ No extra dependency is required. Keep your existing BeaverBuddies Stability Fork
 - Select a farm, forester, lumberjack flag, gatherer, or another building with a terrain/road-spill working range.
 - Check **Keep working area visible**.
 - Deselect it and use your planting/building tools. The outline remains.
+- Pick a crop or tree in the planting tools and the working areas of the buildings that plant it appear on their own: every farmhouse for crops (aquatic farmhouses for aquatic crops) and every forester for trees and bushes, including ones still under construction. They disappear when you leave the planting tool; your pins stay.
 - Pin additional buildings as needed. Overlapping pinned areas merge into a combined outline.
-- Click **Clear pinned areas (N)** at the top right to remove every pin, without finding or selecting any building.
+- Click **Clear pinned areas (N)** at the top right to remove every pin, without finding or selecting any building. Areas the planting tool shows stay until you leave that tool.
 - For a keyboard shortcut, assign **Clear all pinned working areas** under **Persistent Work Areas** in the game's key-binding settings. It starts unbound to avoid taking an existing shortcut.
 - To remove just one pin, select its building and uncheck the checkbox.
 

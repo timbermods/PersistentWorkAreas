@@ -33,6 +33,7 @@ namespace PersistentWorkAreas
     // Decides which pinned ranges need a fresh navigation query and when the combined outline must be rebuilt.
     // Each pin caches its cells, so a navigation change re-queries only the pins it can reach, and a
     // selection change rebuilds the outline from the cache. Unity-free so the checks can count the work.
+    // A building is drawn while the player pins it, the planting tool shows it, or both; either way it has one cache.
     internal sealed class PinRefreshPlanner<TPin, TKey, TCell> where TPin : class
     {
         // Returns false when the pin can no longer be shown. The key holds everything the query depends on
@@ -42,6 +43,8 @@ namespace PersistentWorkAreas
 
         private sealed class Entry
         {
+            public bool Pinned;
+            public bool Shown;
             public bool Described;
             public TKey Key;
             public bool Stale = true;
@@ -59,6 +62,7 @@ namespace PersistentWorkAreas
         private HashSet<TCell> _cells = new HashSet<TCell>();
         private HashSet<TCell> _next = new HashSet<TCell>();
         private HashSet<TCell> _queried = new HashSet<TCell>();
+        private readonly List<TPin> _hidden = new List<TPin>();
         private TPin _selected;
         private bool _pending;
         private bool _union;
@@ -69,6 +73,7 @@ namespace PersistentWorkAreas
             _describe = describe; _query = query; _cellBox = cellBox;
         }
 
+        // Buildings drawn: pinned, shown by the planting tool, or both.
         public int Count => _entries.Count;
         public bool Pending => _pending;
         // The combined range of every pin except the selected one, which the game outlines itself.
@@ -76,17 +81,48 @@ namespace PersistentWorkAreas
 
         public bool Add(TPin pin)
         {
-            if (pin == null || _entries.ContainsKey(pin)) return false;
-            _entries.Add(pin, new Entry());
+            if (pin == null) return false;
+            if (_entries.TryGetValue(pin, out var entry))
+            {
+                // Already drawn for the planting tool, so its cached range stays in use.
+                if (entry.Pinned) return false;
+                entry.Pinned = true;
+                return true;
+            }
+            _entries.Add(pin, new Entry { Pinned = true });
             _pending = true;
             return true;
         }
 
         public bool Remove(TPin pin)
         {
-            if (pin == null || !_entries.Remove(pin)) return false;
-            _pending = _union = true;
+            if (pin == null || !_entries.TryGetValue(pin, out var entry) || !entry.Pinned) return false;
+            entry.Pinned = false;
+            if (!entry.Shown) Drop(pin);
             return true;
+        }
+
+        // The buildings the planting tool shows, replacing the previous set. A building leaving the set keeps its
+        // range only while it is pinned; one joining it reuses a pin's cached range, so switching between crops
+        // of the same planters costs nothing.
+        public void Show(IEnumerable<TPin> pins)
+        {
+            foreach (var entry in _entries.Values) entry.Shown = false;
+            foreach (var pin in pins)
+            {
+                if (pin == null) continue;
+                if (!_entries.TryGetValue(pin, out var entry))
+                {
+                    _entries.Add(pin, entry = new Entry());
+                    _pending = true;
+                }
+                entry.Shown = true;
+            }
+            _hidden.Clear();
+            foreach (var pair in _entries)
+                if (!pair.Value.Pinned && !pair.Value.Shown) _hidden.Add(pair.Key);
+            foreach (var pin in _hidden) Drop(pin);
+            _hidden.Clear();
         }
 
         public void Clear()
@@ -180,6 +216,12 @@ namespace PersistentWorkAreas
         }
 
         private bool Has(TPin pin) => pin != null && _entries.ContainsKey(pin);
+
+        private void Drop(TPin pin)
+        {
+            _entries.Remove(pin);
+            _pending = _union = true;
+        }
 
         private static bool Hits<TBounds>(CellBox box, TBounds bounds, Func<CellBox, TBounds, bool> intersects) =>
             !box.IsEmpty && (box.IsUnbounded || intersects(box, bounds));
