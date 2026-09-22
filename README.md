@@ -21,7 +21,7 @@ First stable release, with no behavior changes from 0.1.3. That build has now be
 2. Extract `PersistentWorkAreas-v1.0.0.zip` into your Timberborn `Mods` folder (normally `Documents\Timberborn\Mods`). The result should be `Mods\PersistentWorkAreas\version-1.1\manifest.json` and `PersistentWorkAreas.dll` beside it.
 3. Start Timberborn and enable **Persistent Work Areas** in the mod manager. Restart if prompted.
 
-Requires Timberborn **1.1.2.4** or a compatible 1.1 build. Built and checked against the installed 1.1.2.4 assemblies. Later versions may change the internal renderer API.
+Requires Timberborn **1.1.2.4** or a compatible 1.1 build. Built and tested on Timberborn 1.1.2.4. Later versions may change the internal renderer API.
 
 No extra dependency is required. Keep your existing BeaverBuddies Stability Fork installation as it is. For co-op, install this mod on both players' computers; that is the tested setup. Pins are always local to each player. The code does not require the other player to install it, but running it on only one computer has not been playtested.
 
