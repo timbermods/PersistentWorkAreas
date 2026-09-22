@@ -4,27 +4,26 @@ Keep a building's working-area outline visible after deselecting it, including w
 
 **Website:** <https://timbermods.github.io/PersistentWorkAreas/> has the feature overview, an install guide, troubleshooting, and an FAQ.
 
-## New in 0.1.3
+## New in 1.0.0
 
-Documentation correction only; there are no functional changes from 0.1.2. The game itself still draws a Builder's Hut's range outline while it is selected. That is vanilla behavior and is not changed by this mod. 0.1.2's notes incorrectly said vanilla shows no working area for Builder's Huts.
+First stable release, with no behavior changes from 0.1.3. That build has now been tested in game, single-player and in a two-player BeaverBuddies Stability Fork session. The game-log line now reads its version number from the mod itself, and the release zip now uses standard `/` folder separators, so it extracts correctly on macOS and with non-Windows tools.
 
-## 0.1.2
+### Earlier versions
 
-Builder's Huts can no longer be pinned, so the mod no longer shows a "Working area" panel for that building. Pinning for farms, foresters, lumberjacks, gatherers and other range buildings is unchanged.
-
-## 0.1.1
-
-The pin control now has a clearly drawn checkbox, an ON/OFF badge, a bordered dark panel, and hover/keyboard-focus highlighting. The entire row is clickable. The checkmark is drawn without a font glyph or the default Unity toggle theme. Pinning behavior is unchanged.
+- **0.1.3:** Documentation correction only. The game itself draws a Builder's Hut's range outline while it is selected; that is vanilla behavior, not something this mod adds or changes.
+- **0.1.2:** Builder's Huts can no longer be pinned, so they no longer show a "Working area" panel.
+- **0.1.1:** The pin control gained a clearly drawn checkbox, an ON/OFF badge, a bordered panel, and hover/keyboard-focus highlighting.
+- **0.1.0:** First preview.
 
 ## Install
 
 1. Close Timberborn.
-2. Extract `PersistentWorkAreas-v0.1.3.zip` into your Timberborn `Mods` folder (normally `Documents\Timberborn\Mods`). The result should be `Mods\PersistentWorkAreas\version-1.1\manifest.json` and `PersistentWorkAreas.dll` beside it.
+2. Extract `PersistentWorkAreas-v1.0.0.zip` into your Timberborn `Mods` folder (normally `Documents\Timberborn\Mods`). The result should be `Mods\PersistentWorkAreas\version-1.1\manifest.json` and `PersistentWorkAreas.dll` beside it.
 3. Start Timberborn and enable **Persistent Work Areas** in the mod manager. Restart if prompted.
 
 Requires Timberborn **1.1.2.4** or a compatible 1.1 build. Built and checked against the installed 1.1.2.4 assemblies. Later versions may change the internal renderer API.
 
-No extra dependency is required. Keep your existing BeaverBuddies Stability Fork installation as it is. Installing this mod on both players' computers is recommended for the first co-op test; pins are always local to each player. The code does not require the other player to install it, but asymmetric installation has not been playtested.
+No extra dependency is required. Keep your existing BeaverBuddies Stability Fork installation as it is. For co-op, install this mod on both players' computers; that is the tested setup. Pins are always local to each player. The code does not require the other player to install it, but running it on only one computer has not been playtested.
 
 ## Use
 
@@ -38,13 +37,13 @@ No extra dependency is required. Keep your existing BeaverBuddies Stability Fork
 
 The currently selected building still uses its normal game outline. Clearing pins restores normal selection behavior; deselecting that building then hides its normal outline. Pins reset on map exit, loading, and multiplayer resynchronization. They are not saved. Deleting a pinned building removes its pin.
 
-This preview supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English.
+The mod supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English.
 
 ## Compatibility and validation
 
 Designed for compatibility with the **BeaverBuddies Stability Fork**. The mod does not patch game methods, change simulation or building data, send multiplayer events, or modify saves. It uses the same navigation queries as the game's selected-building visualizer and a separate instance of its outline renderer.
 
-Release build and 37 automated lifecycle/API checks passed. **Unity rendering, checkbox placement, and two-player operation have not yet been tested in-game.** See `VALIDATION.md` for scope and the short playtest checklist.
+The release build passes 38 automated lifecycle/API checks. The mod has been tested in game on Timberborn 1.1.2.4, both single-player and in a two-player BeaverBuddies Stability Fork session with the mod installed on both computers. See `VALIDATION.md` for what was checked and how.
 
 ## Build from source
 
@@ -54,7 +53,7 @@ Install the .NET 8 SDK and have Timberborn installed, then run:
 .\build.ps1 -GameDir 'C:\Program Files (x86)\Steam\steamapps\common\Timberborn'
 ```
 
-The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v0.1.3.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
+The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.0.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
 
 ## License
 
