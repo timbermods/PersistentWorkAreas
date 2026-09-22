@@ -1,3 +1,13 @@
 ID,Text,Comment
 PersistentWorkAreas.KeyBindings.Group,Persistent Work Areas,
 PersistentWorkAreas.KeyBindings.Clear,Clear all pinned working areas,
+PersistentWorkAreas.Panel.Heading,WORKING AREA,Section heading in the building panel
+PersistentWorkAreas.Pin.Title,Keep working area visible,Label of the pin checkbox
+PersistentWorkAreas.Pin.Tooltip,Click to keep this building's working-area outline visible after deselection. Click again to unpin.,
+PersistentWorkAreas.State.On,ON,Short badge on the pin checkbox while pinned
+PersistentWorkAreas.State.Off,OFF,Short badge on the pin checkbox while not pinned
+PersistentWorkAreas.Hint.Unavailable,Working-area pinning is unavailable. Check the game log.,
+PersistentWorkAreas.Hint.Pinned,Pinned after deselection. Clear all using the top-right button.,
+PersistentWorkAreas.Hint.Unpinned,Click to pin this outline while planting or building.,
+PersistentWorkAreas.ClearAll,Clear pinned areas ({0}),Top-right button. {0} is the number of pinned buildings
+PersistentWorkAreas.ClearAll.Tooltip,Remove all your pinned working-area outlines. You can also assign a shortcut in Settings > Key bindings > Persistent Work Areas.,

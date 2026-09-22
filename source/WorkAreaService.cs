@@ -14,6 +14,7 @@ using Timberborn.Coordinates;
 using Timberborn.EntitySystem;
 using Timberborn.InputSystem;
 using Timberborn.LevelVisibilitySystem;
+using Timberborn.Localization;
 using Timberborn.MapStateSystem;
 using Timberborn.Navigation;
 using Timberborn.Planting;
@@ -55,6 +56,7 @@ namespace PersistentWorkAreas
         private readonly LoadingScreen _loading;
         private readonly UILayout _layout;
         private readonly InputService _input;
+        private readonly ILoc _loc;
         private NativeOutline _outline;
         private Button _clearButton;
         private bool _active;
@@ -76,11 +78,11 @@ namespace PersistentWorkAreas
         public WorkAreaService(INavigationRangeService navigation, NavigationDistance distance, ConstructionModeService construction,
             IBlockService blocks, PreviewBlockService previews, ILevelVisibilityService visibility,
             MapSize mapSize, ISpecService specs, EntityComponentRegistry registry, EventBus events, LoadingScreen loading,
-            UILayout layout, InputService input, EntityRegistry entities, SettlementReferenceService settlements)
+            UILayout layout, InputService input, ILoc loc, EntityRegistry entities, SettlementReferenceService settlements)
         {
             _navigation = navigation; _construction = construction; _blocks = blocks;
             _previews = previews; _visibility = visibility; _mapSize = mapSize; _specs = specs;
-            _registry = registry; _events = events; _loading = loading; _layout = layout; _input = input;
+            _registry = registry; _events = events; _loading = loading; _layout = layout; _input = input; _loc = loc;
             _entities = entities; _settlements = settlements;
             // BuildingTerrainRange's own margin for deciding whether a navigation change can alter a range.
             _reach = distance.ResourceBuildings + 2f;
@@ -94,9 +96,10 @@ namespace PersistentWorkAreas
             _events.Register(this);
             _loading.LoadingScreenEnabled += OnLoading;
             _input.AddInputProcessor(this);
-            _clearButton = WorkAreaFragment.MakeButton("Clear pinned areas", ClearAll);
+            // Notify() below sets the label, which shows the pin count.
+            _clearButton = WorkAreaFragment.MakeButton(string.Empty, ClearAll);
             _clearButton.name = "PersistentWorkAreasClearAll";
-            _clearButton.tooltip = "Remove all your pinned working-area outlines. You can also assign a shortcut in Settings > Key bindings > Persistent Work Areas.";
+            _clearButton.tooltip = _loc.T(LocKeys.ClearAllTooltip);
             _clearButton.style.marginTop = 6;
             _layout.AddTopRight(_clearButton, 1000);
             _pinFile = new PinFile(Path.Combine(UserDataFolder.Folder, "PersistentWorkAreas", "Pins.txt"));
@@ -342,10 +345,20 @@ namespace PersistentWorkAreas
         {
             if (_clearButton != null)
             {
-                _clearButton.text = "Clear pinned areas (" + Count + ")";
+                _clearButton.text = ClearLabel();
                 _clearButton.style.display = Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             }
             Changed?.Invoke();
+        }
+        // Notify also runs inside the game's EntityDeletedEvent, so a translation with a broken {0} must not throw.
+        private string ClearLabel()
+        {
+            try { return _loc.T(LocKeys.ClearAll, Count); }
+            catch (FormatException error)
+            {
+                Debug.LogError("[PersistentWorkAreas] Bad " + LocKeys.ClearAll + " text: " + error.Message);
+                return _loc.T(LocKeys.ClearAll);
+            }
         }
         private void ReleaseOutline()
         {

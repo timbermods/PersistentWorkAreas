@@ -38,7 +38,7 @@ No extra dependency is required. Keep your existing BeaverBuddies Stability Fork
 
 The currently selected building still uses its normal game outline. Clearing pins restores normal selection behavior; deselecting that building then hides its normal outline. Pins are remembered for each settlement on your own computer, in `PersistentWorkAreas\Pins.txt` next to your Timberborn `Saves` folder (on Windows, `Documents\Timberborn\PersistentWorkAreas\Pins.txt`), and come back when you load any save of that settlement, as the latest pins you set there. A different settlement starts with none. They are never written into the save, so co-op players each keep their own. A co-op guest's game names the settlement after the host's save, which changes with every resynchronization, so a guest's pins usually do not come back. The file keeps the 100 settlements you loaded or changed most recently. To forget every pin, delete that file. Deleting a pinned building removes its pin.
 
-The mod supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English.
+The mod supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English. The panel, button and key-binding text is all in `version-1.1/Localizations/enUS_PersistentWorkAreas.csv` (in the repository, under `packaging/PersistentWorkAreas/`), so a translation is one more file in that folder with the same keys, named for the game's language code (for example `deDE_PersistentWorkAreas.csv`). Keep `{0}` in the clear-button text: it becomes the pin count.
 
 ## Compatibility and validation
 
@@ -55,6 +55,8 @@ Install the .NET 8 SDK and have Timberborn installed, then run:
 ```
 
 The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.0.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
+
+Without the game, `dotnet run --project tests/Checks.csproj -c Release` runs only the pin-logic checks and reports the rest as skipped. GitHub Actions runs them for pull requests and pushes to `main`.
 
 ## License
 
