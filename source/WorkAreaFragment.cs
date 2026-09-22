@@ -1,6 +1,7 @@
 using System;
 using Timberborn.BaseComponentSystem;
 using Timberborn.EntityPanelSystem;
+using Timberborn.Localization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,6 +12,7 @@ namespace PersistentWorkAreas
         private static readonly Color Cream = new Color(1f, .95f, .79f);
         private static readonly Color Gold = new Color(.92f, .72f, .35f);
         private readonly WorkAreaService _service;
+        private readonly ILoc _loc;
         private VisualElement _root;
         private Button _toggle;
         private VisualElement _box;
@@ -21,7 +23,7 @@ namespace PersistentWorkAreas
         private bool _pinned;
         private bool _hovered;
         private bool _focused;
-        public WorkAreaFragment(WorkAreaService service) { _service = service; }
+        public WorkAreaFragment(WorkAreaService service, ILoc loc) { _service = service; _loc = loc; }
 
         public VisualElement InitializeFragment()
         {
@@ -35,7 +37,7 @@ namespace PersistentWorkAreas
             _root.style.borderLeftWidth = 4;
             Round(_root, 5);
 
-            var heading = new Label("WORKING AREA");
+            var heading = new Label(_loc.T(LocKeys.Heading));
             heading.style.fontSize = 11;
             heading.style.unityFontStyleAndWeight = FontStyle.Bold;
             heading.style.color = Gold;
@@ -47,7 +49,7 @@ namespace PersistentWorkAreas
             _toggle = new Button(() => _service.SetPinned(_entity, !_service.IsPinned(_entity)))
             {
                 name = "PersistentWorkAreasPin",
-                tooltip = "Click to keep this building's working-area outline visible after deselection. Click again to unpin."
+                tooltip = _loc.T(LocKeys.PinTooltip)
             };
             _toggle.style.flexDirection = FlexDirection.Row;
             _toggle.style.alignItems = Align.Center;
@@ -77,7 +79,7 @@ namespace PersistentWorkAreas
             _check.style.marginTop = -4;
             _box.Add(_check);
             _toggle.Add(_box);
-            var title = new Label("Keep working area visible") { pickingMode = PickingMode.Ignore };
+            var title = new Label(_loc.T(LocKeys.PinTitle)) { pickingMode = PickingMode.Ignore };
             title.style.flexGrow = 1;
             title.style.flexShrink = 1;
             title.style.minWidth = 0;
@@ -129,10 +131,8 @@ namespace PersistentWorkAreas
             _root.style.display = supports ? DisplayStyle.Flex : DisplayStyle.None;
             _pinned = supports && _service.IsPinned(_entity);
             _toggle.SetEnabled(_service.Available);
-            _hint.text = !_service.Available
-                ? "Working-area pinning is unavailable. Check the game log."
-                : _pinned ? "Pinned after deselection. Clear all using the top-right button."
-                : "Click to pin this outline while planting or building.";
+            _hint.text = _loc.T(!_service.Available ? LocKeys.HintUnavailable
+                : _pinned ? LocKeys.HintPinned : LocKeys.HintUnpinned);
             Paint();
         }
         private void Paint()
@@ -146,7 +146,7 @@ namespace PersistentWorkAreas
             Border(_box, accent, 2);
             _box.style.backgroundColor = _pinned ? accent : new Color(.07f, .13f, .12f);
             _check.style.display = _pinned ? DisplayStyle.Flex : DisplayStyle.None;
-            _state.text = _pinned ? "ON" : "OFF";
+            _state.text = _loc.T(_pinned ? LocKeys.StateOn : LocKeys.StateOff);
             _state.style.backgroundColor = _pinned ? accent : new Color(.29f, .29f, .21f);
             _state.style.color = _pinned ? new Color(.09f, .18f, .13f) : Cream;
         }

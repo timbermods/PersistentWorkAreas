@@ -38,7 +38,7 @@ No extra dependency is required. Keep your existing BeaverBuddies Stability Fork
 
 The currently selected building still uses its normal game outline. Clearing pins restores normal selection behavior; deselecting that building then hides its normal outline. Pins reset on map exit, loading, and multiplayer resynchronization. They are not saved. Deleting a pinned building removes its pin.
 
-The mod supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English.
+The mod supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English. The panel, button and key-binding text is all in `version-1.1/Localizations/enUS_PersistentWorkAreas.csv` (in the repository, under `packaging/PersistentWorkAreas/`), so a translation is one more file in that folder with the same keys, named for the game's language code (for example `deDE_PersistentWorkAreas.csv`). Keep `{0}` in the clear-button text: it becomes the pin count.
 
 ## Compatibility and validation
 
@@ -55,6 +55,8 @@ Install the .NET 8 SDK and have Timberborn installed, then run:
 ```
 
 The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.0.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
+
+Without the game, `dotnet run --project tests/Checks.csproj -c Release` runs only the pin-logic checks and reports the rest as skipped. GitHub Actions runs them for pull requests and pushes to `main`.
 
 ## License
 
