@@ -6,9 +6,7 @@ name: Tests
 on:
   push:
     branches: [main]
-    paths: ["source/**", "tests/**", "NuGet.Config", ".github/workflows/tests.yml"]
   pull_request:
-    paths: ["source/**", "tests/**", "NuGet.Config", ".github/workflows/tests.yml"]
   workflow_dispatch:
 
 permissions:

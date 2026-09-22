@@ -28,7 +28,8 @@ Check(pins.Set(forester, false) && pins.Count == 0, "Deleting last pinned buildi
 Check(new PinSet<EqualBuilding>().Count == 0, "New map begins without pins");
 
 // The checks above use only the mod's game-free sources, so CI runs them without arguments on a machine without
-// Timberborn. The rest need the installed game, the built mod DLL and its package folder.
+// Timberborn. The rest need the installed game, the built mod DLL and its package folder. Add checks that need no game
+// files above this block, or CI never runs them: the count guard at the end cannot tell where a check was placed.
 const int GameChecks = 27; // A full run fails if this stops matching the checks below.
 int gameFreeChecks = checks;
 if (args.Length == 0)
@@ -107,7 +108,7 @@ Check(manifest.RootElement.GetProperty("Version").GetString() == mod.GetName().V
 using var binding = JsonDocument.Parse(File.ReadAllText(Path.Combine(packaging, "KeyBindings", "PersistentWorkAreas.Clear.blueprint.json")));
 Check(binding.RootElement.GetProperty("KeyBindingSpec").GetProperty("Id").GetString() == (string)service.GetField("ClearKey")!.GetRawConstantValue()!, "Clear key binding matches input handler");
 if (checks - gameFreeChecks != GameChecks)
-    throw new Exception($"FAIL: {checks - gameFreeChecks} checks need the game but GameChecks says {GameChecks}; update it so runs without the game report the right number skipped");
+    throw new Exception($"FAIL: {checks - gameFreeChecks} checks ran after the game-free block but GameChecks says {GameChecks}; move any new check that needs no game files above that block, then set GameChecks to the number that still needs the game");
 Console.WriteLine($"{checks} checks passed. Unity rendering and multiplayer playtesting still require the game.");
 return 0;
 

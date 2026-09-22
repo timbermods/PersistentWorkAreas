@@ -55,7 +55,7 @@ Install the .NET 8 SDK and have Timberborn installed, then run:
 
 The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.0.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
 
-Without the game, `dotnet run --project tests\Checks.csproj -c Release` runs only the pin-logic checks and reports the rest as skipped. GitHub Actions runs them for pull requests and pushes to `main` that change the code or the checks.
+Without the game, `dotnet run --project tests/Checks.csproj -c Release` runs only the pin-logic checks and reports the rest as skipped. GitHub Actions runs them for pull requests and pushes to `main`.
 
 ## License
 
