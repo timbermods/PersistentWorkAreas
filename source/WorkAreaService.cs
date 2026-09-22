@@ -206,10 +206,20 @@ namespace PersistentWorkAreas
         {
             if (_clearButton != null)
             {
-                _clearButton.text = _loc.T(LocKeys.ClearAll, Count);
+                _clearButton.text = ClearLabel();
                 _clearButton.style.display = Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             }
             Changed?.Invoke();
+        }
+        // Notify also runs inside the game's EntityDeletedEvent, so a translation with a broken {0} must not throw.
+        private string ClearLabel()
+        {
+            try { return _loc.T(LocKeys.ClearAll, Count); }
+            catch (FormatException error)
+            {
+                Debug.LogError("[PersistentWorkAreas] Bad " + LocKeys.ClearAll + " text: " + error.Message);
+                return _loc.T(LocKeys.ClearAll);
+            }
         }
         private void ReleaseOutline()
         {

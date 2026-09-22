@@ -106,24 +106,29 @@ foreach (var row in locRows.Skip(1))
 // The game's CSV validator rejects a space between a comma and a quote.
 string unquoted = locText.Replace("\"\"", "");
 Check(locRowsValid && !unquoted.Contains(", \"") && !unquoted.Contains("\" ,"), "Localization CSV has the game's ID,Text,Comment layout with unique keys");
-var literals = new List<string>();
-using (var modImage = new PEReader(File.OpenRead(modPath)))
-{
-    var metadata = modImage.GetMetadataReader();
-    if (metadata.GetHeapSize(HeapIndex.UserString) > 1)
-        for (var handle = MetadataTokens.UserStringHandle(1); !handle.IsNil; handle = metadata.GetNextHandle(handle))
-            literals.Add(metadata.GetUserString(handle));
-}
-// The English the panel and button used to hard-code, plus every enUS text up to its first placeholder.
-var english = new[] { "WORKING AREA", "Keep working area visible", "working-area outline visible", "Working-area pinning is unavailable",
-    "Pinned after deselection", "Click to pin this outline", "Clear pinned areas", "Remove all your pinned" }
-    .Concat(enUS.Values.Select(x => x.Split('{')[0].Trim()).Where(x => x.Length > 3)).ToArray();
-var hardCoded = literals.Where(x => x is "ON" or "OFF" || english.Any(x.Contains)).Distinct().ToArray();
+// Every string compiled into the mod must be a loc key, a VisualElement name, a name the outline
+// reflects on, or log text. Anything else is hard-coded text a translation cannot reach.
+using var modImage = new PEReader(File.OpenRead(modPath));
+var metadata = modImage.GetMetadataReader();
+var literals = new Dictionary<string, int>();
+if (metadata.GetHeapSize(HeapIndex.UserString) > 1)
+    for (var handle = MetadataTokens.UserStringHandle(1); !handle.IsNil; handle = metadata.GetNextHandle(handle))
+        if (metadata.GetUserString(handle) is { Length: > 0 } text) // the heap's zero padding reads as ""
+            literals.TryAdd(text, MetadataTokens.GetToken(handle));
+var clearKey = (string)service.GetField("ClearKey")!.GetRawConstantValue()!;
+var reflected = new[] { drawer, calculator, bounds, layer };
+var reflectedNames = reflected.Select(x => x.FullName!).Concat(reflected.SelectMany(x => x.GetMembers(
+    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)).Select(x => x.Name)).ToHashSet();
+bool IsCode(string x) => x.StartsWith("PersistentWorkAreas.") ? x == clearKey || enUS.ContainsKey(x)
+    : x.StartsWith("[PersistentWorkAreas] ") || x.StartsWith(" loaded. ") // log text; Mod.cs splits its line around the version
+    || System.Text.RegularExpressions.Regex.IsMatch(x, "^PersistentWorkAreas[A-Z][A-Za-z]*$") || reflectedNames.Contains(x);
+var hardCoded = literals.Keys.Where(x => !IsCode(x)).ToArray();
 Check(hardCoded.Length == 0, "No hard-coded English UI text in the mod DLL" + string.Concat(hardCoded.Select(x => "\n  \"" + x + "\"")));
 var locKeys = mod.GetType("PersistentWorkAreas.LocKeys")?.GetFields(BindingFlags.Public | BindingFlags.Static)
     .Where(x => x.IsLiteral).ToDictionary(x => x.Name, x => (string)x.GetRawConstantValue()!) ?? new Dictionary<string, string>();
-var untranslated = locKeys.Values.Where(x => !enUS.ContainsKey(x)).ToArray();
-Check(locKeys.Count > 0 && untranslated.Length == 0, "Every LocKeys constant has enUS text" + string.Concat(untranslated.Select(x => "\n  " + x)));
+var untranslated = locKeys.Values.Where(x => !enUS.ContainsKey(x) || !literals.ContainsKey(x))
+    .Select(x => x + (enUS.ContainsKey(x) ? " (never used by the code)" : " (no enUS text)")).ToArray();
+Check(locKeys.Count > 0 && untranslated.Length == 0, "Every LocKeys constant has enUS text and is used" + string.Concat(untranslated.Select(x => "\n  " + x)));
 var usedKeys = new HashSet<string>(locKeys.Values);
 foreach (var file in Directory.EnumerateFiles(packaging, "*.blueprint.json", SearchOption.AllDirectories))
 {
@@ -136,6 +141,32 @@ bool TakesLoc(Type type) => type.GetConstructors().Single().GetParameters().Any(
 Check(TakesLoc(service) && TakesLoc(fragment), "Panel and clear button look text up through the game's ILoc");
 Check(locKeys.TryGetValue("ClearAll", out var clearAllKey) && enUS.TryGetValue(clearAllKey, out var clearAll) &&
     clearAll.Contains("{0}") && string.Format(clearAll, 3) == clearAll.Replace("{0}", "3"), "Clear-all label formats the pin count");
+// In the IL: ldstr ClearAll, then within a few bytes callvirt ILoc.T<int>, inside a try that catches FormatException,
+// because Notify also runs in the game's EntityDeletedEvent and a translation with a broken {0} must not throw there.
+string TypeRefName(EntityHandle handle) => handle.Kind == HandleKind.TypeReference
+    ? metadata.GetString(metadata.GetTypeReference((TypeReferenceHandle)handle).Namespace) + "." + metadata.GetString(metadata.GetTypeReference((TypeReferenceHandle)handle).Name) : "";
+var tOfInt = Enumerable.Range(1, metadata.GetTableRowCount(TableIndex.MethodSpec)).Select(MetadataTokens.MethodSpecificationHandle).Where(handle =>
+{
+    var spec = metadata.GetMethodSpecification(handle);
+    if (spec.Method.Kind != HandleKind.MemberReference) return false;
+    var member = metadata.GetMemberReference((MemberReferenceHandle)spec.Method);
+    return metadata.GetString(member.Name) == "T" && TypeRefName(member.Parent) == "Timberborn.Localization.ILoc"
+        && metadata.GetBlobBytes(spec.Signature).SequenceEqual(new byte[] { 0x0A, 1, 0x08 }); // one generic argument: int
+}).Select(x => MetadataTokens.GetToken(x)).ToArray();
+bool guardedCountLookup = false;
+if (literals.TryGetValue(clearAllKey ?? "", out var clearAllToken))
+    foreach (var body in metadata.MethodDefinitions.Select(x => metadata.GetMethodDefinition(x).RelativeVirtualAddress).Where(x => x != 0).Select(modImage.GetMethodBody))
+    {
+        var il = body.GetILBytes();
+        for (int i = 0; i + 5 <= il.Length; i++)
+        {
+            if (il[i] != 0x72 || BitConverter.ToInt32(il, i + 1) != clearAllToken) continue;
+            int call = Enumerable.Range(i + 5, 12).FirstOrDefault(j => j + 5 <= il.Length && il[j] == 0x6F && tOfInt.Contains(BitConverter.ToInt32(il, j + 1)), -1);
+            guardedCountLookup |= call > 0 && body.ExceptionRegions.Any(r => r.Kind == ExceptionRegionKind.Catch &&
+                TypeRefName(r.CatchType) == "System.FormatException" && r.TryOffset <= i && call < r.TryOffset + r.TryLength);
+        }
+    }
+Check(guardedCountLookup, "Clear-all label is looked up with the pin count, guarded against a bad translation");
 Console.WriteLine($"{checks} checks passed. Unity rendering and multiplayer playtesting still require the game.");
 
 // A minimal RFC 4180 reader: quoted fields may hold commas, doubled quotes and line breaks.
