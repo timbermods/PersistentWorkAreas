@@ -272,6 +272,27 @@ Check(Switch(null, cancelPlanting) == (null, false), "Other tools show no plante
 Check(GameType("Timberborn.WorkSystem", "Timberborn.WorkSystem.Workplace").GetInterfaces().Any(x => x.FullName == "Timberborn.EntitySystem.IRegisteredComponent"),
     "Workplaces are registered components, so the entity registry lists every planter building");
 
+// The service's Clear and scan with the planting tool's buildings, on the same instance: one building only the tool shows, one only pinned.
+var entityComponent = GameType("Timberborn.EntitySystem", "Timberborn.EntitySystem.EntityComponent");
+var shownOnly = RuntimeHelpers.GetUninitializedObject(entityComponent);
+var pinnedOnly = RuntimeHelpers.GetUninitializedObject(entityComponent);
+var liveEntries = Get<System.Collections.IDictionary>(livePlanner, "_entries");
+var livePins = Get<object>(live, "_pins");
+livePlanner.GetType().GetMethod("Clear")!.Invoke(livePlanner, null);
+var shownSet = Array.CreateInstance(entityComponent, 1);
+shownSet.SetValue(shownOnly, 0);
+livePlanner.GetType().GetMethod("Show")!.Invoke(livePlanner, new object[] { shownSet });
+livePlanner.GetType().GetMethod("Add")!.Invoke(livePlanner, new[] { pinnedOnly });
+livePins.GetType().GetMethod("Set")!.Invoke(livePins, new object[] { pinnedOnly, true });
+service.GetMethod("ClearAll")!.Invoke(live, null);
+Check(liveEntries.Count == 1 && liveEntries.Contains(shownOnly) && (int)service.GetProperty("Count")!.GetValue(live)! == 0,
+    "Clear pinned areas removes the pins and keeps drawing the planting tool's buildings");
+// UpdateSingleton reads Time.unscaledTime, which only runs in the game, so the scan it starts with is invoked directly.
+Set(live, "_planting", null!);
+Set(live, "_plantersChanged", true);
+service.GetMethod("ShowPlanters", fields)!.Invoke(live, null);
+Check(liveEntries.Count == 0 && !Get<bool>(live, "_plantersChanged"), "Leaving the planting tool with no pins drops its buildings at the next update");
+
 // The planting tool's rule on the game's own blueprints: crops show farmhouses, trees and bushes show foresters.
 var plantables = new List<(string Name, string Group, bool Crop, bool Tree)>();
 var planters = new List<(string Name, string Group, bool FarmHouse, bool Forester, bool Outlined)>();

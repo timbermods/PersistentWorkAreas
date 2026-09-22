@@ -13,7 +13,7 @@
 - Compared the display path with the installed game's `BuildingRangeDrawer`, `BoundsNavRangeDrawer`, and navigation query calls. The mod uses those same range queries and its own outline-renderer instance.
 - Reviewed the BeaverBuddies Stability Fork's `IO/BuildCompatibility.cs`: its handshake identifies Timberborn and the BeaverBuddies/TimberNet binaries. This mod changes none of them.
 - The display service only implements frame-update, input, load, and navigation-notification interfaces. Pin state is per game-scoped service instance. There are no Harmony patches, replay events, simulation ticks, random calls, or save writes.
-- Renderer geometry refreshes on pin, planting-tool, selection, construction-mode, height-visibility and navigation changes, with navigation refreshes capped at five per second. With no pins and no crop or tree planting tool open, the mod does no range queries or drawing. The planting tool's farmhouses or foresters are found when the tool opens, from the game's workplace registry, and share the pins' cached ranges. All pins share a combined mesh. Clearing releases the renderer's owned meshes and cloned materials.
+- Renderer geometry refreshes on pin, selection, construction-mode, height-visibility and navigation changes, with navigation refreshes capped at five per second. Empty pin sets do no range queries or drawing. All pins share a combined mesh. Clearing releases the renderer's owned meshes and cloned materials.
 
 ## Not established by the automated checks
 
@@ -24,7 +24,7 @@ These are compiled API and logic checks, not Unity rendering tests or a co-op se
 Re-run this for each release and after each Timberborn update.
 
 1. With the BeaverBuddies Stability Fork enabled, load a colony, select a farm and enable its checkbox. Deselect, paint crops and leave the planting tool: the working-area outline should remain.
-2. Pin a forester and paint trees. Pin a second nearby building; verify overlapping areas merge and separate areas both remain visible.
+2. Pin a forester, paint trees and leave the planting tool: the forester's outline should remain. Pin a second nearby building; verify overlapping areas merge and separate areas both remain visible.
 3. Select an unrelated building, then clear all from the top-right button. No pinned outlines should remain after deselecting. Reselect formerly pinned buildings and verify their checkboxes are off.
 4. Assign the clear command in key bindings and verify it clears the pins while a planting tool is active; the buildings that tool shows stay until you leave it. Do not assign a shortcut already used by a tool.
 5. Modify a path or terrain, switch visible levels and construction mode, and verify the outline updates. Pause the simulation and repeat selection/clear.
