@@ -8,6 +8,7 @@ using Timberborn.BuildingRange;
 using Timberborn.Buildings;
 using Timberborn.Common;
 using Timberborn.ConstructionMode;
+using Timberborn.Coordinates;
 using Timberborn.EntitySystem;
 using Timberborn.InputSystem;
 using Timberborn.LevelVisibilitySystem;
@@ -26,10 +27,11 @@ namespace PersistentWorkAreas
         IInputProcessor, ISingletonInstantNavMeshListener, ISingletonPreviewNavMeshListener, IDisposable
     {
         public const string ClearKey = "PersistentWorkAreas.Clear";
+        private static readonly Func<CellBox, BoundingBox, bool> Touches = (box, bounds) => ToBoundingBox(box).Intersects(in bounds);
         private readonly PinSet<EntityComponent> _pins = new PinSet<EntityComponent>();
-        private readonly HashSet<Vector3Int> _cells = new HashSet<Vector3Int>();
-        private readonly HashSet<Vector3Int> _nextCells = new HashSet<Vector3Int>();
+        private readonly PinRefreshPlanner<EntityComponent, (Vector3? Center, bool Preview, bool Terrain), Vector3Int> _planner;
         private readonly List<EntityComponent> _removed = new List<EntityComponent>();
+        private readonly float _reach;
         private readonly INavigationRangeService _navigation;
         private readonly ConstructionModeService _construction;
         private readonly IBlockService _blocks;
@@ -43,17 +45,14 @@ namespace PersistentWorkAreas
         private readonly InputService _input;
         private NativeOutline _outline;
         private Button _clearButton;
-        private EntityComponent _selected;
         private bool _active;
-        private bool _dirty;
-        private bool _geometryDirty;
         private float _nextRefresh;
         private bool _rendererFailed;
         public event Action Changed;
         public int Count => _pins.Count;
         public bool Available => _active && !_rendererFailed;
 
-        public WorkAreaService(INavigationRangeService navigation, ConstructionModeService construction,
+        public WorkAreaService(INavigationRangeService navigation, NavigationDistance distance, ConstructionModeService construction,
             IBlockService blocks, PreviewBlockService previews, ILevelVisibilityService visibility,
             MapSize mapSize, ISpecService specs, EventBus events, LoadingScreen loading,
             UILayout layout, InputService input)
@@ -61,6 +60,10 @@ namespace PersistentWorkAreas
             _navigation = navigation; _construction = construction; _blocks = blocks;
             _previews = previews; _visibility = visibility; _mapSize = mapSize; _specs = specs;
             _events = events; _loading = loading; _layout = layout; _input = input;
+            // BuildingTerrainRange's own margin for deciding whether a navigation change can alter a range.
+            _reach = distance.ResourceBuildings + 2f;
+            _planner = new PinRefreshPlanner<EntityComponent, (Vector3? Center, bool Preview, bool Terrain), Vector3Int>(
+                Describe, Query, cell => CellBox.Point(cell.x, cell.y, cell.z));
         }
 
         public void PostLoad()
@@ -92,9 +95,10 @@ namespace PersistentWorkAreas
         public void SetPinned(BaseComponent entity, bool value)
         {
             if (!Available || !entity || (value && !Supports(entity))) return;
-            if (_pins.Set(entity.GetComponent<EntityComponent>(), value))
+            var pin = entity.GetComponent<EntityComponent>();
+            if (_pins.Set(pin, value))
             {
-                Invalidate();
+                if (value) _planner.Add(pin); else _planner.Remove(pin);
                 _nextRefresh = 0;
                 if (_pins.Count == 0) ReleaseOutline();
                 Notify();
@@ -120,12 +124,12 @@ namespace PersistentWorkAreas
             if (!Available || Count == 0) return;
             try
             {
-                if (_dirty && Time.unscaledTime >= _nextRefresh)
+                if (_planner.Pending && Time.unscaledTime >= _nextRefresh)
                 {
                     RefreshCells();
                     _nextRefresh = Time.unscaledTime + .2f;
                 }
-                if (_cells.Count > 0) _outline?.Draw();
+                if (_planner.Cells.Count > 0) _outline?.Draw();
             }
             catch (Exception error)
             {
@@ -138,62 +142,77 @@ namespace PersistentWorkAreas
 
         private void RefreshCells()
         {
-            _dirty = false;
-            _nextCells.Clear();
             _removed.Clear();
-            foreach (var entity in _pins.Items)
-            {
-                if (!Supports(entity)) { _removed.Add(entity); continue; }
-                // The selected building already has its normal outline.
-                if (ReferenceEquals(entity, _selected)) continue;
-                var block = entity.GetComponent<BlockObject>();
-                var access = entity.GetComponent<BuildingAccessible>();
-                bool unfinished = !block.IsFinished;
-                Vector3? center = unfinished ? access.CalculateAccess() : access.Accessible.UnblockedSingleAccessInstant;
-                if (!center.HasValue) continue;
-                bool terrain = entity.GetComponent<BuildingWithTerrainRange>();
-                bool preview = unfinished || _construction.InConstructionMode;
-                IEnumerable<Vector3Int> range = terrain
-                    ? (preview ? _navigation.GetTerrainPreviewNodesInRange(center.Value) : _navigation.GetTerrainNodesInRange(center.Value))
-                    : (preview ? _navigation.GetRoadSpillPreviewNodesInRange(center.Value) : _navigation.GetRoadSpillNodesInRange(center.Value));
-                _nextCells.UnionWith(range);
-            }
+            bool redraw = _planner.Refresh(_removed);
             foreach (var entity in _removed) _pins.Set(entity, false);
             if (_removed.Count > 0) Notify();
-            if (_geometryDirty || !_cells.SetEquals(_nextCells))
+            var cells = _planner.Cells;
+            if ((redraw || _outline == null) && cells.Count > 0)
             {
-                _geometryDirty = false;
-                _cells.Clear();
-                _cells.UnionWith(_nextCells);
-                if (_cells.Count > 0)
-                {
-                    if (_outline == null) _outline = new NativeOutline(_blocks, _previews, _visibility, _mapSize, _specs);
-                    _outline.Update(_cells);
-                }
+                if (_outline == null) _outline = new NativeOutline(_blocks, _previews, _visibility, _mapSize, _specs);
+                _outline.Update(cells);
             }
             if (Count == 0) ReleaseOutline();
         }
 
-        private void Invalidate() { _dirty = true; _geometryDirty = true; }
-        public void OnInstantNavMeshUpdated(NavMeshUpdate update) => Invalidate();
-        public void OnPreviewNavMeshUpdated(NavMeshUpdate update) => Invalidate();
-        [OnEvent] public void OnVisibleLevel(MaxVisibleLevelChangedEvent e) { Invalidate(); _nextRefresh = 0; }
-        [OnEvent] public void OnConstruction(ConstructionModeChangedEvent e) { Invalidate(); _nextRefresh = 0; }
+        private bool Describe(EntityComponent entity, out (Vector3? Center, bool Preview, bool Terrain) key, out CellBox reach)
+        {
+            key = default; reach = CellBox.Empty;
+            if (!Supports(entity)) return false;
+            var block = entity.GetComponent<BlockObject>();
+            var access = entity.GetComponent<BuildingAccessible>();
+            bool unfinished = !block.IsFinished;
+            Vector3? center = unfinished ? access.CalculateAccess() : access.Accessible.UnblockedSingleAccessInstant;
+            bool terrain = entity.GetComponent<BuildingWithTerrainRange>();
+            key = (center, unfinished || _construction.InConstructionMode, terrain);
+            if (!center.HasValue) return true;
+            // A road-spill range follows its district's whole road network, so any navigation change can alter it.
+            if (!terrain) { reach = CellBox.Unbounded; return true; }
+            var grid = CoordinateSystem.WorldToGrid(center.Value);
+            reach = CellBox.Around(grid.x, grid.y, grid.z, _reach);
+            return true;
+        }
+
+        private void Query(EntityComponent entity, (Vector3? Center, bool Preview, bool Terrain) key, HashSet<Vector3Int> cells)
+        {
+            if (!key.Center.HasValue) return;
+            var center = key.Center.Value;
+            // The game refills one shared flow field per query, so each result is copied before the next query.
+            cells.UnionWith(key.Terrain
+                ? (key.Preview ? _navigation.GetTerrainPreviewNodesInRange(center) : _navigation.GetTerrainNodesInRange(center))
+                : (key.Preview ? _navigation.GetRoadSpillPreviewNodesInRange(center) : _navigation.GetRoadSpillNodesInRange(center)));
+        }
+
+        private static BoundingBox ToBoundingBox(CellBox box)
+        {
+            var builder = new BoundingBox.Builder();
+            builder.Expand(new Vector3Int(box.MinX, box.MinY, box.MinZ));
+            builder.Expand(new Vector3Int(box.MaxX, box.MaxY, box.MaxZ));
+            return builder.Build();
+        }
+
+        public void OnInstantNavMeshUpdated(NavMeshUpdate update) => _planner.Touch(update.Bounds, Touches);
+        public void OnPreviewNavMeshUpdated(NavMeshUpdate update) => _planner.Touch(update.Bounds, Touches);
+        [OnEvent] public void OnVisibleLevel(MaxVisibleLevelChangedEvent e) { _planner.Redraw(); _nextRefresh = 0; }
+        [OnEvent] public void OnConstruction(ConstructionModeChangedEvent e) { _planner.InvalidateAll(); _nextRefresh = 0; }
+        // The selected building already has its normal outline, so the pinned outline leaves it out.
         [OnEvent] public void OnSelected(SelectableObjectSelectedEvent e)
         {
-            _selected = e.SelectableObject.GetComponent<EntityComponent>();
-            Invalidate(); _nextRefresh = 0;
+            _planner.Select(e.SelectableObject.GetComponent<EntityComponent>());
+            _nextRefresh = 0;
         }
         [OnEvent] public void OnUnselected(SelectableObjectUnselectedEvent e)
         {
-            _selected = null;
-            Invalidate(); _nextRefresh = 0;
+            _planner.Select(null);
+            _nextRefresh = 0;
         }
         [OnEvent] public void OnDeleted(EntityDeletedEvent e)
         {
-            if (_pins.Set(e.Entity.GetComponent<EntityComponent>(), false))
+            var pin = e.Entity.GetComponent<EntityComponent>();
+            if (_pins.Set(pin, false))
             {
-                Invalidate(); _nextRefresh = 0;
+                _planner.Remove(pin);
+                _nextRefresh = 0;
                 if (Count == 0) ReleaseOutline();
                 Notify();
             }
@@ -214,8 +233,7 @@ namespace PersistentWorkAreas
             _outline = null;
             try { outline?.Dispose(); }
             catch (Exception error) { Debug.LogError("[PersistentWorkAreas] Renderer cleanup failed: " + error); }
-            _cells.Clear(); _nextCells.Clear();
-            _dirty = false; _geometryDirty = false;
+            _planner.Clear();
         }
         private void OnLoading(object sender, EventArgs e) => Dispose();
         public void Dispose()
@@ -226,7 +244,7 @@ namespace PersistentWorkAreas
             _input.RemoveInputProcessor(this);
             _events.Unregister(this);
             ClearAll();
-            _selected = null;
+            _planner.Select(null);
             _clearButton?.RemoveFromHierarchy();
             _clearButton = null;
             Changed = null;

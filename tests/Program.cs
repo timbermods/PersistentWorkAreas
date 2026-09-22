@@ -27,6 +27,83 @@ pins.Set(forester, true);
 Check(pins.Set(forester, false) && pins.Count == 0, "Deleting last pinned building empties collection");
 Check(new PinSet<EqualBuilding>().Count == 0, "New map begins without pins");
 
+// Refresh planning, against a fake navigation world that counts range queries and outline rebuilds.
+var around = CellBox.Around(10.5f, 20.5f, 3f, 22f);
+Check(around.MinX == -12 && around.MaxX == 33 && around.MinY == -2 && around.MaxY == 43 && around.MinZ == -19 && around.MaxZ == 25,
+    "Pin bounds match BuildingTerrainRange: floor(access - 22) to ceil(access + 22)");
+Check(CellBox.Point(0, 0, 0).Intersects(new CellBox(0, 0, 0, 1, 1, 1)) && !CellBox.Point(0, 0, 0).Intersects(CellBox.Point(1, 0, 0)) &&
+    !CellBox.Empty.Intersects(CellBox.Unbounded), "Cell boxes are inclusive like the game's BoundingBox");
+int queries = 0, rebuilds = 0;
+bool DescribeFakePin(FakePin pin, out (int X, int Y, int Z, bool Preview) key, out CellBox reach)
+{
+    key = (pin.X, pin.Y, pin.Z, pin.Preview);
+    reach = pin.RoadSpill ? CellBox.Unbounded : CellBox.Around(pin.X, pin.Y, pin.Z, 22f);
+    return !pin.Gone;
+}
+void QueryFakeRange(FakePin pin, (int X, int Y, int Z, bool Preview) key, HashSet<(int, int, int)> cells)
+{
+    queries++;
+    for (int dx = -pin.Radius; dx <= pin.Radius; dx++)
+        for (int dy = Math.Abs(dx) - pin.Radius; dy <= pin.Radius - Math.Abs(dx); dy++)
+            cells.Add((key.X + dx, key.Y + dy, key.Z));
+}
+var planner = new PinRefreshPlanner<FakePin, (int X, int Y, int Z, bool Preview), (int, int, int)>(
+    DescribeFakePin, QueryFakeRange, cell => CellBox.Point(cell.Item1, cell.Item2, cell.Item3));
+var dropped = new List<FakePin>();
+(int Queries, int Rebuilds) Pass()
+{
+    int queried = queries, rebuilt = rebuilds;
+    dropped.Clear();
+    if (planner.Pending && planner.Refresh(dropped)) rebuilds++;
+    return (queries - queried, rebuilds - rebuilt);
+}
+void NavigationChange(CellBox bounds) => planner.Touch(bounds, (box, changed) => box.Intersects(changed));
+var elsewhere = new CellBox(300, 300, 0, 310, 310, 10);
+var pinA = new FakePin(0, 0, 5); var pinB = new FakePin(100, 0, 5); var pinC = new FakePin(0, 100, 5);
+planner.Add(pinA); planner.Add(pinB); planner.Add(pinC);
+Check(Pass() == (3, 1) && planner.Cells.Count == 3 * 13, "New pins are queried once each and drawn as one outline");
+Check(!planner.Pending && Pass() == (0, 0), "No refresh work until something changes");
+NavigationChange(elsewhere);
+Check(Pass() == (0, 0), "Navigation change missing every pin: 0 queries and 0 rebuilds");
+NavigationChange(CellBox.Point(15, 0, 5));
+Check(Pass() == (1, 0), "Navigation change near pin A only: 1 query, and unchanged cells need no rebuild");
+pinA.Radius = 3; NavigationChange(CellBox.Point(3, 0, 5));
+Check(Pass() == (1, 1) && planner.Cells.Contains((3, 0, 5)), "Navigation change that alters pin A's range: 1 query and 1 rebuild");
+NavigationChange(CellBox.Point(1, 0, 5));
+Check(Pass() == (1, 1), "Navigation change inside a drawn range redraws even when its cells are unchanged");
+planner.Select(pinA);
+Check(Pass() == (0, 1) && !planner.Cells.Contains((3, 0, 5)) && planner.Cells.Contains((100, 0, 5)),
+    "Selecting a pinned building: 0 queries and 1 rebuild from the cached ranges");
+planner.Select(null);
+Check(Pass() == (0, 1) && planner.Cells.Contains((3, 0, 5)), "Deselecting it restores its cached range without a query");
+planner.Select(new FakePin(0, 0, 5));
+Check(!planner.Pending && Pass() == (0, 0), "Selecting an unpinned building does no refresh work");
+planner.Select(null);
+planner.InvalidateAll();
+Check(Pass() == (3, 1), "Construction-mode toggle: N queries for N pins");
+planner.Redraw();
+Check(Pass() == (0, 1), "Visible-level change redraws without queries");
+pinB.Preview = true; NavigationChange(elsewhere);
+Check(Pass() == (1, 0), "A pin whose access or graph changed is re-queried even when the navigation change was elsewhere");
+planner.Select(pinA); Pass();
+pinA.Radius = 2; NavigationChange(CellBox.Point(0, 0, 5));
+Check(Pass() == (0, 0), "A selected pin's query waits while the game draws its outline");
+planner.Select(null);
+Check(Pass() == (1, 1) && !planner.Cells.Contains((3, 0, 5)), "Deselecting a pin that went stale queries it once");
+var spill = new FakePin(0, 200, 5) { RoadSpill = true };
+planner.Add(spill); Pass();
+NavigationChange(elsewhere);
+Check(Pass() == (1, 0), "Road-spill ranges have no bound, so every navigation change re-queries them");
+Check(planner.Remove(spill) && Pass() == (0, 1) && !planner.Cells.Contains((0, 200, 5)), "Unpinning rebuilds from the cache without queries");
+pinC.Gone = true; NavigationChange(elsewhere);
+Check(Pass() == (0, 1) && dropped.SequenceEqual(new[] { pinC }) && planner.Count == 2 && !planner.Cells.Contains((0, 100, 5)),
+    "A pin that can no longer be shown is dropped with its range");
+var twins = new PinRefreshPlanner<EqualBuilding, int, int>((EqualBuilding _, out int key, out CellBox reach) =>
+    { key = 0; reach = CellBox.Empty; return true; }, (_, _, _) => { }, _ => CellBox.Empty);
+Check(twins.Add(new EqualBuilding()) && twins.Add(new EqualBuilding()) && twins.Count == 2, "Refresh planning keeps equal-valued buildings apart");
+planner.Clear(); NavigationChange(CellBox.Point(0, 0, 5));
+Check(planner.Count == 0 && planner.Cells.Count == 0 && !planner.Pending, "Clearing forgets every pin and cached range");
+
 var game = Path.GetFullPath(args[0]);
 var modPath = Path.GetFullPath(args[1]);
 var managed = Path.Combine(game, "Timberborn_Data", "Managed");
@@ -70,9 +147,25 @@ Check(drawer.GetMethod("UpdateArea")!.CreateDelegate(typeof(Action<>).MakeGeneri
 
 var builderHut = GameType("Timberborn.BuilderHubSystem", "Timberborn.BuilderHubSystem.BuilderHubWorkplaceBehavior");
 Check(builderHut.IsClass, "Builder's Hut marker component exists (excluded from pinning)");
+var distance = GameType("Timberborn.Navigation", "Timberborn.Navigation.NavigationDistance");
+Check((float)distance.GetProperty("ResourceBuildings")!.GetValue(Activator.CreateInstance(distance))! + 2f == 22f,
+    "Game range distance plus BuildingTerrainRange's margin is the 22 cells the planner checks use");
 
 var mod = Assembly.LoadFrom(modPath);
 var service = mod.GetType("PersistentWorkAreas.WorkAreaService", true)!;
+var boundingBox = GameType("Timberborn.Common", "Timberborn.Common.BoundingBox");
+object GameBox(int x, int y, int z)
+{
+    var builderType = boundingBox.GetNestedType("Builder")!;
+    var builder = Activator.CreateInstance(builderType)!;
+    builderType.GetMethod("Expand")!.Invoke(builder, new[] { Activator.CreateInstance(vector, x, y, z) });
+    return builderType.GetMethod("Build")!.Invoke(builder, null)!;
+}
+var touches = (Delegate)service.GetField("Touches", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+var pinBox = Activator.CreateInstance(mod.GetType("PersistentWorkAreas.CellBox", true)!, 0, 0, 0, 10, 20, 30);
+bool Touched(int x, int y, int z) => (bool)touches.DynamicInvoke(pinBox, GameBox(x, y, z))!;
+Check(Touched(0, 0, 0) && Touched(10, 20, 30) && Touched(5, 5, 25) && !Touched(11, 5, 5) && !Touched(5, 25, 5) && !Touched(5, 5, -1),
+    "Navigation-change test uses the game's BoundingBox with the same axes and inclusive edges");
 var interfaces = service.GetInterfaces().Select(x => x.FullName).ToArray();
 Check(interfaces.Contains("Timberborn.SingletonSystem.IPostLoadableSingleton"), "Game post-load lifecycle");
 Check(interfaces.Contains("Timberborn.SingletonSystem.IUpdatableSingleton"), "Display refresh lifecycle");
@@ -97,4 +190,13 @@ sealed class EqualBuilding
 {
     public override bool Equals(object obj) => obj is EqualBuilding;
     public override int GetHashCode() => 1;
+}
+
+// Radius stands in for the navigation state: changing it changes the range the next query returns.
+sealed class FakePin
+{
+    public readonly int X, Y, Z;
+    public int Radius = 2;
+    public bool Preview, RoadSpill, Gone;
+    public FakePin(int x, int y, int z) { X = x; Y = y; Z = z; }
 }

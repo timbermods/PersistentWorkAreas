@@ -11,7 +11,8 @@ namespace PersistentWorkAreas
             public bool Equals(T x, T y) => ReferenceEquals(x, y);
             public int GetHashCode(T value) => RuntimeHelpers.GetHashCode(value);
         }
-        private readonly HashSet<T> _items = new HashSet<T>(new IdentityComparer());
+        internal static readonly IEqualityComparer<T> Identity = new IdentityComparer();
+        private readonly HashSet<T> _items = new HashSet<T>(Identity);
         public int Count => _items.Count;
         public IEnumerable<T> Items => _items;
         public bool Contains(T item) => item != null && _items.Contains(item);
