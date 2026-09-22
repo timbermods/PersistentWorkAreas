@@ -150,6 +150,8 @@
             <li>Several pins at once, merged where they overlap</li>
             <li>Outlines that follow terrain, path, visible-level and construction-mode changes</li>
             <li>Automatic cleanup when a pinned building is deleted</li>
+            <li>Planting tools that outline every farmhouse or forester able to plant the chosen crop or tree</li>
+            <li>Pins remembered for each settlement, in a small local file</li>
           </ul>
         </div>
         <div class="card">
@@ -159,19 +161,19 @@
             <li>Effect-radius overlays that are not navigation-based</li>
             <li>Building-placement ghosts</li>
             <li>Pin controls for Builder's Huts</li>
-            <li>Saving pins between sessions, and non-English UI text</li>
+            <li>Translations other than English (adding one takes a single CSV file)</li>
           </ul>
         </div>
         <div class="card">
-          <h3>Pins are temporary</h3>
-          <p>Pins reset when you leave the map, load a save or a multiplayer resync happens, and they are never written to your save file. That is deliberate: it keeps the mod from ever affecting a colony.</p>
+          <h3>Pins are remembered, not saved</h3>
+          <p>Each settlement's pins are kept on your own computer, in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, and come back when you load that settlement. They are never written to your save file, so the mod can't affect a colony and each co-op player keeps their own.</p>
         </div>
         <div class="card">
           <h3>Fails on its own</h3>
           <p>If a future game update changes the internals the outline renderer relies on, pinning disables itself for that map and says so in the panel and the game log. Nothing else is affected.</p>
         </div>
       </div>
-      <p style="margin-top:18px;color:var(--muted)">Running a large colony? The outline recalculates at most five times per second, does no work while nothing is pinned, and releases its meshes when you clear.</p>
+      <p style="margin-top:18px;color:var(--muted)">Running a large colony? A terrain or path change re-checks only the pinned buildings it can reach, at most five times per second. Nothing runs while nothing is pinned and no planting tool is open, and the meshes are released once nothing is drawn.</p>
     </div>
   </section>
 
@@ -183,8 +185,8 @@
           <tr><th scope="row">Game version</th><td>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build. Built and tested on 1.1.2.4; later versions may change the internal renderer API.</td></tr>
           <tr><th scope="row">Multiplayer</th><td>Designed for compatibility with the <strong>BeaverBuddies Stability Fork</strong>. Tested in two-player co-op with the mod on both computers, which is the recommended setup. It sends no multiplayer events and pins are always local.</td></tr>
           <tr><th scope="row">Other mods</th><td>No required mods. No Harmony patches and no BeaverBuddies dependency.</td></tr>
-          <tr><th scope="row">Saves</th><td>Untouched. You can remove the mod at any time.</td></tr>
-          <tr><th scope="row">Language</th><td>English UI text.</td></tr>
+          <tr><th scope="row">Saves</th><td>Untouched. Pins live in their own small local file. You can remove the mod at any time.</td></tr>
+          <tr><th scope="row">Language</th><td>English UI text, translatable with one CSV file.</td></tr>
         </tbody>
       </table>
     </div>
