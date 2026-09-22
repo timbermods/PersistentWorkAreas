@@ -31,6 +31,22 @@ pins.Set(forester, true);
 Check(pins.Set(forester, false) && pins.Count == 0, "Deleting last pinned building empties collection");
 Check(new PinSet<EqualBuilding>().Count == 0, "New map begins without pins");
 
+// The checks above use only the mod's game-free sources, so CI runs them without arguments on a machine without
+// Timberborn. The rest need the installed game, the built mod DLL and its package folder. Add checks that need no game
+// files above this block, or CI never runs them: the count guard at the end cannot tell where a check was placed.
+const int GameChecks = 34; // A full run fails if this stops matching the checks below.
+int gameFreeChecks = checks;
+if (args.Length == 0)
+{
+    Console.WriteLine($"{checks} checks passed; {GameChecks} checks that need the game were skipped (pass <Timberborn folder> <PersistentWorkAreas.dll> <package folder> to run them).");
+    return 0;
+}
+if (args.Length != 3)
+{
+    Console.Error.WriteLine("Usage: Checks [<Timberborn folder> <PersistentWorkAreas.dll> <package folder>]. With no arguments only the game-free checks run.");
+    return 2;
+}
+
 var game = Path.GetFullPath(args[0]);
 var modPath = Path.GetFullPath(args[1]);
 var managed = Path.Combine(game, "Timberborn_Data", "Managed");
@@ -167,7 +183,10 @@ if (literals.TryGetValue(clearAllKey ?? "", out var clearAllToken))
         }
     }
 Check(guardedCountLookup, "Clear-all label is looked up with the pin count, guarded against a bad translation");
+if (checks - gameFreeChecks != GameChecks)
+    throw new Exception($"FAIL: {checks - gameFreeChecks} checks ran after the game-free block but GameChecks says {GameChecks}; move any new check that needs no game files above that block, then set GameChecks to the number that still needs the game");
 Console.WriteLine($"{checks} checks passed. Unity rendering and multiplayer playtesting still require the game.");
+return 0;
 
 // A minimal RFC 4180 reader: quoted fields may hold commas, doubled quotes and line breaks.
 static List<string[]> ReadCsv(string text)
