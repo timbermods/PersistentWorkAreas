@@ -1,0 +1,34 @@
+name: Tests
+
+# The mod builds against the game's own assemblies, which cannot be redistributed, so it is not built here. Run with no
+# arguments, tests/Checks.csproj compiles only the mod's game-free sources (source/PinSet.cs), references no game or
+# package DLLs, runs the pin-logic checks and reports the game checks as skipped. build.ps1 runs all of them locally.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        id: dotnet
+        with:
+          dotnet-version: 8.0.x
+      # NuGet.Config clears every package source, so the build must use the net8.0 targeting pack that comes with a
+      # .NET 8 SDK. The runner may also have newer SDKs, and without a global.json the dotnet CLI picks the newest, so
+      # pin the one just installed, on the runner only (a global.json in the repository would also pin mod builds).
+      - name: Pin the .NET 8 SDK
+        run: dotnet new globaljson --sdk-version ${{ steps.dotnet.outputs.dotnet-version }} --force
+      - name: Game-free checks
+        run: dotnet run --project tests/Checks.csproj -c Release
