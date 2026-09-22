@@ -11,6 +11,7 @@ using Timberborn.ConstructionMode;
 using Timberborn.EntitySystem;
 using Timberborn.InputSystem;
 using Timberborn.LevelVisibilitySystem;
+using Timberborn.Localization;
 using Timberborn.MapStateSystem;
 using Timberborn.Navigation;
 using Timberborn.SceneLoading;
@@ -41,6 +42,7 @@ namespace PersistentWorkAreas
         private readonly LoadingScreen _loading;
         private readonly UILayout _layout;
         private readonly InputService _input;
+        private readonly ILoc _loc;
         private NativeOutline _outline;
         private Button _clearButton;
         private EntityComponent _selected;
@@ -56,11 +58,11 @@ namespace PersistentWorkAreas
         public WorkAreaService(INavigationRangeService navigation, ConstructionModeService construction,
             IBlockService blocks, PreviewBlockService previews, ILevelVisibilityService visibility,
             MapSize mapSize, ISpecService specs, EventBus events, LoadingScreen loading,
-            UILayout layout, InputService input)
+            UILayout layout, InputService input, ILoc loc)
         {
             _navigation = navigation; _construction = construction; _blocks = blocks;
             _previews = previews; _visibility = visibility; _mapSize = mapSize; _specs = specs;
-            _events = events; _loading = loading; _layout = layout; _input = input;
+            _events = events; _loading = loading; _layout = layout; _input = input; _loc = loc;
         }
 
         public void PostLoad()
@@ -69,9 +71,10 @@ namespace PersistentWorkAreas
             _events.Register(this);
             _loading.LoadingScreenEnabled += OnLoading;
             _input.AddInputProcessor(this);
-            _clearButton = WorkAreaFragment.MakeButton("Clear pinned areas", ClearAll);
+            // Notify() below sets the label, which shows the pin count.
+            _clearButton = WorkAreaFragment.MakeButton(string.Empty, ClearAll);
             _clearButton.name = "PersistentWorkAreasClearAll";
-            _clearButton.tooltip = "Remove all your pinned working-area outlines. You can also assign a shortcut in Settings > Key bindings > Persistent Work Areas.";
+            _clearButton.tooltip = _loc.T(LocKeys.ClearAllTooltip);
             _clearButton.style.marginTop = 6;
             _layout.AddTopRight(_clearButton, 1000);
             Notify();
@@ -203,10 +206,20 @@ namespace PersistentWorkAreas
         {
             if (_clearButton != null)
             {
-                _clearButton.text = "Clear pinned areas (" + Count + ")";
+                _clearButton.text = ClearLabel();
                 _clearButton.style.display = Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             }
             Changed?.Invoke();
+        }
+        // Notify also runs inside the game's EntityDeletedEvent, so a translation with a broken {0} must not throw.
+        private string ClearLabel()
+        {
+            try { return _loc.T(LocKeys.ClearAll, Count); }
+            catch (FormatException error)
+            {
+                Debug.LogError("[PersistentWorkAreas] Bad " + LocKeys.ClearAll + " text: " + error.Message);
+                return _loc.T(LocKeys.ClearAll);
+            }
         }
         private void ReleaseOutline()
         {
