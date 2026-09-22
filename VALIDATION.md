@@ -23,13 +23,14 @@ These are compiled API and logic checks, not Unity rendering tests or a co-op se
 
 Re-run this for each release and after each Timberborn update.
 
-1. With the BeaverBuddies Stability Fork enabled, load a colony, select a farm and enable its checkbox. Deselect and paint crops: the working-area outline should remain.
-2. Pin a forester and paint trees. Pin a second nearby building; verify overlapping areas merge and separate areas both remain visible.
+1. With the BeaverBuddies Stability Fork enabled, load a colony, select a farm and enable its checkbox. Deselect, paint crops and leave the planting tool: the working-area outline should remain.
+2. Pin a forester, paint trees and leave the planting tool: the forester's outline should remain. Pin a second nearby building; verify overlapping areas merge and separate areas both remain visible.
 3. Select an unrelated building, then clear all from the top-right button. No pinned outlines should remain after deselecting. Reselect formerly pinned buildings and verify their checkboxes are off.
-4. Assign the clear command in key bindings and verify it clears while a planting tool is active. Do not assign a shortcut already used by a tool.
+4. Assign the clear command in key bindings and verify it clears the pins while a planting tool is active; the buildings that tool shows stay until you leave it. Do not assign a shortcut already used by a tool.
 5. Modify a path or terrain, switch visible levels and construction mode, and verify the outline updates. Pause the simulation and repeat selection/clear.
 6. Delete a pinned building. Its outline and pin count should disappear. Exit/load another map or perform a co-op resync: pins should be empty.
 7. Join with two BeaverBuddies Stability Fork clients. Pin different buildings on each computer and clear on only one. Only that player's pins should change; normal building/planting actions should remain synchronized.
+8. With a few farmhouses (one still under construction) and foresters placed and none pinned, pick a crop in the Fields tools: every farmhouse's outline should appear and no forester's. Pick a tree or bush: only the foresters'. As Folktails, pick an aquatic crop: only the aquatic farmhouses'. Pin one forester and leave the planting tool: only that forester's outline should remain.
 
 ## References
 
