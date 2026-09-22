@@ -1,6 +1,10 @@
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Runtime.Loader;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using PersistentWorkAreas;
 
@@ -103,6 +107,21 @@ var twins = new PinRefreshPlanner<EqualBuilding, int, int>((EqualBuilding _, out
 Check(twins.Add(new EqualBuilding()) && twins.Add(new EqualBuilding()) && twins.Count == 2, "Refresh planning keeps equal-valued buildings apart");
 planner.Clear(); NavigationChange(CellBox.Point(0, 0, 5));
 Check(planner.Count == 0 && planner.Cells.Count == 0 && !planner.Pending, "Clearing forgets every pin and cached range");
+// The checks above use only the mod's game-free sources, so CI runs them without arguments on a machine without
+// Timberborn. The rest need the installed game, the built mod DLL and its package folder. Add checks that need no game
+// files above this block, or CI never runs them: the count guard at the end cannot tell where a check was placed.
+const int GameChecks = 42; // A full run fails if this stops matching the checks below.
+int gameFreeChecks = checks;
+if (args.Length == 0)
+{
+    Console.WriteLine($"{checks} checks passed; {GameChecks} checks that need the game were skipped (pass <Timberborn folder> <PersistentWorkAreas.dll> <package folder> to run them).");
+    return 0;
+}
+if (args.Length != 3)
+{
+    Console.Error.WriteLine("Usage: Checks [<Timberborn folder> <PersistentWorkAreas.dll> <package folder>]. With no arguments only the game-free checks run.");
+    return 2;
+}
 
 var game = Path.GetFullPath(args[0]);
 var modPath = Path.GetFullPath(args[1]);
@@ -217,7 +236,115 @@ Check(manifest.RootElement.GetProperty("RequiredMods").GetArrayLength() == 0, "S
 Check(manifest.RootElement.GetProperty("Version").GetString() == mod.GetName().Version!.ToString(3), "Manifest version matches assembly version");
 using var binding = JsonDocument.Parse(File.ReadAllText(Path.Combine(packaging, "KeyBindings", "PersistentWorkAreas.Clear.blueprint.json")));
 Check(binding.RootElement.GetProperty("KeyBindingSpec").GetProperty("Id").GetString() == (string)service.GetField("ClearKey")!.GetRawConstantValue()!, "Clear key binding matches input handler");
+
+// Player-facing text comes from the enUS CSV through the game's ILoc, so it can be translated.
+var locText = File.ReadAllText(Path.Combine(packaging, "Localizations", "enUS_PersistentWorkAreas.csv"));
+var locRows = ReadCsv(locText);
+var enUS = new Dictionary<string, string>();
+bool locRowsValid = locRows.Count > 1 && locRows[0].SequenceEqual(new[] { "ID", "Text", "Comment" });
+foreach (var row in locRows.Skip(1))
+    locRowsValid &= row.Length == 3 && row[0].Length > 0 && row[1].Length > 0 && !row.Any(x => x.EndsWith(' ')) && enUS.TryAdd(row[0], row[1]);
+// The game's CSV validator rejects a space between a comma and a quote.
+string unquoted = locText.Replace("\"\"", "");
+Check(locRowsValid && !unquoted.Contains(", \"") && !unquoted.Contains("\" ,"), "Localization CSV has the game's ID,Text,Comment layout with unique keys");
+// Every string compiled into the mod must be a loc key, a VisualElement name, a name the outline
+// reflects on, or log text. Anything else is hard-coded text a translation cannot reach.
+using var modImage = new PEReader(File.OpenRead(modPath));
+var metadata = modImage.GetMetadataReader();
+var literals = new Dictionary<string, int>();
+if (metadata.GetHeapSize(HeapIndex.UserString) > 1)
+    for (var handle = MetadataTokens.UserStringHandle(1); !handle.IsNil; handle = metadata.GetNextHandle(handle))
+        if (metadata.GetUserString(handle) is { Length: > 0 } text) // the heap's zero padding reads as ""
+            literals.TryAdd(text, MetadataTokens.GetToken(handle));
+var clearKey = (string)service.GetField("ClearKey")!.GetRawConstantValue()!;
+var reflected = new[] { drawer, calculator, bounds, layer };
+var reflectedNames = reflected.Select(x => x.FullName!).Concat(reflected.SelectMany(x => x.GetMembers(
+    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)).Select(x => x.Name)).ToHashSet();
+bool IsCode(string x) => x.StartsWith("PersistentWorkAreas.") ? x == clearKey || enUS.ContainsKey(x)
+    : x.StartsWith("[PersistentWorkAreas] ") || x.StartsWith(" loaded. ") // log text; Mod.cs splits its line around the version
+    || System.Text.RegularExpressions.Regex.IsMatch(x, "^PersistentWorkAreas[A-Z][A-Za-z]*$") || reflectedNames.Contains(x);
+var hardCoded = literals.Keys.Where(x => !IsCode(x)).ToArray();
+Check(hardCoded.Length == 0, "No hard-coded English UI text in the mod DLL" + string.Concat(hardCoded.Select(x => "\n  \"" + x + "\"")));
+var locKeys = mod.GetType("PersistentWorkAreas.LocKeys")?.GetFields(BindingFlags.Public | BindingFlags.Static)
+    .Where(x => x.IsLiteral).ToDictionary(x => x.Name, x => (string)x.GetRawConstantValue()!) ?? new Dictionary<string, string>();
+var untranslated = locKeys.Values.Where(x => !enUS.ContainsKey(x) || !literals.ContainsKey(x))
+    .Select(x => x + (enUS.ContainsKey(x) ? " (never used by the code)" : " (no enUS text)")).ToArray();
+Check(locKeys.Count > 0 && untranslated.Length == 0, "Every LocKeys constant has enUS text and is used" + string.Concat(untranslated.Select(x => "\n  " + x)));
+var usedKeys = new HashSet<string>(locKeys.Values);
+foreach (var file in Directory.EnumerateFiles(packaging, "*.blueprint.json", SearchOption.AllDirectories))
+{
+    using var blueprint = JsonDocument.Parse(File.ReadAllText(file));
+    usedKeys.UnionWith(BlueprintLocKeys(blueprint.RootElement));
+}
+var unused = enUS.Keys.Where(x => !usedKeys.Contains(x)).ToArray();
+Check(unused.Length == 0, "Every enUS key is used by LocKeys or a key-binding blueprint" + string.Concat(unused.Select(x => "\n  " + x)));
+bool TakesLoc(Type type) => type.GetConstructors().Single().GetParameters().Any(x => x.ParameterType.FullName == "Timberborn.Localization.ILoc");
+Check(TakesLoc(service) && TakesLoc(fragment), "Panel and clear button look text up through the game's ILoc");
+Check(locKeys.TryGetValue("ClearAll", out var clearAllKey) && enUS.TryGetValue(clearAllKey, out var clearAll) &&
+    clearAll.Contains("{0}") && string.Format(clearAll, 3) == clearAll.Replace("{0}", "3"), "Clear-all label formats the pin count");
+// In the IL: ldstr ClearAll, then within a few bytes callvirt ILoc.T<int>, inside a try that catches FormatException,
+// because Notify also runs in the game's EntityDeletedEvent and a translation with a broken {0} must not throw there.
+string TypeRefName(EntityHandle handle) => handle.Kind == HandleKind.TypeReference
+    ? metadata.GetString(metadata.GetTypeReference((TypeReferenceHandle)handle).Namespace) + "." + metadata.GetString(metadata.GetTypeReference((TypeReferenceHandle)handle).Name) : "";
+var tOfInt = Enumerable.Range(1, metadata.GetTableRowCount(TableIndex.MethodSpec)).Select(MetadataTokens.MethodSpecificationHandle).Where(handle =>
+{
+    var spec = metadata.GetMethodSpecification(handle);
+    if (spec.Method.Kind != HandleKind.MemberReference) return false;
+    var member = metadata.GetMemberReference((MemberReferenceHandle)spec.Method);
+    return metadata.GetString(member.Name) == "T" && TypeRefName(member.Parent) == "Timberborn.Localization.ILoc"
+        && metadata.GetBlobBytes(spec.Signature).SequenceEqual(new byte[] { 0x0A, 1, 0x08 }); // one generic argument: int
+}).Select(x => MetadataTokens.GetToken(x)).ToArray();
+bool guardedCountLookup = false;
+if (literals.TryGetValue(clearAllKey ?? "", out var clearAllToken))
+    foreach (var body in metadata.MethodDefinitions.Select(x => metadata.GetMethodDefinition(x).RelativeVirtualAddress).Where(x => x != 0).Select(modImage.GetMethodBody))
+    {
+        var il = body.GetILBytes();
+        for (int i = 0; i + 5 <= il.Length; i++)
+        {
+            if (il[i] != 0x72 || BitConverter.ToInt32(il, i + 1) != clearAllToken) continue;
+            int call = Enumerable.Range(i + 5, 12).FirstOrDefault(j => j + 5 <= il.Length && il[j] == 0x6F && tOfInt.Contains(BitConverter.ToInt32(il, j + 1)), -1);
+            guardedCountLookup |= call > 0 && body.ExceptionRegions.Any(r => r.Kind == ExceptionRegionKind.Catch &&
+                TypeRefName(r.CatchType) == "System.FormatException" && r.TryOffset <= i && call < r.TryOffset + r.TryLength);
+        }
+    }
+Check(guardedCountLookup, "Clear-all label is looked up with the pin count, guarded against a bad translation");
+if (checks - gameFreeChecks != GameChecks)
+    throw new Exception($"FAIL: {checks - gameFreeChecks} checks ran after the game-free block but GameChecks says {GameChecks}; move any new check that needs no game files above that block, then set GameChecks to the number that still needs the game");
 Console.WriteLine($"{checks} checks passed. Unity rendering and multiplayer playtesting still require the game.");
+return 0;
+
+// A minimal RFC 4180 reader: quoted fields may hold commas, doubled quotes and line breaks.
+static List<string[]> ReadCsv(string text)
+{
+    var rows = new List<string[]>();
+    var row = new List<string>();
+    var field = new StringBuilder();
+    bool quoted = false;
+    for (int i = 0; i < text.Length; i++)
+    {
+        char c = text[i];
+        if (quoted)
+        {
+            if (c != '"') field.Append(c);
+            else if (i + 1 < text.Length && text[i + 1] == '"') { field.Append('"'); i++; }
+            else quoted = false;
+        }
+        else if (c == '"') quoted = true;
+        else if (c == ',') { row.Add(field.ToString()); field.Clear(); }
+        else if (c == '\n') { row.Add(field.ToString()); field.Clear(); rows.Add(row.ToArray()); row.Clear(); }
+        else if (c != '\r') field.Append(c);
+    }
+    if (field.Length > 0 || row.Count > 0) { row.Add(field.ToString()); rows.Add(row.ToArray()); }
+    return rows;
+}
+
+static IEnumerable<string> BlueprintLocKeys(JsonElement element) => element.ValueKind switch
+{
+    JsonValueKind.Object => element.EnumerateObject().SelectMany(x =>
+        x.Name == "LocKey" && x.Value.ValueKind == JsonValueKind.String ? new[] { x.Value.GetString()! } : BlueprintLocKeys(x.Value)),
+    JsonValueKind.Array => element.EnumerateArray().SelectMany(BlueprintLocKeys),
+    _ => Enumerable.Empty<string>()
+};
 
 sealed class EqualBuilding
 {
