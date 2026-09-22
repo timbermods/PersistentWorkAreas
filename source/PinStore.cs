@@ -11,9 +11,12 @@ namespace PersistentWorkAreas
     // finds the same building after a load. Unity-free so the checks can run it.
     internal static class PinStore
     {
+        // A later format should keep this header and add only fields that this version skips (anything that is not an
+        // entity id), so that going back to an older build still reads it. This version does not read a file with any
+        // other header, and PinFile keeps a copy of such a file before replacing it.
         public const string Header = "Persistent Work Areas pins v1";
-        // Only the most recently changed settlements are kept. A co-op guest's settlement is named after the host's map,
-        // which changes on every join or resync, so the file would otherwise grow with every session.
+        // Only the most recently loaded or changed settlements are kept. A co-op guest's settlement is named after the
+        // host's map, which changes on every join or resync, so the file would otherwise grow with every session.
         public const int MaxSettlements = 100;
 
         // The entity ids remembered for a settlement. A missing, corrupt or unrecognized file remembers none.
@@ -43,6 +46,18 @@ namespace PersistentWorkAreas
             return output.ToString();
         }
 
+        // The file text with the settlement's entry moved first and its pins unchanged, so that loading a settlement keeps
+        // it among the most recent. Null when there is nothing to move: it has no entry, or its entry is already first.
+        public static string Touch(string text, string settlement)
+        {
+            var entries = Parse(text);
+            int index = entries.FindIndex(entry => entry.Settlement == settlement);
+            return index > 0 ? Write(text, settlement, entries[index].Pins) : null;
+        }
+
+        // Whether this version can read the file: there is none yet, or it starts with this version's header.
+        public static bool Recognizes(string text) => string.IsNullOrEmpty(text) || text.Split('\n')[0].TrimEnd('\r') == Header;
+
         // The buildings to pin again: every remembered id that still names a building which can be pinned, once each.
         public static List<T> Restore<T>(IEnumerable<Guid> ids, Func<Guid, T> resolve, Func<T, bool> supports) where T : class
         {
@@ -63,7 +78,7 @@ namespace PersistentWorkAreas
             var entries = new List<(string Settlement, List<Guid> Pins)>();
             if (string.IsNullOrEmpty(text)) return entries;
             var lines = text.Split('\n');
-            if (lines[0].TrimEnd('\r') != Header) return entries;
+            if (!Recognizes(text)) return entries;
             for (int i = 1; i < lines.Length; i++)
             {
                 var fields = lines[i].TrimEnd('\r').Split('\t');
@@ -108,14 +123,31 @@ namespace PersistentWorkAreas
         public PinFile(string filePath) { FilePath = filePath; }
         public string FilePath { get; }
 
-        public List<Guid> Load(string settlement) =>
-            File.Exists(FilePath) ? PinStore.Read(File.ReadAllText(FilePath), settlement) : new List<Guid>();
+        public List<Guid> Load(string settlement) => PinStore.Read(ReadText(), settlement);
 
         public void Save(string settlement, IEnumerable<Guid> pins)
         {
-            var text = PinStore.Write(File.Exists(FilePath) ? File.ReadAllText(FilePath) : null, settlement, pins);
+            var existing = ReadText();
+            Replace(existing, PinStore.Write(existing, settlement, pins));
+        }
+
+        // Moves the settlement's entry first, so that loading the settlement counts as using it. Writes nothing when
+        // there is nothing to move.
+        public void Touch(string settlement)
+        {
+            var existing = ReadText();
+            var text = PinStore.Touch(existing, settlement);
+            if (text != null) Replace(existing, text);
+        }
+
+        private string ReadText() => File.Exists(FilePath) ? File.ReadAllText(FilePath) : null;
+
+        private void Replace(string existing, string text)
+        {
             var folder = Path.GetDirectoryName(FilePath);
             if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+            // A file this version cannot read, such as one from a newer version, is kept beside it instead of being lost.
+            if (!PinStore.Recognizes(existing)) File.Copy(FilePath, FilePath + ".bak", true);
             // Written beside the file and swapped in, so an interrupted write never leaves half a file.
             var temporary = FilePath + ".tmp";
             File.WriteAllText(temporary, text);

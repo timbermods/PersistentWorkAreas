@@ -191,6 +191,16 @@ Check(PinStore.Read(crowded, "Settlement 0").Count == 0 && PinStore.Read(crowded
 crowded = PinStore.Write(PinStore.Write(crowded, "Settlement 1", new[] { idB }), "Settlement new", new[] { idA });
 Check(PinStore.Read(crowded, "Settlement 1").SequenceEqual(new[] { idB }) && PinStore.Read(crowded, "Settlement 2").Count == 0,
     "Changing a settlement's pins makes it the most recent");
+var touched = PinStore.Touch(PinStore.Write(PinStore.Write(null, "Beaverton", new[] { idA, idB }), "Otter Bay", new[] { idC }), "Beaverton");
+Check(touched != null && touched.Split('\n')[1].StartsWith("Beaverton\t") && PinStore.Read(touched, "Beaverton").SequenceEqual(new[] { idA, idB }) &&
+    PinStore.Read(touched, "Otter Bay").SequenceEqual(new[] { idC }), "Loading a settlement moves its entry first and keeps its pins and every other settlement's");
+Check(PinStore.Touch(touched, "Beaverton") == null && PinStore.Touch(touched, "Nowhere") == null && PinStore.Touch(null, "Beaverton") == null &&
+    PinStore.Touch("garbage\nBeaverton\t" + idA, "Beaverton") == null, "Loading a settlement that is already first, has no entry or has no readable file rewrites nothing");
+crowded = PinStore.Write(PinStore.Touch(crowded, "Settlement 3")!, "Settlement newer", new[] { idA });
+Check(PinStore.Read(crowded, "Settlement 3").SequenceEqual(new[] { idA }) && PinStore.Read(crowded, "Settlement 4").Count == 0,
+    "A settlement loaded recently is kept over one changed longer ago");
+var doubled = PinStore.Header + "\nBeaverton\t" + idA + "\t" + idA + "\t" + Guid.Empty + "\t" + idB + "\nBeaverton\t" + idC + "\n";
+Check(PinStore.Read(doubled, "Beaverton").SequenceEqual(new[] { idA, idB }), "A hand-edited pin file that lists a settlement twice uses its first line, each building once");
 var built = new[] { new SavedBuilding(idA), new SavedBuilding(idB), new SavedBuilding(idC) };
 remembered = PinStore.Write(null, "Beaverton", built.Take(2).Select(x => x.Id));
 var reloaded = new[] { new SavedBuilding(idA), new SavedBuilding(idB), new SavedBuilding(idC) };
@@ -210,11 +220,26 @@ try
     pinFile.Save("Otter Bay", new[] { idC });
     Check(new PinFile(pinFile.FilePath).Load("Beaverton").SequenceEqual(new[] { idA, idB }) && new PinFile(pinFile.FilePath).Load("Otter Bay").SequenceEqual(new[] { idC }),
         "Pins round-trip through the file on disk, whose folder is created on the first save");
-    File.WriteAllBytes(pinFile.FilePath, new byte[] { 0x50, 0x4B, 0x03, 0x04, 0x00, 0xFF, 0xFE, 0x0A, 0x09, 0xC3 });
+    var pinFiles = Path.GetDirectoryName(pinFile.FilePath)!;
+    string[] FileNames() => Directory.GetFiles(pinFiles).Select(x => Path.GetFileName(x)!).OrderBy(x => x, StringComparer.Ordinal).ToArray();
+    var beforeTouch = File.ReadAllText(pinFile.FilePath);
+    pinFile.Touch("Nowhere");
+    bool untouched = File.ReadAllText(pinFile.FilePath) == beforeTouch;
+    pinFile.Touch("Beaverton");
+    Check(untouched && File.ReadAllLines(pinFile.FilePath)[1].StartsWith("Beaverton\t") && pinFile.Load("Beaverton").SequenceEqual(new[] { idA, idB }) &&
+        pinFile.Load("Otter Bay").SequenceEqual(new[] { idC }) && FileNames().SequenceEqual(new[] { "Pins.txt" }),
+        "Loading a settlement moves its entry first on disk, with no copy or temporary file left behind");
+    var corrupt = new byte[] { 0x50, 0x4B, 0x03, 0x04, 0x00, 0xFF, 0xFE, 0x0A, 0x09, 0xC3 };
+    File.WriteAllBytes(pinFile.FilePath, corrupt);
     Check(pinFile.Load("Beaverton").Count == 0, "A corrupt pin file on disk is ignored");
     pinFile.Save("Beaverton", new[] { idA });
-    Check(pinFile.Load("Beaverton").SequenceEqual(new[] { idA }) && Directory.GetFiles(Path.GetDirectoryName(pinFile.FilePath)!).Length == 1,
-        "Saving replaces a corrupt pin file and leaves no temporary file behind");
+    Check(pinFile.Load("Beaverton").SequenceEqual(new[] { idA }) && FileNames().SequenceEqual(new[] { "Pins.txt", "Pins.txt.bak" }) &&
+        File.ReadAllBytes(pinFile.FilePath + ".bak").SequenceEqual(corrupt), "Saving replaces an unreadable pin file, keeps a copy of it and leaves no temporary file behind");
+    var newer = PinStore.Header.Replace("v1", "v2") + "\nBeaverton\t" + idB + "\n";
+    File.WriteAllText(pinFile.FilePath, newer);
+    pinFile.Save("Beaverton", new[] { idA });
+    Check(pinFile.Load("Beaverton").SequenceEqual(new[] { idA }) && File.ReadAllText(pinFile.FilePath + ".bak") == newer,
+        "A pin file from a newer version is kept as a copy before this version replaces it");
 }
 finally
 {
@@ -370,13 +395,15 @@ service.GetMethod("ShowPlanters", fields)!.Invoke(live, null);
 Check(liveEntries.Count == 0 && !Get<bool>(live, "_plantersChanged"), "Leaving the planting tool with no pins drops its buildings at the next update");
 
 // Remembered pins, on the same instance: its pin file in a temporary folder, and the settlement as the game's own service names it.
-// UpdateSingleton reads Time.unscaledTime, so the save it starts with is invoked directly.
+// SavePins is what the frame update starts with; UpdateSingleton itself only reads Time.unscaledTime (which runs only in the game)
+// and passes it to UpdateAt, which the last check here invokes.
 var settlementReference = GameType("Timberborn.GameSaveRepositorySystem", "Timberborn.GameSaveRepositorySystem.SettlementReference");
 var settlements = RuntimeHelpers.GetUninitializedObject(GameType("Timberborn.SettlementNameSystem", "Timberborn.SettlementNameSystem.SettlementReferenceService"));
 Set(live, "_settlements", settlements);
 var liveFolder = Path.Combine(Path.GetTempPath(), "pwa-checks-" + Guid.NewGuid().ToString("N"));
 var livePinPath = Path.Combine(liveFolder, "Pins.txt");
-Set(live, "_pinFile", Activator.CreateInstance(mod.GetType("PersistentWorkAreas.PinFile", true)!, livePinPath)!);
+var pinFileType = mod.GetType("PersistentWorkAreas.PinFile", true)!;
+Set(live, "_pinFile", Activator.CreateInstance(pinFileType, livePinPath)!);
 void PinEntity(Guid id)
 {
     var entity = RuntimeHelpers.GetUninitializedObject(entityComponent);
@@ -404,6 +431,49 @@ try
     SavePins();
     Check(Remembered("Beaverton").SequenceEqual(new[] { idC }) && (int)service.GetProperty("Count")!.GetValue(live)! == 0 && !PinsChanged(),
         "Leaving the map saves a pending pin change, then forgets the pins in memory only");
+
+    // Loading: the settlement's remembered ids go through the game's own EntityRegistry. idD is a building only a newer save has.
+    // PostLoad passes Supports, which needs live game objects, so this passes a test that turns down building A.
+    var idD = new Guid("f3b1c8e2-7a4d-4c59-9e06-2b8d5f1a6c37");
+    File.WriteAllText(livePinPath, PinStore.Write(PinStore.Write(null, "Beaverton", new[] { idA, idB, idD }), "Otter Bay", new[] { idC }));
+    var entityRegistry = Activator.CreateInstance(GameType("Timberborn.EntitySystem", "Timberborn.EntitySystem.EntityRegistry"))!;
+    object Loaded(Guid id)
+    {
+        var entity = RuntimeHelpers.GetUninitializedObject(entityComponent);
+        Set(entity, "<EntityId>k__BackingField", id);
+        Get<System.Collections.IDictionary>(entityRegistry, "_entities")[id] = entity;
+        return entity;
+    }
+    var loadedA = Loaded(idA); var loadedB = Loaded(idB); Loaded(idC);
+    Set(live, "_entities", entityRegistry);
+    var beforeLoad = File.ReadAllText(livePinPath);
+    Func<object, bool> pinnable = x => !ReferenceEquals(x, loadedA);
+    service.GetMethod("RestorePins", fields)!.Invoke(live, new object[] { pinnable });
+    Check((int)service.GetProperty("Count")!.GetValue(live)! == 1 && (bool)livePins.GetType().GetMethod("Contains")!.Invoke(livePins, new[] { loadedB })! &&
+        liveEntries.Count == 1 && liveEntries.Contains(loadedB) && !PinsChanged() && File.ReadAllText(livePinPath) == beforeLoad,
+        "Loading pins this settlement's remembered buildings that can be pinned, draws them, and writes nothing yet");
+    SavePins();
+    Check(File.ReadAllLines(livePinPath)[1].StartsWith("Beaverton\t") && Remembered("Beaverton").SequenceEqual(new[] { idA, idB, idD }) &&
+        Remembered("Otter Bay").SequenceEqual(new[] { idC }),
+        "The first update after loading moves the settlement first in the pin file and keeps the buildings this save lacks");
+
+    // The frame update, given the clock: it saves before anything else, and waits 10 seconds after a failed write.
+    // The failure warning goes to Unity's log, which runs only in the game, so it is marked as already given.
+    service.GetMethod("ClearAll")!.Invoke(live, null);
+    Set(live, "_active", true);
+    Set(live, "_saveWarned", true);
+    var goodPinFile = Get<object>(live, "_pinFile");
+    Set(live, "_pinFile", Activator.CreateInstance(pinFileType, Path.Combine(livePinPath, "Pins.txt"))!);
+    void UpdateAt(float now) => service.GetMethod("UpdateAt", fields)!.Invoke(live, new object[] { now });
+    UpdateAt(100f);
+    bool retryLater = PinsChanged() && Get<float>(live, "_nextSave") == 110f;
+    Set(live, "_pinFile", goodPinFile);
+    UpdateAt(109f);
+    bool waited = Remembered("Beaverton").Count == 3;
+    UpdateAt(110f);
+    Check(retryLater && waited && Remembered("Beaverton").Count == 0 && Remembered("Otter Bay").SequenceEqual(new[] { idC }) && !PinsChanged() && liveEntries.Count == 0,
+        "The frame update saves a pin change with nothing left to draw, and retries a failed write 10 seconds later");
+    Set(live, "_active", false);
 }
 finally
 {
