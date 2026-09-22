@@ -32,7 +32,7 @@ var around = CellBox.Around(10.5f, 20.5f, 3f, 22f);
 Check(around.MinX == -12 && around.MaxX == 33 && around.MinY == -2 && around.MaxY == 43 && around.MinZ == -19 && around.MaxZ == 25,
     "Pin bounds match BuildingTerrainRange: floor(access - 22) to ceil(access + 22)");
 Check(CellBox.Point(0, 0, 0).Intersects(new CellBox(0, 0, 0, 1, 1, 1)) && !CellBox.Point(0, 0, 0).Intersects(CellBox.Point(1, 0, 0)) &&
-    !CellBox.Empty.Intersects(CellBox.Unbounded), "Cell boxes are inclusive like the game's BoundingBox");
+    !CellBox.Empty.Intersects(CellBox.Unbounded), "Fake-world cell boxes are inclusive and empty boxes meet nothing");
 int queries = 0, rebuilds = 0;
 bool DescribeFakePin(FakePin pin, out (int X, int Y, int Z, bool Preview) key, out CellBox reach)
 {
@@ -148,8 +148,6 @@ Check(drawer.GetMethod("UpdateArea")!.CreateDelegate(typeof(Action<>).MakeGeneri
 var builderHut = GameType("Timberborn.BuilderHubSystem", "Timberborn.BuilderHubSystem.BuilderHubWorkplaceBehavior");
 Check(builderHut.IsClass, "Builder's Hut marker component exists (excluded from pinning)");
 var distance = GameType("Timberborn.Navigation", "Timberborn.Navigation.NavigationDistance");
-Check((float)distance.GetProperty("ResourceBuildings")!.GetValue(Activator.CreateInstance(distance))! + 2f == 22f,
-    "Game range distance plus BuildingTerrainRange's margin is the 22 cells the planner checks use");
 
 var mod = Assembly.LoadFrom(modPath);
 var service = mod.GetType("PersistentWorkAreas.WorkAreaService", true)!;
@@ -166,6 +164,41 @@ var pinBox = Activator.CreateInstance(mod.GetType("PersistentWorkAreas.CellBox",
 bool Touched(int x, int y, int z) => (bool)touches.DynamicInvoke(pinBox, GameBox(x, y, z))!;
 Check(Touched(0, 0, 0) && Touched(10, 20, 30) && Touched(5, 5, 25) && !Touched(11, 5, 5) && !Touched(5, 25, 5) && !Touched(5, 5, -1),
     "Navigation-change test uses the game's BoundingBox with the same axes and inclusive edges");
+
+// Service wiring, on an instance built outside the game: the constructor only stores its dependencies and reads NavigationDistance.
+var distanceValue = Activator.CreateInstance(distance)!;
+var serviceCtor = service.GetConstructors().Single();
+var live = serviceCtor.Invoke(serviceCtor.GetParameters().Select(p => p.ParameterType == distance ? distanceValue : null).ToArray());
+Check((float)service.GetField("_reach", fields)!.GetValue(live)! == (float)distance.GetProperty("ResourceBuildings")!.GetValue(distanceValue)! + 2f,
+    "Pin reach is the game's range distance plus BuildingTerrainRange's 2-cell margin");
+T Get<T>(object target, string name) => (T)target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!.GetValue(target)!;
+void Set(object target, string name, object value) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)!.SetValue(target, value);
+var livePlanner = Get<object>(live, "_planner");
+var livePin = RuntimeHelpers.GetUninitializedObject(GameType("Timberborn.EntitySystem", "Timberborn.EntitySystem.EntityComponent"));
+Check((bool)livePlanner.GetType().GetMethod("Add")!.Invoke(livePlanner, new[] { livePin })!, "Service planner accepts a pinned entity");
+var liveEntry = Get<System.Collections.IDictionary>(livePlanner, "_entries")[livePin]!;
+Set(liveEntry, "Reach", pinBox);
+var navMeshUpdate = GameType("Timberborn.Navigation", "Timberborn.Navigation.NavMeshUpdate").GetConstructors(fields).Single();
+object Update(int x, int y, int z) => navMeshUpdate.Invoke(navMeshUpdate.GetParameters()
+    .Select((p, i) => i == 0 ? GameBox(x, y, z) : p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null).ToArray());
+// What a handler leaves behind: a pass pending, the outline marked for a redraw, the pin marked for a query, the throttle skipped.
+(bool Pending, bool Redraw, bool Query, bool Now) Handle(string handler, object argument)
+{
+    Set(livePlanner, "_pending", false); Set(livePlanner, "_redraw", false); Set(liveEntry, "Stale", false); Set(live, "_nextRefresh", 99f);
+    service.GetMethod(handler)!.Invoke(live, new[] { argument });
+    return (Get<bool>(livePlanner, "_pending"), Get<bool>(livePlanner, "_redraw"), Get<bool>(liveEntry, "Stale"), Get<float>(live, "_nextRefresh") == 0f);
+}
+Check(Handle("OnVisibleLevel", null) == (true, true, false, true), "Visible-level event redraws the pinned outline without re-querying");
+Check(Handle("OnConstruction", null) == (true, true, true, true), "Construction-mode event re-queries every pin");
+Check(Handle("OnInstantNavMeshUpdated", Update(5, 5, 25)) == (true, false, true, false) &&
+    Handle("OnPreviewNavMeshUpdated", Update(10, 20, 30)) == (true, false, true, false),
+    "Live and preview navigation updates inside a pin's reach re-query it at the throttled rate");
+Check(Handle("OnInstantNavMeshUpdated", Update(11, 5, 5)) == (true, false, false, false) &&
+    Handle("OnPreviewNavMeshUpdated", Update(5, 25, 5)) == (true, false, false, false),
+    "Navigation updates outside a pin's reach keep its cached range");
+Set(livePlanner, "_selected", livePin);
+Check(Handle("OnUnselected", null) == (true, false, false, true) && Get<object>(livePlanner, "_selected") == null,
+    "Deselecting a pinned building rebuilds the pinned outline from the cache");
 var interfaces = service.GetInterfaces().Select(x => x.FullName).ToArray();
 Check(interfaces.Contains("Timberborn.SingletonSystem.IPostLoadableSingleton"), "Game post-load lifecycle");
 Check(interfaces.Contains("Timberborn.SingletonSystem.IUpdatableSingleton"), "Display refresh lifecycle");
