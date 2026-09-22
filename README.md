@@ -36,13 +36,13 @@ No extra dependency is required. Keep your existing BeaverBuddies Stability Fork
 - For a keyboard shortcut, assign **Clear all pinned working areas** under **Persistent Work Areas** in the game's key-binding settings. It starts unbound to avoid taking an existing shortcut.
 - To remove just one pin, select its building and uncheck the checkbox.
 
-The currently selected building still uses its normal game outline. Clearing pins restores normal selection behavior; deselecting that building then hides its normal outline. Pins reset on map exit, loading, and multiplayer resynchronization. They are not saved. Deleting a pinned building removes its pin.
+The currently selected building still uses its normal game outline. Clearing pins restores normal selection behavior; deselecting that building then hides its normal outline. Pins are remembered for each settlement on your own computer, in `PersistentWorkAreas\Pins.txt` next to your Timberborn `Saves` folder (on Windows, `Documents\Timberborn\PersistentWorkAreas\Pins.txt`), and come back when you load any save of that settlement, as the latest pins you set there. A different settlement starts with none. They are never written into the save, so co-op players each keep their own. A co-op guest's game names the settlement after the host's save, which changes with every resynchronization, so a guest's pins usually do not come back. The file keeps the 100 settlements you loaded or changed most recently. To forget every pin, delete that file. Deleting a pinned building removes its pin.
 
 The mod supports navigation-based working areas. It does not pin district road coloring, every kind of effect-radius overlay, or building-placement ghosts. UI text is currently English. The panel, button and key-binding text is all in `version-1.1/Localizations/enUS_PersistentWorkAreas.csv` (in the repository, under `packaging/PersistentWorkAreas/`), so a translation is one more file in that folder with the same keys, named for the game's language code (for example `deDE_PersistentWorkAreas.csv`). Keep `{0}` in the clear-button text: it becomes the pin count.
 
 ## Compatibility and validation
 
-Designed for compatibility with the **BeaverBuddies Stability Fork**. The mod does not patch game methods, change simulation or building data, send multiplayer events, or modify saves. It uses the same navigation queries as the game's selected-building visualizer and a separate instance of its outline renderer.
+Designed for compatibility with the **BeaverBuddies Stability Fork**. The mod does not patch game methods, change simulation or building data, send multiplayer events, or modify saves; the pins live in their own small local file. It uses the same navigation queries as the game's selected-building visualizer and a separate instance of its outline renderer.
 
 The release build passes 38 automated lifecycle/API checks. The mod has been tested in game on Timberborn 1.1.2.4, both single-player and in a two-player BeaverBuddies Stability Fork session with the mod installed on both computers. See `VALIDATION.md` for what was checked and how.
 

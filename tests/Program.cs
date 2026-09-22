@@ -31,6 +31,15 @@ Check(!pins.Clear(), "Repeated global clear is safe");
 pins.Set(forester, true);
 Check(pins.Set(forester, false) && pins.Count == 0, "Deleting last pinned building empties collection");
 Check(new PinSet<EqualBuilding>().Count == 0, "New map begins without pins");
+var tracked = new PinSet<EqualBuilding>();
+Check(!tracked.Changed && tracked.Set(farm, true) && tracked.Changed, "Pinning marks the pins for saving");
+tracked.Changed = false;
+Check(!tracked.Set(farm, true) && !tracked.Set(forester, false) && !tracked.Set(null, true) && !tracked.Changed, "A pin or unpin that changes nothing needs no save");
+Check(tracked.Set(farm, false) && tracked.Changed, "Unpinning marks the pins for saving");
+tracked.Set(farm, true); tracked.Changed = false;
+Check(tracked.Clear() && tracked.Changed, "Clearing marks the pins for saving");
+tracked.Changed = false;
+Check(!tracked.Clear() && !tracked.Changed, "Clearing no pins needs no save");
 
 // Refresh planning, against a fake navigation world that counts range queries and outline rebuilds.
 var around = CellBox.Around(10.5f, 20.5f, 3f, 22f);
@@ -148,10 +157,101 @@ Check(Pass() == (0, 1) && planner.Count == 1 && planner.Cells.Contains((0, 0, 5)
     "Closing the tool keeps the ranges that are pinned and drops the rest");
 planner.Clear();
 
+// Pins are remembered per settlement in a local file, by the entity id the save keeps for each building, never in the save.
+var idA = new Guid("18c0e8f4-5b0e-4d7a-9a52-0c7c1d3b9e01");
+var idB = new Guid("6d2f9a31-0e47-4b8c-8f1d-5a9e7c3b2d44");
+var idC = new Guid("c4a7e2d9-3f61-4e0b-b8a5-9d2c6f1e7a53");
+var remembered = PinStore.Write(null, "Beaverton", new[] { idB, idA, idB, Guid.Empty });
+Check(PinStore.Read(remembered, "Beaverton").SequenceEqual(new[] { idA, idB }) && remembered.Split(idB.ToString("D")).Length == 2 && !remembered.Contains(Guid.Empty.ToString("D")),
+    "Pins round-trip through the pin file as entity ids, written once each");
+Check(PinStore.Read(remembered, "Otter Bay").Count == 0 && PinStore.Read(remembered, "beaverton").Count == 0 && PinStore.Read(remembered, "Beaverton ").Count == 0,
+    "A different settlement shows none: the settlement name must match exactly");
+remembered = PinStore.Write(remembered, "Otter Bay", new[] { idC });
+Check(PinStore.Read(remembered, "Beaverton").SequenceEqual(new[] { idA, idB }) && PinStore.Read(remembered, "Otter Bay").SequenceEqual(new[] { idC }),
+    "Saving one settlement's pins keeps every other settlement's");
+var forgotten = PinStore.Write(remembered, "Beaverton", Array.Empty<Guid>());
+Check(PinStore.Read(forgotten, "Beaverton").Count == 0 && !forgotten.Contains("Beaverton") && PinStore.Read(forgotten, "Otter Bay").SequenceEqual(new[] { idC }),
+    "Clearing a settlement's pins removes its entry and keeps the others");
+Check(PinStore.Read(null, "Beaverton").Count == 0 && PinStore.Read("", "Beaverton").Count == 0, "A missing or empty pin file remembers no pins");
+Check(PinStore.Read("PK\u0003\u0004\uFFFD\u0000 not a pin file\n" + remembered, "Beaverton").Count == 0 &&
+    PinStore.Read(remembered.Replace(PinStore.Header, PinStore.Header + "0"), "Beaverton").Count == 0,
+    "A corrupt pin file, or one in another format, remembers no pins");
+var damaged = remembered.Replace(idA.ToString("D"), "18c0e8f4-5b0e") + "Bad\\qname\t" + idC + "\n\t" + idC + "\nhalf a li";
+Check(PinStore.Read(damaged, "Beaverton").SequenceEqual(new[] { idB }) && PinStore.Read(damaged, "Otter Bay").SequenceEqual(new[] { idC }) &&
+    PinStore.Read(damaged, "Badqname").Count == 0 && PinStore.Read(damaged, "Bad\\qname").Count == 0 && PinStore.Read(damaged, "").Count == 0,
+    "Damaged entries in the pin file are skipped and the rest survive");
+Check(PinStore.Write("garbage\n\u0000", "Beaverton", new[] { idA }) == PinStore.Write(null, "Beaverton", new[] { idA }), "Saving over a corrupt pin file replaces it");
+var names = new[] { "Tab\tTown", "Two\nLines\r", "Back\\slash\\t", "Back\\slash\t", "\u00DCbersee \u6CB3\u72F8", " spaced ", "Online Games" };
+string awkward = null;
+for (int i = 0; i < names.Length; i++) awkward = PinStore.Write(awkward, names[i], new[] { i % 2 == 0 ? idA : idB });
+Check(names.Select((name, i) => PinStore.Read(awkward, name).SequenceEqual(new[] { i % 2 == 0 ? idA : idB })).All(x => x) &&
+    PinStore.Read(awkward, "Tab").Count == 0 && PinStore.Read(awkward, "Two").Count == 0 && awkward.Split('\n').Length == names.Length + 2,
+    "Settlement names with tabs, line breaks, backslashes and other scripts keep their own pins, one line each");
+string crowded = null;
+for (int i = 0; i <= PinStore.MaxSettlements; i++) crowded = PinStore.Write(crowded, "Settlement " + i, new[] { idA });
+Check(PinStore.Read(crowded, "Settlement 0").Count == 0 && PinStore.Read(crowded, "Settlement 1").Count == 1 &&
+    PinStore.Read(crowded, "Settlement " + PinStore.MaxSettlements).Count == 1, "The pin file keeps only the most recently changed settlements");
+crowded = PinStore.Write(PinStore.Write(crowded, "Settlement 1", new[] { idB }), "Settlement new", new[] { idA });
+Check(PinStore.Read(crowded, "Settlement 1").SequenceEqual(new[] { idB }) && PinStore.Read(crowded, "Settlement 2").Count == 0,
+    "Changing a settlement's pins makes it the most recent");
+var touched = PinStore.Touch(PinStore.Write(PinStore.Write(null, "Beaverton", new[] { idA, idB }), "Otter Bay", new[] { idC }), "Beaverton");
+Check(touched != null && touched.Split('\n')[1].StartsWith("Beaverton\t") && PinStore.Read(touched, "Beaverton").SequenceEqual(new[] { idA, idB }) &&
+    PinStore.Read(touched, "Otter Bay").SequenceEqual(new[] { idC }), "Loading a settlement moves its entry first and keeps its pins and every other settlement's");
+Check(PinStore.Touch(touched, "Beaverton") == null && PinStore.Touch(touched, "Nowhere") == null && PinStore.Touch(null, "Beaverton") == null &&
+    PinStore.Touch("garbage\nBeaverton\t" + idA, "Beaverton") == null, "Loading a settlement that is already first, has no entry or has no readable file rewrites nothing");
+crowded = PinStore.Write(PinStore.Touch(crowded, "Settlement 3")!, "Settlement newer", new[] { idA });
+Check(PinStore.Read(crowded, "Settlement 3").SequenceEqual(new[] { idA }) && PinStore.Read(crowded, "Settlement 4").Count == 0,
+    "A settlement loaded recently is kept over one changed longer ago");
+var doubled = PinStore.Header + "\nBeaverton\t" + idA + "\t" + idA + "\t" + Guid.Empty + "\t" + idB + "\nBeaverton\t" + idC + "\n";
+Check(PinStore.Read(doubled, "Beaverton").SequenceEqual(new[] { idA, idB }), "A hand-edited pin file that lists a settlement twice uses its first line, each building once");
+var built = new[] { new SavedBuilding(idA), new SavedBuilding(idB), new SavedBuilding(idC) };
+remembered = PinStore.Write(null, "Beaverton", built.Take(2).Select(x => x.Id));
+var reloaded = new[] { new SavedBuilding(idA), new SavedBuilding(idB), new SavedBuilding(idC) };
+SavedBuilding Resolve(Guid id) => reloaded.FirstOrDefault(x => x.Id == id);
+Check(PinStore.Restore(PinStore.Read(remembered, "Beaverton"), Resolve, _ => true).SequenceEqual(reloaded.Take(2), PinSet<SavedBuilding>.Identity),
+    "After a load, pins find the reloaded buildings by entity id, not the objects that were pinned");
+Check(PinStore.Restore(new[] { idA, Guid.NewGuid(), idA }, Resolve, _ => true).SequenceEqual(new[] { reloaded[0] }, PinSet<SavedBuilding>.Identity),
+    "Ids of buildings the loaded save no longer has are dropped, and each building is pinned once");
+Check(PinStore.Restore(new[] { idA, idB }, Resolve, x => !ReferenceEquals(x, reloaded[0])).SequenceEqual(new[] { reloaded[1] }, PinSet<SavedBuilding>.Identity),
+    "A remembered building that can no longer be pinned stays unpinned");
+var pinFolder = Path.Combine(Path.GetTempPath(), "pwa-checks-" + Guid.NewGuid().ToString("N"));
+try
+{
+    var pinFile = new PinFile(Path.Combine(pinFolder, "PersistentWorkAreas", "Pins.txt"));
+    Check(pinFile.Load("Beaverton").Count == 0 && !Directory.Exists(pinFolder), "Before any pin is saved there is no pin file, and loading needs none");
+    pinFile.Save("Beaverton", new[] { idB, idA });
+    pinFile.Save("Otter Bay", new[] { idC });
+    Check(new PinFile(pinFile.FilePath).Load("Beaverton").SequenceEqual(new[] { idA, idB }) && new PinFile(pinFile.FilePath).Load("Otter Bay").SequenceEqual(new[] { idC }),
+        "Pins round-trip through the file on disk, whose folder is created on the first save");
+    var pinFiles = Path.GetDirectoryName(pinFile.FilePath)!;
+    string[] FileNames() => Directory.GetFiles(pinFiles).Select(x => Path.GetFileName(x)!).OrderBy(x => x, StringComparer.Ordinal).ToArray();
+    var beforeTouch = File.ReadAllText(pinFile.FilePath);
+    pinFile.Touch("Nowhere");
+    bool untouched = File.ReadAllText(pinFile.FilePath) == beforeTouch;
+    pinFile.Touch("Beaverton");
+    Check(untouched && File.ReadAllLines(pinFile.FilePath)[1].StartsWith("Beaverton\t") && pinFile.Load("Beaverton").SequenceEqual(new[] { idA, idB }) &&
+        pinFile.Load("Otter Bay").SequenceEqual(new[] { idC }) && FileNames().SequenceEqual(new[] { "Pins.txt" }),
+        "Loading a settlement moves its entry first on disk, with no copy or temporary file left behind");
+    var corrupt = new byte[] { 0x50, 0x4B, 0x03, 0x04, 0x00, 0xFF, 0xFE, 0x0A, 0x09, 0xC3 };
+    File.WriteAllBytes(pinFile.FilePath, corrupt);
+    Check(pinFile.Load("Beaverton").Count == 0, "A corrupt pin file on disk is ignored");
+    pinFile.Save("Beaverton", new[] { idA });
+    Check(pinFile.Load("Beaverton").SequenceEqual(new[] { idA }) && FileNames().SequenceEqual(new[] { "Pins.txt", "Pins.txt.bak" }) &&
+        File.ReadAllBytes(pinFile.FilePath + ".bak").SequenceEqual(corrupt), "Saving replaces an unreadable pin file, keeps a copy of it and leaves no temporary file behind");
+    var newer = PinStore.Header.Replace("v1", "v2") + "\nBeaverton\t" + idB + "\n";
+    File.WriteAllText(pinFile.FilePath, newer);
+    pinFile.Save("Beaverton", new[] { idA });
+    Check(pinFile.Load("Beaverton").SequenceEqual(new[] { idA }) && File.ReadAllText(pinFile.FilePath + ".bak") == newer,
+        "A pin file from a newer version is kept as a copy before this version replaces it");
+}
+finally
+{
+    if (Directory.Exists(pinFolder)) Directory.Delete(pinFolder, true);
+}
 // The checks above use only the mod's game-free sources, so CI runs them without arguments on a machine without
 // Timberborn. The rest need the installed game, the built mod DLL and its package folder. Add checks that need no game
 // files above this block, or CI never runs them: the count guard at the end cannot tell where a check was placed.
-const int GameChecks = 56; // A full run fails if this stops matching the checks below.
+const int GameChecks = 65; // A full run fails if this stops matching the checks below.
 int gameFreeChecks = checks;
 if (args.Length == 0)
 {
@@ -312,6 +412,92 @@ Set(live, "_plantersChanged", true);
 service.GetMethod("ShowPlanters", fields)!.Invoke(live, null);
 Check(liveEntries.Count == 0 && !Get<bool>(live, "_plantersChanged"), "Leaving the planting tool with no pins drops its buildings at the next update");
 
+// Remembered pins, on the same instance: its pin file in a temporary folder, and the settlement as the game's own service names it.
+// SavePins is what the frame update starts with; UpdateSingleton itself only reads Time.unscaledTime (which runs only in the game)
+// and passes it to UpdateAt, which the last check here invokes.
+var settlementReference = GameType("Timberborn.GameSaveRepositorySystem", "Timberborn.GameSaveRepositorySystem.SettlementReference");
+var settlements = RuntimeHelpers.GetUninitializedObject(GameType("Timberborn.SettlementNameSystem", "Timberborn.SettlementNameSystem.SettlementReferenceService"));
+Set(live, "_settlements", settlements);
+var liveFolder = Path.Combine(Path.GetTempPath(), "pwa-checks-" + Guid.NewGuid().ToString("N"));
+var livePinPath = Path.Combine(liveFolder, "Pins.txt");
+var pinFileType = mod.GetType("PersistentWorkAreas.PinFile", true)!;
+Set(live, "_pinFile", Activator.CreateInstance(pinFileType, livePinPath)!);
+void PinEntity(Guid id)
+{
+    var entity = RuntimeHelpers.GetUninitializedObject(entityComponent);
+    Set(entity, "<EntityId>k__BackingField", id);
+    livePins.GetType().GetMethod("Set")!.Invoke(livePins, new object[] { entity, true });
+}
+bool PinsChanged() => (bool)livePins.GetType().GetProperty("Changed")!.GetValue(livePins)!;
+List<Guid> Remembered(string settlement) => File.Exists(livePinPath) ? PinStore.Read(File.ReadAllText(livePinPath), settlement) : new List<Guid>();
+void SavePins() => service.GetMethod("SavePins", fields)!.Invoke(live, null);
+try
+{
+    PinEntity(idB); PinEntity(idA);
+    SavePins();
+    Check(!File.Exists(livePinPath) && PinsChanged(), "A new game's pins wait until the player names the settlement");
+    Set(settlements, "<SettlementReference>k__BackingField", Activator.CreateInstance(settlementReference, "Beaverton", "Saves")!);
+    SavePins();
+    Check(Remembered("Beaverton").SequenceEqual(new[] { idA, idB }) && !PinsChanged(), "A pin change is saved under the game's settlement name at the next update");
+    File.WriteAllText(livePinPath, PinStore.Write(File.ReadAllText(livePinPath), "Otter Bay", new[] { idC }));
+    service.GetMethod("ClearAll")!.Invoke(live, null);
+    Check(PinsChanged() && Remembered("Beaverton").Count == 2, "Clear pinned areas leaves the file to the next update");
+    SavePins();
+    Check(Remembered("Beaverton").Count == 0 && Remembered("Otter Bay").SequenceEqual(new[] { idC }), "Clear pinned areas forgets this settlement's pins and keeps other settlements'");
+    PinEntity(idC);
+    service.GetMethod("Reset", fields)!.Invoke(live, null);
+    SavePins();
+    Check(Remembered("Beaverton").SequenceEqual(new[] { idC }) && (int)service.GetProperty("Count")!.GetValue(live)! == 0 && !PinsChanged(),
+        "Leaving the map saves a pending pin change, then forgets the pins in memory only");
+
+    // Loading: the settlement's remembered ids go through the game's own EntityRegistry. idD is a building only a newer save has.
+    // PostLoad passes Supports, which needs live game objects, so this passes a test that turns down building A.
+    var idD = new Guid("f3b1c8e2-7a4d-4c59-9e06-2b8d5f1a6c37");
+    File.WriteAllText(livePinPath, PinStore.Write(PinStore.Write(null, "Beaverton", new[] { idA, idB, idD }), "Otter Bay", new[] { idC }));
+    var entityRegistry = Activator.CreateInstance(GameType("Timberborn.EntitySystem", "Timberborn.EntitySystem.EntityRegistry"))!;
+    object Loaded(Guid id)
+    {
+        var entity = RuntimeHelpers.GetUninitializedObject(entityComponent);
+        Set(entity, "<EntityId>k__BackingField", id);
+        Get<System.Collections.IDictionary>(entityRegistry, "_entities")[id] = entity;
+        return entity;
+    }
+    var loadedA = Loaded(idA); var loadedB = Loaded(idB); Loaded(idC);
+    Set(live, "_entities", entityRegistry);
+    var beforeLoad = File.ReadAllText(livePinPath);
+    Func<object, bool> pinnable = x => !ReferenceEquals(x, loadedA);
+    service.GetMethod("RestorePins", fields)!.Invoke(live, new object[] { pinnable });
+    Check((int)service.GetProperty("Count")!.GetValue(live)! == 1 && (bool)livePins.GetType().GetMethod("Contains")!.Invoke(livePins, new[] { loadedB })! &&
+        liveEntries.Count == 1 && liveEntries.Contains(loadedB) && !PinsChanged() && File.ReadAllText(livePinPath) == beforeLoad,
+        "Loading pins this settlement's remembered buildings that can be pinned, draws them, and writes nothing yet");
+    SavePins();
+    Check(File.ReadAllLines(livePinPath)[1].StartsWith("Beaverton\t") && Remembered("Beaverton").SequenceEqual(new[] { idA, idB, idD }) &&
+        Remembered("Otter Bay").SequenceEqual(new[] { idC }),
+        "The first update after loading moves the settlement first in the pin file and keeps the buildings this save lacks");
+
+    // The frame update, given the clock: it saves before anything else, and waits 10 seconds after a failed write.
+    // The failure warning goes to Unity's log, which runs only in the game, so it is marked as already given.
+    service.GetMethod("ClearAll")!.Invoke(live, null);
+    Set(live, "_active", true);
+    Set(live, "_saveWarned", true);
+    var goodPinFile = Get<object>(live, "_pinFile");
+    Set(live, "_pinFile", Activator.CreateInstance(pinFileType, Path.Combine(livePinPath, "Pins.txt"))!);
+    void UpdateAt(float now) => service.GetMethod("UpdateAt", fields)!.Invoke(live, new object[] { now });
+    UpdateAt(100f);
+    bool retryLater = PinsChanged() && Get<float>(live, "_nextSave") == 110f;
+    Set(live, "_pinFile", goodPinFile);
+    UpdateAt(109f);
+    bool waited = Remembered("Beaverton").Count == 3;
+    UpdateAt(110f);
+    Check(retryLater && waited && Remembered("Beaverton").Count == 0 && Remembered("Otter Bay").SequenceEqual(new[] { idC }) && !PinsChanged() && liveEntries.Count == 0,
+        "The frame update saves a pin change with nothing left to draw, and retries a failed write 10 seconds later");
+    Set(live, "_active", false);
+}
+finally
+{
+    if (Directory.Exists(liveFolder)) Directory.Delete(liveFolder, true);
+}
+
 // The planting tool's rule on the game's own blueprints: crops show farmhouses, trees and bushes show foresters.
 var plantables = new List<(string Name, string Group, bool Crop, bool Tree)>();
 var planters = new List<(string Name, string Group, bool FarmHouse, bool Forester, bool Outlined)>();
@@ -347,6 +533,10 @@ Check(interfaces.Contains("Timberborn.SingletonSystem.IPostLoadableSingleton"), 
 Check(interfaces.Contains("Timberborn.SingletonSystem.IUpdatableSingleton"), "Display refresh lifecycle");
 Check(interfaces.Contains("Timberborn.Navigation.ISingletonInstantNavMeshListener") && interfaces.Contains("Timberborn.Navigation.ISingletonPreviewNavMeshListener"), "Live and construction preview invalidation");
 Check(!interfaces.Any(x => x.Contains("Saveable") || x.Contains("Tickable") || x.Contains("PersistentEntity")), "No simulation tick or persistence interfaces");
+Check(mod.GetTypes().All(t => !t.GetInterfaces().Any(x => x.Namespace?.StartsWith("Timberborn") == true &&
+        (x.Name.Contains("Sav") || x.Name.Contains("Persist") || x.Name.Contains("Tick")))) &&
+    !mod.GetReferencedAssemblies().Any(x => x.Name is "Timberborn.Persistence" or "Timberborn.WorldPersistence" or "Timberborn.SaveSystem" or "Timberborn.GameSaveRuntimeSystem"),
+    "Pins stay out of the save: no mod type saves, persists or ticks, and the mod never references the game's save writers");
 Check(!mod.GetReferencedAssemblies().Any(x => x.Name.Contains("BeaverBuddies") || x.Name.Contains("TimberNet") || x.Name.Contains("Harmony")), "No multiplayer or Harmony assembly dependencies");
 Check(mod.GetTypes().All(t => !t.GetCustomAttributesData().Any(a => a.AttributeType.Name.StartsWith("HarmonyPatch"))), "No method patches");
 var fragment = mod.GetType("PersistentWorkAreas.WorkAreaFragment", true)!;
@@ -384,9 +574,16 @@ var clearKey = (string)service.GetField("ClearKey")!.GetRawConstantValue()!;
 var reflected = new[] { drawer, calculator, bounds, layer };
 var reflectedNames = reflected.Select(x => x.FullName!).Concat(reflected.SelectMany(x => x.GetMembers(
     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)).Select(x => x.Name)).ToHashSet();
+// The pin file's header, folder and file names, its escapes and GUID format, PinStore's argument check, and the
+// ": " that joins a log warning to its error. None of it is shown in the game's UI.
+var pinFileText = new HashSet<string> {
+    (string)mod.GetType("PersistentWorkAreas.PinStore", true)!.GetField("Header")!.GetRawConstantValue()!,
+    "PersistentWorkAreas", "Pins.txt", ".tmp", ".bak", "D", "\t", "\n", "\r", "\\", "\\\\", "\\t", "\\n", "\\r",
+    "A settlement name is required.", "settlement", ": " };
 bool IsCode(string x) => x.StartsWith("PersistentWorkAreas.") ? x == clearKey || enUS.ContainsKey(x)
     : x.StartsWith("[PersistentWorkAreas] ") || x.StartsWith(" loaded. ") // log text; Mod.cs splits its line around the version
-    || System.Text.RegularExpressions.Regex.IsMatch(x, "^PersistentWorkAreas[A-Z][A-Za-z]*$") || reflectedNames.Contains(x);
+    || System.Text.RegularExpressions.Regex.IsMatch(x, "^PersistentWorkAreas[A-Z][A-Za-z]*$") || reflectedNames.Contains(x)
+    || pinFileText.Contains(x);
 var hardCoded = literals.Keys.Where(x => !IsCode(x)).ToArray();
 Check(hardCoded.Length == 0, "No hard-coded English UI text in the mod DLL" + string.Concat(hardCoded.Select(x => "\n  \"" + x + "\"")));
 var locKeys = mod.GetType("PersistentWorkAreas.LocKeys")?.GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -473,6 +670,15 @@ static IEnumerable<string> BlueprintLocKeys(JsonElement element) => element.Valu
 sealed class EqualBuilding
 {
     public override bool Equals(object obj) => obj is EqualBuilding;
+    public override int GetHashCode() => 1;
+}
+
+// A building as a save knows it: only its entity id survives a load. Equal-valued so that restoring must go by id.
+sealed class SavedBuilding
+{
+    public readonly Guid Id;
+    public SavedBuilding(Guid id) { Id = id; }
+    public override bool Equals(object obj) => obj is SavedBuilding;
     public override int GetHashCode() => 1;
 }
 

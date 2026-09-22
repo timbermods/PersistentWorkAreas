@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Timberborn.BaseComponentSystem;
 using Timberborn.BlockSystem;
 using Timberborn.BlueprintSystem;
@@ -17,8 +19,10 @@ using Timberborn.MapStateSystem;
 using Timberborn.Navigation;
 using Timberborn.Planting;
 using Timberborn.PlantingUI;
+using Timberborn.PlatformUtilities;
 using Timberborn.SceneLoading;
 using Timberborn.SelectionSystem;
+using Timberborn.SettlementNameSystem;
 using Timberborn.SingletonSystem;
 using Timberborn.ToolSystem;
 using Timberborn.UILayoutSystem;
@@ -46,6 +50,8 @@ namespace PersistentWorkAreas
         private readonly MapSize _mapSize;
         private readonly ISpecService _specs;
         private readonly EntityComponentRegistry _registry;
+        private readonly EntityRegistry _entities;
+        private readonly SettlementReferenceService _settlements;
         private readonly EventBus _events;
         private readonly LoadingScreen _loading;
         private readonly UILayout _layout;
@@ -59,6 +65,12 @@ namespace PersistentWorkAreas
         // The resource group of the plant whose planting tool is open, or null.
         private string _planting;
         private bool _plantersChanged;
+        private PinFile _pinFile;
+        // Set at load, so the first update marks this settlement as recently used in the pin file.
+        private bool _touchPinFile;
+        // After a failed write the next attempt waits, and only the first failure is logged.
+        private float _nextSave;
+        private bool _saveWarned;
         public event Action Changed;
         public int Count => _pins.Count;
         public bool Available => _active && !_rendererFailed;
@@ -66,11 +78,12 @@ namespace PersistentWorkAreas
         public WorkAreaService(INavigationRangeService navigation, NavigationDistance distance, ConstructionModeService construction,
             IBlockService blocks, PreviewBlockService previews, ILevelVisibilityService visibility,
             MapSize mapSize, ISpecService specs, EntityComponentRegistry registry, EventBus events, LoadingScreen loading,
-            UILayout layout, InputService input, ILoc loc)
+            UILayout layout, InputService input, ILoc loc, EntityRegistry entities, SettlementReferenceService settlements)
         {
             _navigation = navigation; _construction = construction; _blocks = blocks;
             _previews = previews; _visibility = visibility; _mapSize = mapSize; _specs = specs;
             _registry = registry; _events = events; _loading = loading; _layout = layout; _input = input; _loc = loc;
+            _entities = entities; _settlements = settlements;
             // BuildingTerrainRange's own margin for deciding whether a navigation change can alter a range.
             _reach = distance.ResourceBuildings + 2f;
             _planner = new PinRefreshPlanner<EntityComponent, (Vector3? Center, bool Preview, bool Terrain), Vector3Int>(
@@ -89,6 +102,8 @@ namespace PersistentWorkAreas
             _clearButton.tooltip = _loc.T(LocKeys.ClearAllTooltip);
             _clearButton.style.marginTop = 6;
             _layout.AddTopRight(_clearButton, 1000);
+            _pinFile = new PinFile(Path.Combine(UserDataFolder.Folder, "PersistentWorkAreas", "Pins.txt"));
+            RestorePins(Supports);
             Notify();
         }
 
@@ -134,17 +149,21 @@ namespace PersistentWorkAreas
             return true;
         }
 
-        public void UpdateSingleton()
+        public void UpdateSingleton() => UpdateAt(Time.unscaledTime);
+
+        // The frame update, given the clock, so the checks can run it outside the game.
+        private void UpdateAt(float now)
         {
             if (!Available) return;
             try
             {
+                if (now >= _nextSave && !SavePins()) _nextSave = now + 10f;
                 if (_plantersChanged) ShowPlanters();
                 if (_planner.Count == 0) return;
-                if (_planner.Pending && Time.unscaledTime >= _nextRefresh)
+                if (_planner.Pending && now >= _nextRefresh)
                 {
                     RefreshCells();
-                    _nextRefresh = Time.unscaledTime + .2f;
+                    _nextRefresh = now + .2f;
                 }
                 if (_planner.Cells.Count > 0) _outline?.Draw();
             }
@@ -276,6 +295,52 @@ namespace PersistentWorkAreas
             _plantersChanged = true;
         }
 
+        // Pins come back from the pin file, never from the save, so each co-op player gets back only their own.
+        // PostLoad passes Supports; the checks pass their own test, because Supports needs live game objects.
+        private void RestorePins(Func<EntityComponent, bool> supports)
+        {
+            var settlement = _settlements.SettlementReference?.SettlementName;
+            if (settlement == null) return;
+            try
+            {
+                foreach (var pin in PinStore.Restore(_pinFile.Load(settlement), _entities.GetEntity, supports))
+                    if (_pins.Set(pin, true)) _planner.Add(pin);
+                _touchPinFile = true;
+            }
+            catch (Exception error)
+            {
+                Debug.LogWarning("[PersistentWorkAreas] Pinned areas not restored from " + _pinFile.FilePath + ": " + error.Message);
+            }
+            // Restoring is not a change: the file keeps remembered buildings this save lacks, for when a newer save loads.
+            _pins.Changed = false;
+        }
+
+        // Writes the pins after they change, or marks the loaded settlement as recently used. A new game's settlement
+        // has no name until the player gives one, so its pins wait until then. Leaving the map, loading or a renderer
+        // failure forgets pins in memory only. False when the write failed; the change stays pending for a retry.
+        private bool SavePins()
+        {
+            if ((!_pins.Changed && !_touchPinFile) || _pinFile == null) return true;
+            var settlement = _settlements.SettlementReference?.SettlementName;
+            if (settlement == null) return true;
+            try
+            {
+                if (_pins.Changed) _pinFile.Save(settlement, _pins.Items.Select(pin => pin.EntityId));
+                else _pinFile.Touch(settlement);
+                _pins.Changed = false;
+                _touchPinFile = false;
+                return true;
+            }
+            catch (Exception error)
+            {
+                // Moving the settlement's entry first is only a courtesy, so it is not retried.
+                _touchPinFile = false;
+                if (!_saveWarned) Debug.LogWarning("[PersistentWorkAreas] Pinned areas not saved to " + _pinFile.FilePath + ": " + error.Message);
+                _saveWarned = true;
+                return false;
+            }
+        }
+
         private void Notify()
         {
             if (_clearButton != null)
@@ -303,12 +368,14 @@ namespace PersistentWorkAreas
             catch (Exception error) { Debug.LogError("[PersistentWorkAreas] Renderer cleanup failed: " + error); }
             _planner.Clear();
         }
-        // Forgets the pins and the planting tool's buildings, and releases the renderer.
+        // Saves a pending pin change, then forgets the pins and the planting tool's buildings, and releases the renderer.
         private void Reset()
         {
+            SavePins();
             _planting = null;
             _plantersChanged = false;
             _pins.Clear();
+            _pins.Changed = false;
             ReleaseOutline();
             Notify();
         }
