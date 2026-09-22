@@ -87,7 +87,7 @@
         </details>
         <details class="q" id="saves">
           <summary>Is it safe for my saves? Can I remove it mid-game?</summary>
-          <div class="a"><p>Yes. The mod never writes to your save files and doesn't change buildings, beavers or the simulation. Pins aren't saved at all. You can disable or delete the mod at any time and your colony loads as normal.</p></div>
+          <div class="a"><p>Yes. The mod never writes to your save files and doesn't change buildings, beavers or the simulation. Pins are kept in their own small file outside your saves. You can disable or delete the mod at any time and your colony loads as normal.</p></div>
         </details>
         <details class="q" id="multiplayer">
           <summary>Does it work in multiplayer? Do both players need it?</summary>
@@ -119,7 +119,11 @@
         </details>
         <details class="q" id="persist">
           <summary>Do my pins survive saving and loading?</summary>
-          <div class="a"><p>No. Pins reset when you leave the map, load a save, or a multiplayer resync happens. That's deliberate, so the mod can never affect a saved colony.</p></div>
+          <div class="a"><p>Yes, since version 1.1.0. Each settlement's pins are remembered on your own computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load any save of that settlement. They are never written into the save itself, so the mod can't affect a saved colony. A different settlement starts with no pins, and a co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save. To forget every pin, delete that file.</p></div>
+        </details>
+        <details class="q" id="planting">
+          <summary>Why do farmhouse or forester outlines appear when I pick a crop or tree?</summary>
+          <div class="a"><p>Since version 1.1.0, picking a crop or tree in the planting tools outlines the working area of every building that can plant it: farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes, including ones still under construction. The outlines go away when you leave the planting tool. <strong>Clear pinned areas</strong> removes only your pins, not these.</p></div>
         </details>
         <details class="q" id="overlays">
           <summary>Can it pin district road colors, effect radii or placement ghosts?</summary>
@@ -127,11 +131,11 @@
         </details>
         <details class="q" id="language">
           <summary>Is it translated?</summary>
-          <div class="a"><p>Not yet. The mod's text is English only.</p></div>
+          <div class="a"><p>Not yet. The mod's text is English only, but since version 1.1.0 all of it lives in one file, <code>version-1.1/Localizations/enUS_PersistentWorkAreas.csv</code>. A translation is one more file there with the same keys, named for the game's language code, for example <code>deDE_PersistentWorkAreas.csv</code>.</p></div>
         </details>
         <details class="q" id="perf">
           <summary>Will it slow down my game?</summary>
-          <div class="a"><p>It's designed not to. Outlines recalculate at most five times per second and only when something changes, all pins share one combined mesh, nothing runs while there are no pins, and the mesh is released when you clear. If you notice a drop in a very large colony, <a href="troubleshooting.html#performance">let us know</a>.</p></div>
+          <div class="a"><p>It's designed not to. A terrain or path change re-checks only the pinned buildings it can reach, at most five times per second, and selecting a building redraws from what was already worked out. All outlines share one combined mesh, nothing runs while there are no pins and no planting tool is open, and the mesh is released once nothing is drawn. If you notice a drop in a very large colony, <a href="troubleshooting.html#performance">let us know</a>.</p></div>
         </details>
       </div>
 

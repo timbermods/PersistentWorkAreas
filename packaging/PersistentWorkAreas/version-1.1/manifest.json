@@ -1,8 +1,8 @@
 {
   "Name": "Persistent Work Areas",
-  "Version": "1.0.0",
+  "Version": "1.1.0",
   "Id": "kyler.persistentworkareas",
   "MinimumGameVersion": "1.1.2.4",
-  "Description": "Pin farm, forester, lumberjack and other navigation-based working-area outlines. Clear all pins from the top-right button or a configurable key binding. Local display only; designed for compatibility with the BeaverBuddies Stability Fork.",
+  "Description": "Pin farm, forester, lumberjack and other navigation-based working-area outlines. Planting tools also outline the farmhouses or foresters that plant the chosen crop or tree, and pins are remembered per settlement in a local file, never in the save. Clear all pins from the top-right button or a configurable key binding. Local display only; designed for compatibility with the BeaverBuddies Stability Fork.",
   "RequiredMods": []
 }

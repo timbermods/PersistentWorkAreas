@@ -132,7 +132,7 @@
         <h2>The outline doesn't match my recent terrain or path changes</h2>
         <dl>
           <dt>What to expect</dt>
-          <dd>Outlines refresh when terrain, paths, visible level, construction mode or your selection change, at most five times per second, so a change can take a moment to show.</dd>
+          <dd>Outlines recalculate when terrain, paths or construction mode change near a pinned building, at most five times per second, so a change can take a moment to show. Selection and visible-level changes redraw from the last result right away.</dd>
           <dt>Fix</dt>
           <dd>Wait a second. If it's still stale, uncheck and re-check the building's box to rebuild it, and <a href="#report">report it</a> if it keeps happening, saying what you changed.</dd>
         </dl>
@@ -142,9 +142,9 @@
         <h2>My pins disappeared</h2>
         <dl>
           <dt>Why</dt>
-          <dd>Pins are temporary by design. They reset when you leave the map, load a save, or a multiplayer resync happens. They are never written to your save file. Deleting a pinned building also removes its pin, and <strong>Clear pinned areas</strong> removes all of them.</dd>
+          <dd>Pins are remembered for each settlement in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, never in your save. A different settlement starts with none. A co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save. Deleting a pinned building removes its pin, <strong>Clear pinned areas</strong> removes all of them, and deleting <code>Pins.txt</code> forgets every settlement's pins. Outlines that appeared because a planting tool was open go away when you leave the tool; they were never pins.</dd>
           <dt>Fix</dt>
-          <dd>Pin the buildings again. This is expected behavior, not a fault.</dd>
+          <dd>Load a save of the same settlement, or pin the buildings again. If pins don't come back for the same settlement, look in <code>Player.log</code> for a <code>[PersistentWorkAreas] Pinned areas not</code> warning and <a href="#report">report it</a>.</dd>
         </dl>
       </article>
 
@@ -214,7 +214,7 @@
         <h2>Slowdowns with many pins</h2>
         <dl>
           <dt>What to expect</dt>
-          <dd>The outline only recalculates when something changes, at most five times per second, and does no work while nothing is pinned. All pins share one combined mesh.</dd>
+          <dd>A terrain or path change re-checks only the pinned buildings it can reach, at most five times per second. Nothing runs while nothing is pinned and no planting tool is open. All outlines share one combined mesh. Opening a planting tool works out every matching farmhouse's or forester's area at once, which can take a moment in a very large colony.</dd>
           <dt>Fix</dt>
           <dd>Clear pins you no longer need. If you still see a drop in frame rate, <a href="#report">report it</a> with roughly how many pins and how large your colony is.</dd>
         </dl>

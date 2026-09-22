@@ -132,10 +132,10 @@
         <li>Extract it into the same <code>Mods</code> folder and choose <strong>Replace</strong> when asked about existing files.</li>
         <li>Start the game and confirm <strong>Persistent Work Areas</strong> is still enabled in the mod manager.</li>
       </ol>
-      <p>Pins are never saved, so there's nothing to migrate.</p>
+      <p>Replace the whole folder rather than only the DLL: since 1.1.0 the mod reads its text from the <code>Localizations</code> folder beside it. Your pins are kept outside the mod folder, in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, so updating keeps them.</p>
 
       <h2 id="uninstall">Uninstalling</h2>
-      <p>Disable the mod in the mod manager, or close the game and delete <code>Documents\Timberborn\Mods\PersistentWorkAreas</code>. Your saves are unaffected because the mod never writes to them.</p>
+      <p>Disable the mod in the mod manager, or close the game and delete <code>Documents\Timberborn\Mods\PersistentWorkAreas</code>. Your saves are unaffected because the mod never writes to them. To remove the remembered pins too, delete the <code>Documents\Timberborn\PersistentWorkAreas</code> folder.</p>
     </div>
   </div>
 </main>
