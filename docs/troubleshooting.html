@@ -91,7 +91,7 @@
             </ul>
           </dd>
           <dt>Fix</dt>
-          <dd>Try a farm or forester first. If the panel appears there, the mod is working and the other building simply has no pinnable area. If it doesn't appear on a farm either, <a href="#log">check the log</a>.</dd>
+          <dd>Try a farm or forester first. If the panel appears there, the mod is working and the other building has no pinnable area. If it doesn't appear on a farm either, <a href="#log">check the log</a>.</dd>
         </dl>
       </article>
 
@@ -179,7 +179,7 @@
         <h2>A Builder's Hut shows an outline when I select it</h2>
         <dl>
           <dt>Why</dt>
-          <dd>That outline comes from Timberborn itself. The game gives every Builder's Hut a road-spill range and draws it while the hut is selected. Persistent Work Areas doesn't draw it and doesn't change it. Since version 0.1.2 the mod simply doesn't offer a pin for Builder's Huts.</dd>
+          <dd>That outline comes from Timberborn itself. The game gives every Builder's Hut a road-spill range and draws it while the hut is selected. Persistent Work Areas doesn't draw it and doesn't change it. Since version 0.1.2 the mod doesn't offer a pin for Builder's Huts.</dd>
           <dt>Fix</dt>
           <dd>Nothing to fix. To confirm, disable the mod, restart, and select a Builder's Hut: the same outline appears.</dd>
         </dl>
@@ -203,8 +203,8 @@
             <ul>
               <li>Pins are local. Pinning or clearing on your computer never changes what your partner sees.</li>
               <li>The mod doesn't patch the game, run simulation code or send multiplayer events, so it shouldn't cause desyncs. If you suspect it, disable it on the affected computer and see if the problem goes away.</li>
-              <li>It's designed for compatibility with the BeaverBuddies Stability Fork and has been tested in co-op with the mod installed on both computers. Running it on only one computer hasn't been playtested.</li>
-              <li>A multiplayer resync clears your pins. That's expected.</li>
+              <li>It's designed for compatibility with the BeaverBuddies Stability Fork but doesn't depend on it. For co-op, every player installs the same version of the mod and runs the same game version; that's the tested setup. Running it on only one computer hasn't been playtested.</li>
+              <li>A multiplayer resync reloads the map. The host's pins should come back. A guest's pins usually don't, because the guest's settlement is named after the host's save. That's expected.</li>
             </ul>
           </dd>
         </dl>
@@ -228,6 +228,7 @@
         <li><code>[PersistentWorkAreas] &lt;version&gt; loaded.</code> when the mod started normally.</li>
         <li><code>Outline disabled for this map:</code> followed by an error, when the renderer failed.</li>
         <li><code>Renderer cleanup failed:</code> followed by an error, if freeing the outline hit a problem.</li>
+        <li><code>Pinned areas not restored from</code> or <code>Pinned areas not saved to</code>, followed by the path of <code>Pins.txt</code> and an error, if the pin file couldn't be read or written.</li>
       </ul>
       <p>No <code>[PersistentWorkAreas]</code> lines at all means the game never loaded the mod, so go back to <a href="#not-listed">the first fix</a>.</p>
 
@@ -247,8 +248,8 @@
 <footer class="site-footer">
   <div class="container foot">
     <div>
-      <p><strong>Persistent Work Areas</strong>, an unofficial Timberborn mod.</p>
-      <p>Timberborn is made by Mechanistry. This is a fan project and is not affiliated with or endorsed by them.</p>
+      <p><strong>Persistent Work Areas</strong>, maintained by <a href="https://github.com/timbermods">Timbermods</a>.</p>
+      <p>An unofficial community mod for Timberborn. Not affiliated with or endorsed by Mechanistry.</p>
     </div>
     <ul aria-label="Links">
       <li><a href="install.html">Install</a></li>
@@ -257,6 +258,7 @@
       <li><a href="https://github.com/timbermods/PersistentWorkAreas">Source</a></li>
       <li><a href="https://github.com/timbermods/PersistentWorkAreas/releases">Releases</a></li>
       <li><a href="https://github.com/timbermods/PersistentWorkAreas/issues">Report a problem</a></li>
+      <li><a href="https://timbermods.github.io/">More mods from Timbermods</a></li>
     </ul>
   </div>
 </footer>
