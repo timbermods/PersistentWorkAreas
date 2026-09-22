@@ -9,7 +9,8 @@ namespace PersistentWorkAreas
     {
         public void StartMod(IModEnvironment environment)
         {
-            Debug.Log("[PersistentWorkAreas] 0.1.3 loaded. Local working-area pins; no simulation or multiplayer patches.");
+            var version = typeof(ModStarter).Assembly.GetName().Version.ToString(3);
+            Debug.Log("[PersistentWorkAreas] " + version + " loaded. Local working-area pins; no simulation or multiplayer patches.");
         }
     }
 

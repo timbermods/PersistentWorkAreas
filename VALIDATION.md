@@ -1,19 +1,27 @@
-# Validation — Persistent Work Areas 0.1.3
+# Validation — Persistent Work Areas 1.0.0
 
-## Completed
+## In-game testing
+
+- Tested in game on Timberborn 1.1.2.4 with the BeaverBuddies Stability Fork, both single-player and in a two-player co-op session with the mod installed on both computers. Pinning, clearing and outline display worked as expected.
+- The tested build was 0.1.3. The 1.0.0 code is the same except for the version number and the startup log line, which now reads the version from the assembly.
+- Running the mod on only one of the two co-op computers has not been playtested.
+
+## Automated checks
 
 - Compiled for `netstandard2.1` against the installed Timberborn 1.1.2.4 assemblies: zero errors and zero warnings.
-- 37 checks passed: reference-identity pins, duplicate pin/unpin, independent pins, replacement/deletion behavior, global clear, new-map isolation, native renderer constructors/methods/cleanup fields, delegate binding to internal renderer methods, lifecycle/navigation/event interfaces, no simulation persistence interfaces, no Harmony/BeaverBuddies dependencies, package/key-binding consistency, and presence of the Builder's Hut marker component used to exclude it from pinning.
+- 38 checks passed: reference-identity pins, duplicate pin/unpin, independent pins, replacement/deletion behavior, global clear, new-map isolation, native renderer constructors/methods/cleanup fields, delegate binding to internal renderer methods, lifecycle/navigation/event interfaces, no simulation persistence interfaces, no Harmony/BeaverBuddies dependencies, package/key-binding consistency, manifest/assembly version agreement, and presence of the Builder's Hut marker component used to exclude it from pinning.
 - Compared the display path with the installed game's `BuildingRangeDrawer`, `BoundsNavRangeDrawer`, and navigation query calls. The mod uses those same range queries and its own outline-renderer instance.
 - Reviewed the BeaverBuddies Stability Fork's `IO/BuildCompatibility.cs`: its handshake identifies Timberborn and the BeaverBuddies/TimberNet binaries. This mod changes none of them.
 - The display service only implements frame-update, input, load, and navigation-notification interfaces. Pin state is per game-scoped service instance. There are no Harmony patches, replay events, simulation ticks, random calls, or save writes.
 - Renderer geometry refreshes on pin, selection, construction-mode, height-visibility and navigation changes, with navigation refreshes capped at five per second. Empty pin sets do no range queries or drawing. All pins share a combined mesh. Clearing releases the renderer's owned meshes and cloned materials.
 
-## Not established by these checks
+## Not established by the automated checks
 
-These are compiled API and logic checks, not Unity rendering tests or an actual co-op session. They do not establish the visual placement of controls, frame-rate impact in a large colony, or compatibility with every other mod. Internal renderer reflection is deliberately isolated in `NativeOutline.cs` and checked against the installed assemblies.
+These are compiled API and logic checks, not Unity rendering tests or a co-op session; the in-game testing above covers those. Neither establishes frame-rate impact in a very large colony or compatibility with every other mod. Internal renderer reflection is deliberately isolated in `NativeOutline.cs` and checked against the installed assemblies.
 
-## First in-game playtest
+## Release playtest checklist
+
+Re-run this for each release and after each Timberborn update.
 
 1. With the BeaverBuddies Stability Fork enabled, load a colony, select a farm and enable its checkbox. Deselect and paint crops: the working-area outline should remain.
 2. Pin a forester and paint trees. Pin a second nearby building; verify overlapping areas merge and separate areas both remain visible.
@@ -28,4 +36,4 @@ These are compiled API and logic checks, not Unity rendering tests or an actual 
 - [Timberborn official modding tools](https://github.com/mechanistry/timberborn-modding)
 - [BeaverBuddies Stability Fork](https://github.com/timbermods/BeaverBuddies-Stability-Fork)
 
-The exact API decisions were verified against the user's installed game assemblies and local BeaverBuddies Stability Fork source, rather than assuming the latest online API matches their installation.
+The exact API decisions were verified against the installed game assemblies and local BeaverBuddies Stability Fork source, rather than assuming the latest online API matches the installed game.
