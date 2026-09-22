@@ -27,6 +27,21 @@ pins.Set(forester, true);
 Check(pins.Set(forester, false) && pins.Count == 0, "Deleting last pinned building empties collection");
 Check(new PinSet<EqualBuilding>().Count == 0, "New map begins without pins");
 
+// The checks above use only the mod's game-free sources, so CI runs them without arguments on a machine without
+// Timberborn. The rest need the installed game, the built mod DLL and its package folder.
+const int GameChecks = 27; // A full run fails if this stops matching the checks below.
+int gameFreeChecks = checks;
+if (args.Length == 0)
+{
+    Console.WriteLine($"{checks} checks passed; {GameChecks} checks that need the game were skipped (pass <Timberborn folder> <PersistentWorkAreas.dll> <package folder> to run them).");
+    return 0;
+}
+if (args.Length != 3)
+{
+    Console.Error.WriteLine("Usage: Checks [<Timberborn folder> <PersistentWorkAreas.dll> <package folder>]. With no arguments only the game-free checks run.");
+    return 2;
+}
+
 var game = Path.GetFullPath(args[0]);
 var modPath = Path.GetFullPath(args[1]);
 var managed = Path.Combine(game, "Timberborn_Data", "Managed");
@@ -91,7 +106,10 @@ Check(manifest.RootElement.GetProperty("RequiredMods").GetArrayLength() == 0, "S
 Check(manifest.RootElement.GetProperty("Version").GetString() == mod.GetName().Version!.ToString(3), "Manifest version matches assembly version");
 using var binding = JsonDocument.Parse(File.ReadAllText(Path.Combine(packaging, "KeyBindings", "PersistentWorkAreas.Clear.blueprint.json")));
 Check(binding.RootElement.GetProperty("KeyBindingSpec").GetProperty("Id").GetString() == (string)service.GetField("ClearKey")!.GetRawConstantValue()!, "Clear key binding matches input handler");
+if (checks - gameFreeChecks != GameChecks)
+    throw new Exception($"FAIL: {checks - gameFreeChecks} checks need the game but GameChecks says {GameChecks}; update it so runs without the game report the right number skipped");
 Console.WriteLine($"{checks} checks passed. Unity rendering and multiplayer playtesting still require the game.");
+return 0;
 
 sealed class EqualBuilding
 {
