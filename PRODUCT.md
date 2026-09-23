@@ -107,7 +107,8 @@ community range-overlay mods is on record; don't invent one.
 
 - **Stack and hosting:** plain static HTML/CSS/JS in `docs/` on `main`, no build step: `index.html` (Overview),
   `install.html`, `troubleshooting.html`, `faq.html`, `404.html`, `.nojekyll`, and `assets/` (`style.css`, `site.js`,
-  `demo.js`, `favicon.svg`). GitHub Pages serves `main:/docs` (legacy build) at
+  `demo.js`, `favicon.svg`, `fonts/` with self-hosted Chivo 700/800, `textures/` with the rasters and
+  `make_textures.py`). GitHub Pages serves `main:/docs` (legacy build) at
   https://timbermods.github.io/PersistentWorkAreas/, so a change is live once it's merged to `main`; there is no deploy
   script and no `gh-pages` branch. It must stay fast, light and mobile-friendly. It's one of the timbermods sites
   (MixedStorage, the BeaverBuddies Stability Fork and MultiColony are siblings; the org catalog is
@@ -121,8 +122,8 @@ community range-overlay mods is on record; don't invent one.
     `pwa-latest-release`), fills every `[data-latest-version]` (unhiding it), points every `[data-latest-zip]` link at
     the asset matching `^PersistentWorkAreas-v[\d.]+\.zip$`, and fills `[data-zip-name]` / unhides `[data-zip-line]`.
     Every download link's `href` already points at `/releases/latest`, so the page works without the script.
-  - Elements that start `hidden` (the version badge, the zip-name line, the demo's clear button) must stay hidden
-    under the stylesheet until script reveals them.
+  - Elements that start `hidden` (the version badge, the zip-name line, the demo's clear and planting buttons) must
+    stay hidden under the stylesheet until script reveals them.
   - `404.html` loads its assets and links by absolute `/PersistentWorkAreas/` paths.
   - `demo.js` is a simplified illustration, not the mod's renderer; it and the install-page panel sample use the
     in-game strings (WORKING AREA, Keep working area visible, ON/OFF, Clear pinned areas (N), the hints). Keep them
@@ -132,9 +133,9 @@ community range-overlay mods is on record; don't invent one.
     every link.
   - Footer standard on every page: "maintained by Timbermods", the catalog link "More mods from Timbermods", and the
     disclaimer "An unofficial community mod for Timberborn. Not affiliated with or endorsed by Mechanistry."
-- **Shared files:** this site has no `release.js` today (`site.js` is its own). If the redesign adopts the shared
-  timbermods `assets/release.js` (as the MixedStorage site does), it's a byte-for-byte copy shared across timbermods
-  sites: replace it, never edit it.
+- **Shared files:** none. The redesign kept this site's own `site.js` and did not adopt the shared timbermods
+  `release.js`. If a later change adopts it, it's a byte-for-byte copy shared across timbermods sites: replace it,
+  never edit it.
 - **Terminology:** working area (not range, radius or zone, except "road-spill range" / "terrain range" as the kinds
   that qualify); pin / pinned / unpin; **Keep working area visible**; **WORKING AREA**; **Clear pinned areas (N)**;
   **Clear all pinned working areas**; planting tools; farmhouses, aquatic farmhouses, foresters, lumberjack flags,
@@ -146,11 +147,12 @@ community range-overlay mods is on record; don't invent one.
   **1.1.0's additions have not been played in game yet:** the planting-tool outlines, pins remembered in `Pins.txt`,
   the faster per-pin refresh and the translatable text. Also not played: the mod on only one co-op computer, the
   original BeaverBuddies or MultiColony, frame rate in a very large colony, every other mod. Say so plainly, next to
-  the feature, without alarm; the current site doesn't yet say it anywhere.
+  the feature, without alarm. The site does this with "Checked, not played in game yet." after each unplayed feature
+  on the home page (the planting fact and move, and the pins, refresh and translation notes) and in the "What is
+  tested, and what isn't" section; the FAQ answers on those features don't carry it yet.
 - **Describe the mod as it is now.** Version history belongs in the changelog: the README's "New in 1.1.0" / "Earlier
-  versions" and the GitHub release notes (there is no separate CHANGELOG file). The current site has leftovers to
-  remove: "since version 0.1.2" (FAQ `#builder`, troubleshooting `#builder-hut`) and "since version 1.1.0" / "since
-  1.1.0" (FAQ `#persist`, `#planting`, `#language`, install `#update`). Keep only the upgrade facts players need:
+  versions" and the GitHub release notes (there is no separate CHANGELOG file). The site has no "since version" or
+  "new in" lines; keep it that way. Keep only the upgrade facts players need:
   close the game, replace the whole `PersistentWorkAreas` folder (copying only the DLL shows raw text keys), pins are
   kept because they live outside the mod folder.
 - **Sources of truth:** `README.md`, `VALIDATION.md`, the localization CSV and the release notes. Where the site and
@@ -171,10 +173,12 @@ community range-overlay mods is on record; don't invent one.
 
 ## Evidence on Hand
 
-- `docs/assets/favicon.svg`: the project's brand mark (also inline in every page header). It is the only image the
-  repo has.
+- `docs/assets/favicon.svg`: the project's brand mark (also inline in every page header). The only other images are
+  the procedural site textures in `docs/assets/textures/` (plan, vellum, tape) and the inline SVG drawings on the
+  move sheets; none shows the game.
 - The interactive pinning illustration on the home page (`docs/assets/demo.js`: a simplified map with a Farmhouse and a
-  Forester, select → pin → deselect → clear) and a static panel sample on the install page, both captioned as
+  Forester; it starts with the Forester pinned, then select → pin → deselect → clear, plus a planting switch that
+  outlines the Farmhouse without pinning it) and a static panel sample on the install page, both captioned as
   illustrations.
 - Exact in-game text in `packaging/PersistentWorkAreas/version-1.1/Localizations/enUS_PersistentWorkAreas.csv`.
 - `VALIDATION.md`: what the 142 checks cover and the 10-step release playtest checklist.
