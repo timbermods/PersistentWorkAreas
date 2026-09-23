@@ -264,7 +264,7 @@ Two columns, "What it outlines" and "What it doesn't". Each row is a 34 by 22px 
 Lists marked with drawn masks, never glyphs: a pin-green check for done, a muted dash for "doesn't", a dashed muted circle for open.
 
 ### Not-Played Marker
-"Checked, not played in game yet." sits on its own line after each unplayed feature, 0.9rem italic in Soft Graphite. It follows every feature that has not been played in game, and never appears on one that has.
+"Checked, not played in game yet." sits on its own line after each unplayed feature, 0.9rem italic in Soft Graphite. It follows every feature that has not been played in game, and never appears on one that has. Every current feature has been played, so the site carries none today; the style stays for the next new feature.
 
 ### Callouts and Code
 Opaque vellum boxes with a 1px pencil border; callouts add a 3px gold top rule and a Chivo title line. Code blocks wrap rather than scroll where they can.
