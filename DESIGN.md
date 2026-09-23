@@ -182,6 +182,7 @@ Warm plan paper and graphite by day, panel teal and pale ink under the lamp, wit
 
 ### In-game panel (the demo only)
 - **Panel Teal** (`panel-bg`), **Panel Frame** (`panel-frame`), **Panel Line** (`panel-line`), **Panel Cream** (`panel-cream`), **Panel Hint** (`panel-hint`), **Panel Button** (`panel-button`, edge `panel-button-edge`), **Check Ink** (`panel-check-ink`), **Map Ground** (`map-ground`), with the in-game gold and green (`outline-dark`, `pin-dark`). Farmhouse and Forester bodies on the map are `#c9a25a` and `#5f9a57`.
+- Shades the replica uses beyond those tokens (all in `style.css`): frame border `#2b4339`; button hover `#33614f`, pressed (planting switch on) `#3d5b2c`; toggle `#26382f`, toggle hover `#40593f`, pinned toggle `#304d38`; checkbox well `#122320`; OFF badge `#4a4a35`; map grid lines `#2b4735`; road `#8b7a55` with a dashed centre mark `#a8966b`; building outline and label halo `#0c1712`; caption text under the map `#a9bdab`.
 
 ### Named Rules
 **The Real Panel Rule.** The in-game panel replica keeps the mod's real panel colours in both themes. Never re-theme it to the page.
@@ -225,7 +226,7 @@ The header is not sticky: a 66px bar with a 2px ink rule under it. Tap targets a
 Flat. There are no drop shadows anywhere. Depth is the drafting table's: the plan raster below, translucent vellum sheets over it (the grid shows through), and drafting tape strips that hold each sheet down. Rules and borders, not shadows, separate things. The only shadow-like device is the in-game panel's 4px inset left stripe (gold, green when pinned), copied from the mod.
 
 ### Named Rules
-**The Vellum, Not Paint Rule.** A sheet's background is the vellum raster alone (about 74–77% alpha), never an opaque colour, so the survey grid reads through. Opaque vellum is reserved for code blocks, callouts and the skip link.
+**The Vellum, Not Paint Rule.** A sheet's background is the vellum raster alone (about 74–77% alpha: base alpha 190 in `vellum-light.png`, 196 in `vellum-dark.png`, varied slightly by the fibre cloud), never an opaque colour, so the survey grid reads through. Opaque vellum is reserved for code blocks, callouts and the skip link.
 
 **The Tape Holds Every Sheet Rule.** Every sheet is taped at both top corners: 76 by 24px strips of the produced tape raster, 12px above the edge, 18px in from each side, turned -4deg on the left and 3deg on the right. A sheet without tape is not a sheet.
 
