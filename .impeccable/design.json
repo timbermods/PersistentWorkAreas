@@ -1,0 +1,680 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-23T21:00:00Z",
+  "title": "Design System: Persistent Work Areas",
+  "extensions": {
+    "colorMeta": {
+      "plan": {
+        "role": "neutral",
+        "displayName": "Plan Paper",
+        "canonical": "oklch(93.9% 0.011 100.8)",
+        "tonalRamp": [
+          "#0c0b07",
+          "#26251f",
+          "#43423c",
+          "#62615b",
+          "#83837b",
+          "#a6a59e",
+          "#cac9c2",
+          "#f0efe7"
+        ]
+      },
+      "plan-dark": {
+        "role": "neutral",
+        "displayName": "Plan Paper, under the lamp",
+        "canonical": "oklch(24.0% 0.017 176.2)",
+        "tonalRamp": [
+          "#040d0b",
+          "#1d2825",
+          "#394542",
+          "#586461",
+          "#788682",
+          "#9ba9a5",
+          "#bfcdc9",
+          "#e4f2ee"
+        ]
+      },
+      "vellum": {
+        "role": "neutral",
+        "displayName": "Vellum",
+        "canonical": "oklch(97.2% 0.009 100.0)",
+        "tonalRamp": [
+          "#0c0b07",
+          "#262520",
+          "#43423d",
+          "#62615b",
+          "#83827c",
+          "#a6a59f",
+          "#cac9c3",
+          "#f0efe8"
+        ]
+      },
+      "vellum-dark": {
+        "role": "neutral",
+        "displayName": "Vellum, under the lamp",
+        "canonical": "oklch(28.0% 0.019 179.1)",
+        "tonalRamp": [
+          "#030e0b",
+          "#1b2825",
+          "#384542",
+          "#566561",
+          "#778682",
+          "#99a9a5",
+          "#bdcdc9",
+          "#e2f3ef"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Graphite Ink",
+        "canonical": "oklch(28.4% 0.007 182.5)",
+        "tonalRamp": [
+          "#080c0b",
+          "#212625",
+          "#3e4342",
+          "#5d6361",
+          "#7e8483",
+          "#a0a7a5",
+          "#c4cbc9",
+          "#e9f0ef"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Graphite Ink, under the lamp",
+        "canonical": "oklch(92.8% 0.008 121.6)",
+        "tonalRamp": [
+          "#0b0c08",
+          "#242621",
+          "#41433e",
+          "#60625d",
+          "#81837e",
+          "#a4a6a0",
+          "#c8cac4",
+          "#edefe9"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Soft Graphite",
+        "canonical": "oklch(46.4% 0.010 168.4)",
+        "tonalRamp": [
+          "#070d0a",
+          "#212724",
+          "#3d4441",
+          "#5c6360",
+          "#7d8481",
+          "#9fa7a4",
+          "#c3cbc8",
+          "#e8f1ed"
+        ]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Soft Graphite, under the lamp",
+        "canonical": "oklch(76.2% 0.017 160.5)",
+        "tonalRamp": [
+          "#050d09",
+          "#1e2822",
+          "#3b453f",
+          "#59645e",
+          "#7a867f",
+          "#9da8a1",
+          "#c0cdc5",
+          "#e5f2eb"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Pencil Rule",
+        "canonical": "oklch(84.3% 0.021 97.6)",
+        "tonalRamp": [
+          "#0d0b03",
+          "#28251a",
+          "#454236",
+          "#646254",
+          "#858375",
+          "#a8a597",
+          "#cccabb",
+          "#f2efdf"
+        ]
+      },
+      "rule-dark": {
+        "role": "neutral",
+        "displayName": "Pencil Rule, under the lamp",
+        "canonical": "oklch(37.1% 0.022 174.0)",
+        "tonalRamp": [
+          "#020e0a",
+          "#1a2924",
+          "#364641",
+          "#556660",
+          "#758781",
+          "#98aaa4",
+          "#bbcec8",
+          "#e0f4ed"
+        ]
+      },
+      "link": {
+        "role": "tertiary",
+        "displayName": "Survey Teal",
+        "canonical": "oklch(43.4% 0.063 184.6)",
+        "tonalRamp": [
+          "#00120e",
+          "#002e29",
+          "#0a4d46",
+          "#326d66",
+          "#548f87",
+          "#77b2aa",
+          "#9bd7ce",
+          "#bffdf4"
+        ]
+      },
+      "link-hover": {
+        "role": "tertiary",
+        "displayName": "Survey Teal, deep",
+        "canonical": "oklch(33.6% 0.049 184.9)",
+        "tonalRamp": [
+          "#00110e",
+          "#002d28",
+          "#1f4b45",
+          "#3f6b65",
+          "#608c86",
+          "#82b0a9",
+          "#a6d4cd",
+          "#cbfaf3"
+        ]
+      },
+      "link-dark": {
+        "role": "tertiary",
+        "displayName": "Lamp Gold Link",
+        "canonical": "oklch(87.1% 0.113 91.1)",
+        "tonalRamp": [
+          "#1c0300",
+          "#391f00",
+          "#583d00",
+          "#795d00",
+          "#9c7f20",
+          "#bfa24a",
+          "#e4c76f",
+          "#ffec94"
+        ]
+      },
+      "link-hover-dark": {
+        "role": "tertiary",
+        "displayName": "Lamp Gold Link, hover",
+        "canonical": "oklch(92.7% 0.072 91.8)",
+        "tonalRamp": [
+          "#160800",
+          "#322300",
+          "#504009",
+          "#70602d",
+          "#92814e",
+          "#b5a470",
+          "#dac893",
+          "#ffeeb8"
+        ]
+      },
+      "outline": {
+        "role": "primary",
+        "displayName": "Outline Gold",
+        "canonical": "oklch(66.1% 0.127 83.0)",
+        "tonalRamp": [
+          "#210000",
+          "#401a00",
+          "#603900",
+          "#825900",
+          "#a57a12",
+          "#c99e42",
+          "#efc268",
+          "#ffe78d"
+        ]
+      },
+      "outline-ink": {
+        "role": "primary",
+        "displayName": "Outline Ink",
+        "canonical": "oklch(48.8% 0.095 82.9)",
+        "tonalRamp": [
+          "#1d0300",
+          "#3b1d00",
+          "#5a3c00",
+          "#7b5b10",
+          "#9e7d39",
+          "#c2a05c",
+          "#e7c480",
+          "#ffe9a4"
+        ]
+      },
+      "outline-dark": {
+        "role": "primary",
+        "displayName": "Outline Gold, in game",
+        "canonical": "oklch(81.1% 0.127 80.8)",
+        "tonalRamp": [
+          "#220000",
+          "#411800",
+          "#623700",
+          "#835800",
+          "#a77914",
+          "#cb9c42",
+          "#f1c169",
+          "#ffe68e"
+        ]
+      },
+      "outline-cream": {
+        "role": "primary",
+        "displayName": "Outline Cream",
+        "canonical": "oklch(92.2% 0.087 97.0)",
+        "tonalRamp": [
+          "#160800",
+          "#312300",
+          "#4f4100",
+          "#6f611e",
+          "#918342",
+          "#b4a665",
+          "#d9ca88",
+          "#ffefac"
+        ]
+      },
+      "pin": {
+        "role": "secondary",
+        "displayName": "Pin Green",
+        "canonical": "oklch(53.0% 0.120 133.1)",
+        "tonalRamp": [
+          "#001200",
+          "#072f00",
+          "#264e00",
+          "#456f1e",
+          "#659142",
+          "#87b565",
+          "#aada88",
+          "#cfffac"
+        ]
+      },
+      "pin-dark": {
+        "role": "secondary",
+        "displayName": "Pin Green, in game",
+        "canonical": "oklch(84.5% 0.149 131.6)",
+        "tonalRamp": [
+          "#001200",
+          "#0b2f00",
+          "#284e00",
+          "#476e1b",
+          "#679140",
+          "#89b563",
+          "#adda86",
+          "#d1ffab"
+        ]
+      },
+      "panel-frame": {
+        "role": "neutral",
+        "displayName": "Panel Frame",
+        "canonical": "oklch(21.7% 0.020 184.5)",
+        "tonalRamp": [
+          "#030e0c",
+          "#1a2826",
+          "#364643",
+          "#556562",
+          "#768684",
+          "#98a9a6",
+          "#bccecb",
+          "#e1f3f0"
+        ]
+      },
+      "panel-bg": {
+        "role": "neutral",
+        "displayName": "Panel Teal",
+        "canonical": "oklch(28.3% 0.027 183.9)",
+        "tonalRamp": [
+          "#000f0c",
+          "#152926",
+          "#324743",
+          "#516663",
+          "#718884",
+          "#93aba7",
+          "#b7cfcb",
+          "#dcf5f0"
+        ]
+      },
+      "panel-line": {
+        "role": "neutral",
+        "displayName": "Panel Line",
+        "canonical": "oklch(53.3% 0.048 154.0)",
+        "tonalRamp": [
+          "#001003",
+          "#102c1a",
+          "#2d4a36",
+          "#4c6955",
+          "#6c8b75",
+          "#8eae98",
+          "#b2d3bb",
+          "#d7f9e0"
+        ]
+      },
+      "panel-cream": {
+        "role": "neutral",
+        "displayName": "Panel Cream",
+        "canonical": "oklch(96.1% 0.055 92.5)",
+        "tonalRamp": [
+          "#130900",
+          "#2e2400",
+          "#4c411d",
+          "#6c613c",
+          "#8e825c",
+          "#b1a57e",
+          "#d5c9a1",
+          "#fbeec5"
+        ]
+      },
+      "panel-hint": {
+        "role": "neutral",
+        "displayName": "Panel Hint",
+        "canonical": "oklch(85.7% 0.031 145.3)",
+        "tonalRamp": [
+          "#040f04",
+          "#1b291c",
+          "#384738",
+          "#566657",
+          "#778877",
+          "#99ab99",
+          "#bdcfbd",
+          "#e2f5e2"
+        ]
+      },
+      "panel-button": {
+        "role": "neutral",
+        "displayName": "Panel Button",
+        "canonical": "oklch(39.6% 0.047 174.8)",
+        "tonalRamp": [
+          "#00110a",
+          "#032c24",
+          "#244a40",
+          "#446a60",
+          "#658c81",
+          "#87afa3",
+          "#aad4c7",
+          "#cff9ec"
+        ]
+      },
+      "panel-button-edge": {
+        "role": "neutral",
+        "displayName": "Panel Button Edge",
+        "canonical": "oklch(70.0% 0.083 137.9)",
+        "tonalRamp": [
+          "#001200",
+          "#0c2e00",
+          "#2a4c1d",
+          "#496c3d",
+          "#6a8e5d",
+          "#8cb27e",
+          "#afd7a2",
+          "#d4fdc6"
+        ]
+      },
+      "panel-check-ink": {
+        "role": "neutral",
+        "displayName": "Check Ink",
+        "canonical": "oklch(28.3% 0.044 153.0)",
+        "tonalRamp": [
+          "#001003",
+          "#122b1b",
+          "#2f4937",
+          "#4e6955",
+          "#6f8a76",
+          "#91ae98",
+          "#b4d2bc",
+          "#d9f8e1"
+        ]
+      },
+      "map-ground": {
+        "role": "neutral",
+        "displayName": "Map Ground",
+        "canonical": "oklch(32.4% 0.039 157.7)",
+        "tonalRamp": [
+          "#001005",
+          "#132b1e",
+          "#30483a",
+          "#4f6859",
+          "#6f8a79",
+          "#91ad9c",
+          "#b5d1bf",
+          "#daf7e4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The home page title only; guide titles use clamp(2.4rem, 5.4vw, 3.6rem)."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles; in guide prose clamp(1.6rem, 3vw, 2.1rem) under a 2px ink rule."
+      },
+      "pitch": {
+        "displayName": "Pitch",
+        "purpose": "The one-line pitch under the home title, in Outline Ink."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Sheet titles, definition terms, table heads, buttons."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All reading text; bold is 650."
+      },
+      "label": {
+        "displayName": "Title-block Label",
+        "purpose": "Uppercase tracked labels in the compatibility title block only."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Paths, file names, log lines."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel-stripe",
+        "value": "inset 4px 0 0 #ebb859",
+        "purpose": "The in-game panel's left stripe, green (#a8e075) when pinned. The only shadow in the system; there are no drop shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-lift",
+        "value": "cubic-bezier(.2, .8, .2, 1)",
+        "purpose": "Button lift (translateY(-1px), 0.15s) and FAQ chevron turn (0.2s)."
+      },
+      {
+        "name": "duration-button",
+        "value": "0.15s",
+        "purpose": "Button hover lift and fill change."
+      },
+      {
+        "name": "duration-chevron",
+        "value": "0.2s",
+        "purpose": "FAQ chevron rotation."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition: none; animation: none",
+        "purpose": "All motion removed under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "hero-stack",
+        "value": "960px"
+      },
+      {
+        "name": "single-column",
+        "value": "860px"
+      },
+      {
+        "name": "phone",
+        "value": "720px"
+      }
+    ],
+    "textures": [
+      {
+        "name": "plan-light / plan-dark",
+        "value": "assets/textures/plan-light.webp, plan-dark.webp",
+        "purpose": "Page ground: plan paper with a 24px fine and 96px firm survey grid. Provenance in the .json beside each."
+      },
+      {
+        "name": "vellum-light / vellum-dark",
+        "value": "assets/textures/vellum-light.png (alpha 190), vellum-dark.png (alpha 196)",
+        "purpose": "Sheet background, the raster only, about 74-77% alpha so the grid reads through."
+      },
+      {
+        "name": "tape",
+        "value": "assets/textures/tape.png",
+        "purpose": "Drafting tape, 76x24px at both top corners of every sheet, -4deg and 3deg."
+      }
+    ],
+    "focus": [
+      {
+        "name": "page-focus",
+        "value": "outline: 3px solid var(--focus); outline-offset: 3px",
+        "purpose": "Teal #1f5c55 in light, cream #f5e6a3 in dark."
+      },
+      {
+        "name": "demo-focus",
+        "value": "outline: 3px dashed #fff2c9; building stroke dashed 5 3",
+        "purpose": "Focus inside the demo; selection is a solid 3.5px gold (#ebb859) stroke."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Download and main actions: graphite stamp with plan-paper text.",
+      "html": "<a class=\"ds-btn\" href=\"#\"><svg viewBox=\"0 0 18 18\" aria-hidden=\"true\"><path d=\"M9 2v10M4.5 7.5L9 12l4.5-4.5M3 15.5h12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Download latest release</a>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:10px;min-height:50px;padding:0 22px;border-radius:3px;background:#262b2a;color:#ecebe3;border:2px solid #262b2a;font:700 1.05rem/1 Chivo,'Arial Narrow',sans-serif;text-decoration:none;transition:transform .15s cubic-bezier(.2,.8,.2,1),background-color .15s}.ds-btn svg{width:18px;height:18px}.ds-btn:hover{background:#123f3a;border-color:#123f3a;transform:translateY(-1px)}.ds-btn:focus-visible{outline:3px solid #1f5c55;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Second action beside a primary: ink outline, band tint on hover.",
+      "html": "<a class=\"ds-btn-sec\" href=\"#\">Install guide</a>",
+      "css": ".ds-btn-sec{display:inline-flex;align-items:center;min-height:50px;padding:0 22px;border-radius:3px;background:transparent;color:#262b2a;border:2px solid #262b2a;font:700 1.05rem/1 Chivo,'Arial Narrow',sans-serif;text-decoration:none;transition:transform .15s cubic-bezier(.2,.8,.2,1),background-color .15s}.ds-btn-sec:hover{background:rgba(38,43,42,.045)}.ds-btn-sec:focus-visible{outline:3px solid #1f5c55;outline-offset:3px}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Non-sticky header links; current page underlined in outline gold.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Overview</a><a href=\"#\">Install</a><a href=\"#\">Troubleshooting</a><a href=\"#\">FAQ</a></nav>",
+      "css": ".ds-nav{display:flex;border-bottom:2px solid #262b2a;background:#ecebe3}.ds-nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:#545b58;text-decoration:none;font:600 .98rem system-ui,sans-serif;border-bottom:2px solid transparent}.ds-nav a:hover{color:#262b2a}.ds-nav a[aria-current=page]{color:#262b2a;border-bottom-color:#b88a1e}.ds-nav a:focus-visible{outline:3px solid #1f5c55;outline-offset:3px}"
+    },
+    {
+      "name": "Taped Move Sheet",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "A translucent vellum sheet taped at both top corners, with a drawn outline, a title and muted text. (Preview approximates the plan and tape rasters, which the panel cannot load.)",
+      "html": "<div class=\"ds-plan\"><div class=\"ds-sheet\"><svg viewBox=\"0 0 240 120\" aria-hidden=\"true\"><path d=\"M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120\" stroke=\"#cfccbd\"/><path d=\"M40 20H150V50H190V110H40Z\" fill=\"#b88a1e\" fill-opacity=\".14\" stroke=\"#b88a1e\" stroke-width=\"2.4\" stroke-linejoin=\"round\"/><rect x=\"96\" y=\"56\" width=\"24\" height=\"24\" rx=\"2\" fill=\"#262b2a\"/><circle cx=\"124\" cy=\"56\" r=\"6\" fill=\"#4f7a2a\"/></svg><h3>Pin a working area</h3><p>Deselect it and the outline stays.</p></div></div>",
+      "css": ".ds-plan{padding:28px 20px;background-color:#ecebe3;background-image:linear-gradient(#dedcd0 1px,transparent 1px),linear-gradient(90deg,#dedcd0 1px,transparent 1px);background-size:24px 24px}.ds-sheet{position:relative;max-width:320px;padding:26px 22px 20px;background:rgba(248,247,240,.75);border:1px solid #cfccbd;color:#262b2a;font:400 1.0625rem/1.62 system-ui,sans-serif}.ds-sheet::before,.ds-sheet::after{content:\"\";position:absolute;top:-12px;width:76px;height:24px;background:rgba(236,226,190,.85);pointer-events:none;}.ds-sheet::before{left:18px;transform:rotate(-4deg)}.ds-sheet::after{right:18px;transform:rotate(3deg)}.ds-sheet svg{display:block;width:100%;max-height:120px;margin:0 0 14px}.ds-sheet h3{font:700 1.28rem/1.2 Chivo,'Arial Narrow',sans-serif;margin:0 0 .3em}.ds-sheet p{margin:0;color:#545b58}"
+    },
+    {
+      "name": "Legend Swatches",
+      "kind": "custom",
+      "description": "Outlined vs struck swatches for what the mod outlines and what it doesn't.",
+      "html": "<ul class=\"ds-legend\"><li><span class=\"ds-sw\"></span>Working areas, merged where they overlap</li><li><span class=\"ds-sw ds-no\"></span>District road coloring</li></ul>",
+      "css": ".ds-legend{list-style:none;padding:0;margin:0;font:400 1rem/1.5 system-ui,sans-serif;color:#262b2a}.ds-legend li{display:grid;grid-template-columns:34px 1fr;gap:12px;margin:0 0 .7em}.ds-sw{width:34px;height:22px;border:2.5px solid #b88a1e;background:rgb(235 184 89/.18);box-sizing:border-box}.ds-sw.ds-no{border:2px dashed #545b58;background:none;position:relative}.ds-sw.ds-no::after{content:\"\";position:absolute;left:-3px;right:-3px;top:50%;border-top:2px solid #545b58;transform:rotate(-24deg)}"
+    },
+    {
+      "name": "Title Block",
+      "kind": "custom",
+      "description": "Compatibility facts as a drawing's title block.",
+      "html": "<dl class=\"ds-tb\"><div><dt>Game version</dt><dd>Timberborn 1.1.2.4</dd></div><div><dt>Other mods</dt><dd>None required</dd></div><div><dt>Co-op</dt><dd>Same version on every computer</dd></div><div><dt>Saves</dt><dd>Untouched</dd></div></dl>",
+      "css": ".ds-tb{display:grid;grid-template-columns:1fr 1fr;border:2px solid #262b2a;margin:0;color:#262b2a;font:400 1rem/1.5 system-ui,sans-serif}.ds-tb>div{padding:16px 18px;border-right:1px solid #262b2a;border-bottom:1px solid #262b2a}.ds-tb>div:nth-child(2n){border-right:0}.ds-tb>div:nth-last-child(-n+2){border-bottom:0}.ds-tb dt{font:700 .82rem/1.2 Chivo,'Arial Narrow',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#545b58;margin-bottom:6px}.ds-tb dd{margin:0}"
+    },
+    {
+      "name": "Callout",
+      "kind": "card",
+      "refersTo": "callout",
+      "description": "Opaque vellum note with a gold top rule, for guide warnings.",
+      "html": "<div class=\"ds-callout\"><span class=\"ds-t\">Pick the zip under Assets</span><p>Not -source.zip or Source code.</p></div>",
+      "css": ".ds-callout{padding:18px 20px;background:#f7f6ef;border:1px solid #cfccbd;border-top:3px solid #b88a1e;color:#262b2a;font:400 1rem/1.6 system-ui,sans-serif}.ds-t{display:block;font:700 1.05rem/1.3 Chivo,'Arial Narrow',sans-serif;margin-bottom:.3em}.ds-callout p{margin:0}"
+    },
+    {
+      "name": "Panel Toggle",
+      "kind": "custom",
+      "refersTo": "panel-toggle-pinned",
+      "description": "The in-game Working Area toggle, pinned, in the mod's real panel colours in both themes.",
+      "html": "<div class=\"ds-panel\"><div class=\"ds-h\">WORKING AREA</div><button type=\"button\" class=\"ds-tog\" aria-pressed=\"true\"><span class=\"ds-box\"><i></i></span><span class=\"ds-name\">Keep working area visible</span><span class=\"ds-state\">ON</span></button></div>",
+      "css": ".ds-panel{background:#1a2e2b;border:1px solid #577560;border-radius:5px;padding:10px;box-shadow:inset 4px 0 0 #a8e075;font-family:system-ui,sans-serif;max-width:360px}.ds-h{font-size:11px;font-weight:800;color:#ebb859;letter-spacing:.04em;margin:0 0 7px 6px}.ds-tog{width:100%;display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 10px;background:#304d38;color:#fff2c9;border:2px solid #a8e075;border-radius:4px;cursor:pointer;font:inherit;text-align:left}.ds-tog:hover{background:#40593f;border-color:#fff2c9}.ds-tog:focus-visible{outline:3px dashed #fff2c9;outline-offset:2px}.ds-box{width:24px;height:24px;border:2px solid #a8e075;border-radius:3px;background:#a8e075;display:grid;place-items:center}.ds-box i{display:block;width:7px;height:12px;border-right:3px solid #17301f;border-bottom:3px solid #17301f;transform:rotate(40deg) translate(-1px,-2px)}.ds-name{flex:1;font-weight:700;font-size:14px}.ds-state{min-width:34px;text-align:center;font-size:11px;font-weight:800;padding:3px 5px;border-radius:3px;background:#a8e075;color:#17301f}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Tracing Overlay",
+    "overview": "The site is a drafting table. The page itself is the site plan: warm plan paper with a faint surveyed grid, a produced raster rather than CSS stripes. Everything worth reading sits on sheets of translucent vellum taped over that plan, so the grid reads faintly through each sheet the way a drawing shows through tracing paper. The ink is graphite; the only colours with meaning are the mod's own outline gold (what is outlined or pinned) and its pin green (what is pinned or confirmed). Lifting a sheet changes nothing below, and every layer has one job.\n\nUnder a lamp (dark, following the system; there is no toggle) the same table turns to the mod's panel teal, the vellum to a deeper teal, and the ink to pale grey; gold and green brighten to the mod's in-game values. The one authored exhibit, the interactive pin demo, is a replica of the in-game panel and keeps the mod's real panel colours in both themes, so it reads as the game on top of the drawing rather than as part of the drawing.\n\nDensity is a reference document's: ruled rows, bordered title-block cells, short notes, measured lines (56–62ch in leads, 760px prose). Drawing lettering (Chivo 800) for titles, system text for reading, mono for paths and log lines. The site refuses the template it would otherwise wear: eyebrows, pill chips, a card grid with numbered badges, a numbered steps band on the home page, a spec table, a centered CTA band.",
+    "keyCharacteristics": [
+      "Plan paper with a produced surveyed grid (24px fine, 96px firm lines) as the page ground.",
+      "Translucent vellum sheets (raster only, about 74–77% alpha) with drafting tape at both top corners.",
+      "Graphite ink plus at most two meaningful inks: outline gold and pin green.",
+      "Drawn outlines (SVG, gold stroke over a 14% gold fill) instead of icons or illustrations.",
+      "Horizontal rules as structure: 2px ink rules open sections, 1px rules separate rows.",
+      "The in-game panel replica keeps the mod's real colours in both themes.",
+      "No shadows, one small lift on buttons, everything still under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The Real Panel Rule",
+        "body": "The in-game panel replica keeps the mod's real panel colours in both themes. Never re-theme it to the page.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Inks Rule",
+        "body": "No sheet carries more than three inks: graphite (with its muted and rule tints), outline gold, pin green. Anything else on a sheet is the panel replica.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gold Means Outlined Rule",
+        "body": "Outline gold marks what is outlined, pinned or current. It is not decoration and not a general accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lettering Rule",
+        "body": "Chivo is for titles, terms and buttons, never for running text. Headings balance their lines and track slightly tight (-0.015em).",
+        "section": "typography"
+      },
+      {
+        "name": "The Vellum, Not Paint Rule",
+        "body": "A sheet's background is the vellum raster alone (about 74–77% alpha), never an opaque colour, so the survey grid reads through. Opaque vellum is reserved for code blocks, callouts and the skip link.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Tape Holds Every Sheet Rule",
+        "body": "Every sheet is taped at both top corners: 76 by 24px strips of the produced tape raster, 12px above the edge, 18px in from each side, turned -4deg on the left and 3deg on the right. A sheet without tape is not a sheet.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Produced Surface Rule",
+        "body": "Plan, vellum and tape are rasters made by `docs/assets/textures/make_textures.py` (fixed seeds, no source images, no generative model), with provenance beside them. Never fake them with CSS gradients or stripes.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put every block of reading content that stands apart on a taped vellum sheet, tape at both top corners.",
+      "**Do** let the plan grid read through sheets: vellum raster only, about 74–77% alpha.",
+      "**Do** draw outlines in SVG with the gold stroke (2.4px) over a 14% gold fill, on a faint pencil grid, when a feature needs a picture.",
+      "**Do** keep the in-game panel replica in the mod's real colours in both themes.",
+      "**Do** draw focus dashed in cream inside the demo and solid gold for selection, so the two never look alike.",
+      "**Do** mark each unplayed feature with \"Checked, not played in game yet.\" in the not-played style.",
+      "**Do** separate sections with 2px ink rules and rows with 1px pencil rules.",
+      "**Do** follow the system theme; there is no toggle."
+    ],
+    "donts": [
+      "**Don't** add drop shadows, glows or offset shadows; depth is translucency and tape.",
+      "**Don't** fake paper, grid or tape with CSS gradients or stripes; use the produced rasters with provenance.",
+      "**Don't** use eyebrows or kickers, pill chips, card grids with numbered badges, a numbered steps band on the home page, or a centered CTA band.",
+      "**Don't** use outline gold as a generic accent; it means outlined, pinned or current.",
+      "**Don't** use glyph or icon-font icons; icons are drawn SVG or masks.",
+      "**Don't** set running text in Chivo.",
+      "**Don't** use Timberborn art or screenshots; the demo is labelled an illustration.",
+      "**Don't** make the header sticky."
+    ]
+  }
+}

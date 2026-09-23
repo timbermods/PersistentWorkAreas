@@ -1,5 +1,7 @@
 // Interactive illustration of pinning. It is a simplified drawing, not the mod's renderer:
-// the real mod uses the game's own outline renderer and navigation queries.
+// the real mod uses the game's own outline renderer and navigation queries. It starts with the Forester pinned and
+// nothing selected, so the kept outline is on screen at rest. The planting switch outlines every farmhouse, as the
+// game's planting tools do with the mod installed; those outlines are not pins.
 (function () {
   var root = document.getElementById("demo");
   if (!root) return;
@@ -9,8 +11,8 @@
   var ROAD_ROW = 8;
 
   var buildings = [
-    { id: "farm", name: "Farmhouse", x: 7, y: 6, w: 2, h: 2, color: "#c9a25a", access: [8, 8], r: 5.6 },
-    { id: "forester", name: "Forester", x: 15, y: 9, w: 2, h: 2, color: "#5f9a57", access: [15, 8], r: 5.1 }
+    { id: "farm", name: "Farmhouse", x: 5, y: 5, w: 2, h: 2, color: "#c9a25a", access: [6, 8], r: 4.6 },
+    { id: "forester", name: "Forester", x: 16, y: 10, w: 2, h: 2, color: "#5f9a57", access: [17, 8], r: 4.6 }
   ];
   buildings.forEach(function (b) {
     b.cells = [];
@@ -32,9 +34,13 @@
   var clearBtn = root.querySelector("[data-clear]");
   var deselectBtn = root.querySelector("[data-deselect]");
   var status = root.querySelector("[data-status]");
+  var plantBtn = root.querySelector("[data-plant]");
+  var cap = document.getElementById("demo-cap");
+  var restCap = cap ? cap.textContent : "";
+  var planting = false;
 
   var selected = null;
-  var pinned = {};
+  var pinned = { forester: true };
 
   function el(name, attrs, parent) {
     var n = document.createElementNS(SVGNS, name);
@@ -45,6 +51,7 @@
 
   // Static layer: ground grid, road.
   var ground = el("g", {}, svg);
+  el("rect", { class: "ground-hit", x: 0, y: 0, width: COLS * C, height: ROWS * C }, ground);
   for (var i = 0; i <= COLS; i++) el("line", { class: "grid-line", x1: i * C, y1: 0, x2: i * C, y2: ROWS * C }, ground);
   for (var j = 0; j <= ROWS; j++) el("line", { class: "grid-line", x1: 0, y1: j * C, x2: COLS * C, y2: j * C }, ground);
   el("rect", { class: "road", x: 0, y: ROAD_ROW * C, width: COLS * C, height: C }, ground);
@@ -76,7 +83,7 @@
   function drawArea() {
     var set = {};
     buildings.forEach(function (b) {
-      if (pinned[b.id] || selected === b.id) b.cells.forEach(function (c) { set[c] = true; });
+      if (pinned[b.id] || selected === b.id || (planting && b.id === "farm")) b.cells.forEach(function (c) { set[c] = true; });
     });
     var fill = "", edge = "";
     Object.keys(set).forEach(function (key) {
@@ -129,8 +136,27 @@
     if (pinned[selected]) delete pinned[selected]; else pinned[selected] = true;
     render(b.name + (pinned[selected] ? " pinned." : " unpinned."));
   });
-  clearBtn.addEventListener("click", function () { pinned = {}; render("All pins cleared."); });
-  deselectBtn.addEventListener("click", function () { select(null); });
+  clearBtn.addEventListener("click", function () {
+    pinned = {}; render("All pins cleared.");
+    // the button hides itself, so keep focus on the map
+    nodes[buildings[0].id].g.focus();
+  });
+  deselectBtn.addEventListener("click", function () {
+    var was = selected; select(null);
+    if (was) nodes[was].g.focus();
+  });
+  if (plantBtn) {
+    plantBtn.hidden = false;
+    plantBtn.addEventListener("click", function () {
+      planting = !planting;
+      plantBtn.setAttribute("aria-pressed", String(planting));
+      if (cap) cap.textContent = planting ? "Planting tool open: the Farmhouse is outlined for you. Not a pin." : restCap;
+      render(planting ? "Planting tool open: the Farmhouse's working area is outlined." : "Planting tool closed.");
+    });
+  }
+  root.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && selected) { var was = selected; select(null); nodes[was].g.focus(); }
+  });
 
   render();
 })();

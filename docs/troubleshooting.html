@@ -7,7 +7,9 @@
 <meta name="description" content="Fixes for common Persistent Work Areas problems: mod not listed, no pin panel, missing outlines, unavailable pinning, key bindings and how to read the game log.">
 <link rel="canonical" href="https://timbermods.github.io/PersistentWorkAreas/troubleshooting.html">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0d1716">
+<meta name="theme-color" content="#ecebe3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17221f" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="assets/fonts/chivo-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -24,7 +26,7 @@
         <li><a href="install.html">Install</a></li>
         <li><a href="troubleshooting.html" aria-current="page">Troubleshooting</a></li>
         <li><a href="faq.html">FAQ</a></li>
-        <li><a class="btn btn-small" href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
+        <li><a href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
       </ul>
     </nav>
   </div>
@@ -179,7 +181,7 @@
         <h2>A Builder's Hut shows an outline when I select it</h2>
         <dl>
           <dt>Why</dt>
-          <dd>That outline comes from Timberborn itself. The game gives every Builder's Hut a road-spill range and draws it while the hut is selected. Persistent Work Areas doesn't draw it and doesn't change it. Since version 0.1.2 the mod doesn't offer a pin for Builder's Huts.</dd>
+          <dd>That outline comes from Timberborn itself. The game gives every Builder's Hut a road-spill range and draws it while the hut is selected. Persistent Work Areas doesn't draw it and doesn't change it. The mod doesn't offer a pin for Builder's Huts.</dd>
           <dt>Fix</dt>
           <dd>Nothing to fix. To confirm, disable the mod, restart, and select a Builder's Hut: the same outline appears.</dd>
         </dl>
