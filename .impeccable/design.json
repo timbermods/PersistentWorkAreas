@@ -662,7 +662,7 @@
       "**Do** draw outlines in SVG with the gold stroke (2.4px) over a 14% gold fill, on a faint pencil grid, when a feature needs a picture.",
       "**Do** keep the in-game panel replica in the mod's real colours in both themes.",
       "**Do** draw focus dashed in cream inside the demo and solid gold for selection, so the two never look alike.",
-      "**Do** mark each unplayed feature with \"Checked, not played in game yet.\" in the not-played style.",
+      "**Do** mark each unplayed feature with \"Checked, not played in game yet.\" in the not-played style (none today: every current feature has been played).",
       "**Do** separate sections with 2px ink rules and rows with 1px pencil rules.",
       "**Do** follow the system theme; there is no toggle."
     ],

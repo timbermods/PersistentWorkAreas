@@ -2,7 +2,7 @@
 
 ## In-game testing
 
-- **1.1.0 has not been playtested in game yet.** Its new behavior (planting-tool outlines, pins remembered in a local file, per-pin refresh caching and localized text) is covered only by the automated checks below. Run the release playtest checklist, including steps 8 to 10, to confirm it.
+- **1.1.0 has been playtested extensively in game** on Timberborn 1.1.2.4, including its new behavior: planting-tool outlines, pins remembered in a local file, per-pin refresh caching and localized text.
 - 1.0.0 was tested in game on Timberborn 1.1.2.4 with the BeaverBuddies Stability Fork, both single-player and in a two-player co-op session with the mod installed on both computers. Pinning, clearing and outline display worked as expected. That tested build was 0.1.3; the 1.0.0 code was the same except for the version number and the startup log line.
 - Running the mod on only one of the two co-op computers has not been playtested.
 
@@ -17,7 +17,7 @@
 
 ## Not established by the automated checks
 
-These are compiled API and logic checks, not Unity rendering tests or a co-op session. The in-game testing above covers those for the 1.0.0 behavior; for 1.1.0's new behavior, the playtest checklist below still has to be run. Neither establishes frame-rate impact in a very large colony or compatibility with every other mod. Internal renderer reflection is deliberately isolated in `NativeOutline.cs` and checked against the installed assemblies.
+These are compiled API and logic checks, not Unity rendering tests or a co-op session. The in-game testing above covers those. Neither establishes frame-rate impact in a very large colony or compatibility with every other mod. Internal renderer reflection is deliberately isolated in `NativeOutline.cs` and checked against the installed assemblies.
 
 ## Release playtest checklist
 

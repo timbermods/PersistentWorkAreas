@@ -142,14 +142,13 @@ community range-overlay mods is on record; don't invent one.
   gatherers, Builder's Huts; settlement (what pins are remembered per); resync; BeaverBuddies Stability Fork. "Display
   only", "local", "never written into the save".
 - **Honest status:** 1.1.0 passes 142 automated checks (77 game-free, which also run in CI; 65 against the installed
-  game's assemblies and blueprints). 1.0.0's behavior ("pinning, clearing and outline display worked as expected") was played
-  in game on 1.1.2.4, single player and in a two-player Stability Fork co-op session with the mod on both computers.
-  **1.1.0's additions have not been played in game yet:** the planting-tool outlines, pins remembered in `Pins.txt`,
-  the faster per-pin refresh and the translatable text. Also not played: the mod on only one co-op computer, the
-  original BeaverBuddies or MultiColony, frame rate in a very large colony, every other mod. Say so plainly, next to
-  the feature, without alarm. The site does this with "Checked, not played in game yet." after each unplayed feature
-  on the home page (the planting fact and move, and the pins, refresh and translation notes) and in the "What is
-  tested, and what isn't" section; the FAQ answers on those features don't carry it yet.
+  game's assemblies and blueprints). **1.1.0 has been playtested extensively in game** on 1.1.2.4, including its
+  additions (the planting-tool outlines, pins remembered in `Pins.txt`, the faster per-pin refresh and the
+  translatable text). Pinning, clearing and the outlines were also played in a two-player Stability Fork co-op session
+  with the mod on both computers. Not played: the mod on only one co-op computer, the original BeaverBuddies or
+  MultiColony, frame rate in a very large colony, every other mod. Say so plainly in the "What is tested, and what
+  isn't" section, without alarm. A feature added later and not yet played carries "Checked, not played in game yet."
+  next to it until it is.
 - **Describe the mod as it is now.** Version history belongs in the changelog: the README's "New in 1.1.0" / "Earlier
   versions" and the GitHub release notes (there is no separate CHANGELOG file). The site has no "since version" or
   "new in" lines; keep it that way. Keep only the upgrade facts players need:
@@ -194,5 +193,5 @@ community range-overlay mods is on record; don't invent one.
    once, precisely, and back it with the specifics.
 3. **Install right the first time.** The right zip, the exact folder layout, not nested: impossible to miss.
 4. **The game's own words.** Name the panel, row, button and key binding exactly as the game shows them.
-5. **Honest about what's been played.** 1.0.0's pinning was played; 1.1.0's additions are checked, not yet played.
-   Say which, next to the feature.
+5. **Honest about what's been played.** Every current feature has been played; a new feature that hasn't carries
+   the not-played marker next to it until it is.

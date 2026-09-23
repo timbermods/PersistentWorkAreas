@@ -45,14 +45,14 @@
         <p class="lede">A Timberborn mod. The game shows a building's working area only while it's selected, so the outline vanishes the moment you pick a planting tool. Pin the ones you care about and they stay on screen while you plant, build and plan.</p>
         <ul class="facts">
           <li><b>The game's own outline, kept.</b> Check <strong>Keep working area visible</strong> on a farmhouse, forester or gatherer, then deselect it.</li>
-          <li><b>The planting tools show their planters.</b> Pick a crop or tree and the buildings that can plant it are outlined for you. <span class="unplayed">Checked, not played in game yet.</span></li>
+          <li><b>The planting tools show their planters.</b> Pick a crop or tree and the buildings that can plant it are outlined for you.</li>
           <li><b>Display only.</b> Saves untouched, nothing to set, no other mods needed.</li>
         </ul>
         <div class="btn-row">
           <a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/releases/latest" data-latest-zip><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2v10M4.5 7.5L9 12l4.5-4.5M3 15.5h12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download latest release</a>
           <a class="btn btn-secondary" href="install.html">Install guide</a>
         </div>
-        <p class="status-note"><strong>Stable.</strong> <span class="ver" data-latest-version hidden></span> Pinning, clearing and pinned outlines were played in single player and a two-player co-op session; the newest additions are checked but not played yet. <a href="#status">What is tested, and what isn't</a></p>
+        <p class="status-note"><strong>Stable.</strong> <span class="ver" data-latest-version hidden></span> Every feature has been played extensively in game, and pinning also in two-player co-op. <a href="#status">What is tested, and what isn't</a></p>
       </div>
 
       <div class="demo-sheet sheet taped">
@@ -100,7 +100,7 @@
         <li class="move sheet taped">
           <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><path class="draw-fill" d="M30 16H130V104H30Z"/><path class="draw-outline" d="M30 16H130V104H30Z"/><rect class="draw-bld" x="68" y="48" width="24" height="24" rx="2"/><g class="draw-label"><text x="146" y="44">pick a crop:</text><text x="146" y="62">its farmhouses</text><text x="146" y="80">are outlined</text></g></svg>
           <h3>Plant with the planters in view</h3>
-          <p>Pick a crop or tree in the planting tools and every building that can plant it is outlined on its own: farmhouses for crops, aquatic farmhouses for aquatic crops, foresters for trees and bushes. They go away when you leave the tool. <span class="unplayed">Checked, not played in game yet.</span></p>
+          <p>Pick a crop or tree in the planting tools and every building that can plant it is outlined on its own: farmhouses for crops, aquatic farmhouses for aquatic crops, foresters for trees and bushes. They go away when you leave the tool.</p>
         </li>
         <li class="move sheet taped">
           <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><rect x="20" y="40" width="200" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><text x="120" y="65" text-anchor="middle" class="draw-label draw-strong">Clear pinned areas (2)</text></svg>
@@ -140,10 +140,10 @@
         <p>The mod does one thing and stays out of the way.</p>
       </div>
       <div class="notes-sheet sheet taped">
-        <div><h3>Pins are remembered, not saved</h3><p>Each settlement's pins are kept on your computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load that settlement. They're never written to your save, so the mod can't affect a colony, and each co-op player keeps their own. <span class="unplayed">Checked, not played in game yet.</span></p></div>
+        <div><h3>Pins are remembered, not saved</h3><p>Each settlement's pins are kept on your computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load that settlement. They're never written to your save, so the mod can't affect a colony, and each co-op player keeps their own.</p></div>
         <div><h3>Fails on its own</h3><p>If a game update changes the internals the outline renderer relies on, pinning turns itself off for that map and says so in the panel and the game log. Nothing else is affected.</p></div>
-        <div><h3>Light on a large colony</h3><p>A terrain or path change re-checks only the pinned buildings it can reach, at most five times a second. Nothing runs while nothing is pinned and no planting tool is open. <span class="unplayed">Checked, not played in game yet.</span></p></div>
-        <div><h3>English, translatable</h3><p>The panel text is English; a translation is one CSV file in the mod's <code>Localizations</code> folder. <span class="unplayed">Checked, not played in game yet.</span></p></div>
+        <div><h3>Light on a large colony</h3><p>A terrain or path change re-checks only the pinned buildings it can reach, at most five times a second. Nothing runs while nothing is pinned and no planting tool is open.</p></div>
+        <div><h3>English, translatable</h3><p>The panel text is English; a translation is one CSV file in the mod's <code>Localizations</code> folder.</p></div>
       </div>
     </div>
   </section>
@@ -172,14 +172,14 @@
         <div class="sheet taped">
           <h3>Tested</h3>
           <ul class="checks">
-            <li>Pinning, clearing and the outlines, played in game on 1.1.2.4: in single player and in a two-player Stability Fork co-op session with the mod on both computers.</li>
+            <li>Every feature, played extensively in game on 1.1.2.4: pinning and clearing, the pinned outlines, the planting-tool outlines, pins remembered between sessions, the refresh and the panel text.</li>
+            <li>Pinning, clearing and the outlines in a two-player Stability Fork co-op session, with the mod on both computers.</li>
             <li>142 automated checks: 77 that need no game (they also run on every change), and 65 against the installed game's own assemblies and blueprints.</li>
           </ul>
         </div>
         <div class="sheet taped open-col">
           <h3>Not played yet</h3>
           <ul class="checks open">
-            <li>The newest additions: the planting-tool outlines, pins remembered in <code>Pins.txt</code>, the faster refresh and the translatable text. Automated checks cover them.</li>
             <li>The mod on only one computer in a co-op game.</li>
             <li>The original BeaverBuddies, and BeaverBuddies MultiColony.</li>
             <li>Frame rate in a very large colony, and other mods alongside it.</li>

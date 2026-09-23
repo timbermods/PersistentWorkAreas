@@ -13,7 +13,7 @@ Keep a building's working-area outline visible after deselecting it, including w
 
 When updating, replace the whole `PersistentWorkAreas` folder. The new DLL reads its text from the CSV, so copying only the DLL over 1.0.0 shows raw keys.
 
-1.1.0 passes 142 automated checks. Its new features have not been playtested in game yet; 1.0.0's behavior has been.
+1.1.0 passes 142 automated checks and has been playtested extensively in game.
 
 ### Earlier versions
 

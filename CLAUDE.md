@@ -79,9 +79,9 @@ in `source/`, game assets and localization in `packaging/PersistentWorkAreas/ver
 - Describe the mod as it is now. No "New in", "added in", "since version" on player pages; version history lives in
   the README's "New in …" / "Earlier versions" and the GitHub release notes (no CHANGELOG file). Upgrade facts players
   need (replace the whole folder; pins are kept) are the exception.
-- Status matches README/VALIDATION exactly. Each unplayed feature carries
-  `<span class="unplayed">Checked, not played in game yet.</span>`; never on a played one (1.0.0's pinning, clearing and
-  outlines were played on 1.1.2.4, single player and two-player Stability Fork co-op). Never invent numbers, reviews,
+- Status matches README/VALIDATION exactly. Every current feature has been played extensively in game (1.1.0 on
+  1.1.2.4), so none carries the marker today. A new feature not yet played gets
+  `<span class="unplayed">Checked, not played in game yet.</span>` after it, and loses it once played. Never invent numbers, reviews,
   screenshots, download counts. No og image exists; don't fake one.
 - Keep the footer standard on every page: "maintained by Timbermods", "More mods from Timbermods"
   (https://timbermods.github.io/), and "An unofficial community mod for Timberborn. Not affiliated with or endorsed by
@@ -150,8 +150,6 @@ When asked to "update the website for the latest release, consistent with the de
 
 ### Open to-dos
 
-- FAQ status lines: per the README, 1.1.0's four additions are unplayed, but their FAQ answers lack the marker. Add
-  `<span class="unplayed">Checked, not played in game yet.</span>` to `#planting`, `#persist`, `#perf` and `#language`.
 - The direction contract says vellum at ~88%; as shipped (and in DESIGN.md) it is 74–77%. DESIGN.md wins.
 
 ### Full redesign
