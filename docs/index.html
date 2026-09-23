@@ -4,14 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Persistent Work Areas</title>
-<meta name="description" content="A Timberborn mod that keeps a building's working-area outline visible after you deselect it, so you can plant, build and plan without losing the boundaries.">
+<meta name="description" content="A Timberborn mod that keeps a building's working-area outline visible after you deselect it, and outlines the planters while you use the planting tools. Display only; saves untouched; no other mods needed.">
 <link rel="canonical" href="https://timbermods.github.io/PersistentWorkAreas/">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Persistent Work Areas, a Timberborn mod">
-<meta property="og:description" content="Pin the working-area outline of any farm, forester or gatherer so it stays on screen while you plant and build.">
+<meta property="og:description" content="Keep the outline, keep planting: pin a building's working area so it stays on screen after you deselect it.">
 <meta property="og:url" content="https://timbermods.github.io/PersistentWorkAreas/">
-<meta name="theme-color" content="#0d1716">
+<meta name="theme-color" content="#ecebe3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17221f" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="assets/fonts/chivo-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -28,7 +30,7 @@
         <li><a href="install.html">Install</a></li>
         <li><a href="troubleshooting.html">Troubleshooting</a></li>
         <li><a href="faq.html">FAQ</a></li>
-        <li><a class="btn btn-small" href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
+        <li><a href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
       </ul>
     </nav>
   </div>
@@ -38,164 +40,165 @@
   <div class="hero">
     <div class="container hero-grid">
       <div>
-        <span class="eyebrow">Timberborn mod <span class="ver" data-latest-version hidden></span></span>
-        <h1>Keep your working areas in view.</h1>
-        <p class="lede">Pin the working-area outline of any farm, forester or gatherer so it stays on screen while you plant, build and plan. One click to pin, one click to clear.</p>
+        <h1>Persistent Work Areas</h1>
+        <p class="pitch">Keep the outline. Keep planting.</p>
+        <p class="lede">A Timberborn mod. The game shows a building's working area only while it's selected, so the outline vanishes the moment you pick a planting tool. Pin the ones you care about and they stay on screen while you plant, build and plan.</p>
+        <ul class="facts">
+          <li><b>The game's own outline, kept.</b> Check <strong>Keep working area visible</strong> on a farmhouse, forester or gatherer, then deselect it.</li>
+          <li><b>The planting tools show their planters.</b> Pick a crop or tree and the buildings that can plant it are outlined for you. <span class="unplayed">Checked, not played in game yet.</span></li>
+          <li><b>Display only.</b> Saves untouched, nothing to set, no other mods needed.</li>
+        </ul>
         <div class="btn-row">
-          <a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/releases/latest" data-latest-zip>Download latest release</a>
+          <a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/releases/latest" data-latest-zip><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2v10M4.5 7.5L9 12l4.5-4.5M3 15.5h12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download latest release</a>
           <a class="btn btn-secondary" href="install.html">Install guide</a>
         </div>
-        <ul class="chips" aria-label="At a glance">
-          <li>Timberborn 1.1.2.4+</li>
-          <li>Display only</li>
-          <li>Never touches your saves</li>
-          <li>No other mods needed</li>
-        </ul>
+        <p class="status-note"><strong>Stable.</strong> <span class="ver" data-latest-version hidden></span> Pinning, clearing and pinned outlines were played in single player and a two-player co-op session; the newest additions are checked but not played yet. <a href="#status">What is tested, and what isn't</a></p>
       </div>
 
-      <figure class="demo" id="demo" aria-labelledby="demo-cap">
-        <div class="demo-top">
-          <span class="t" id="demo-cap">Try it: select a building, pin it, then deselect.</span>
-          <button type="button" class="ui-btn" data-clear hidden>Clear pinned areas (0)</button>
-        </div>
-        <svg class="map" viewBox="0 0 480 320" role="group" aria-label="Simplified map with a Farmhouse and a Forester beside a road"></svg>
-        <div class="demo-ui">
-          <p class="ui-empty">Click the Farmhouse or the Forester on the map.</p>
-          <div class="ui-panel" hidden>
-            <div class="h">WORKING AREA</div>
-            <div class="who"></div>
-            <button type="button" class="ui-toggle" aria-pressed="false">
-              <span class="box" aria-hidden="true"><i></i></span>
-              <span class="name">Keep working area visible</span>
-              <span class="state" aria-hidden="true">OFF</span>
-            </button>
-            <p class="hint"></p>
+      <div class="demo-sheet sheet taped">
+        <figure class="demo" id="demo" aria-labelledby="demo-cap">
+          <div class="demo-top">
+            <span class="t" id="demo-cap">The Forester is pinned. Select a building, pin it, then deselect.</span>
+            <div class="demo-tools">
+              <button type="button" class="ui-btn" data-plant aria-pressed="false" hidden>Planting tool: crops</button>
+              <button type="button" class="ui-btn" data-clear hidden>Clear pinned areas (0)</button>
+            </div>
           </div>
-          <div><button type="button" class="ui-btn" data-deselect disabled>Deselect building</button></div>
-        </div>
-        <div class="demo-foot"><span>Interactive illustration, not a game screenshot.</span><span class="sr-only" role="status" aria-live="polite" data-status></span></div>
-      </figure>
+          <svg class="map" viewBox="0 0 480 320" role="group" aria-label="Simplified map with a Farmhouse and a Forester beside a road"></svg>
+          <div class="demo-ui">
+            <p class="ui-empty">Click the Farmhouse or the Forester on the map.</p>
+            <div class="ui-panel" hidden>
+              <div class="h">WORKING AREA</div>
+              <div class="who"></div>
+              <button type="button" class="ui-toggle" aria-pressed="false">
+                <span class="box" aria-hidden="true"><i></i></span>
+                <span class="name">Keep working area visible</span>
+                <span class="state" aria-hidden="true">OFF</span>
+              </button>
+              <p class="hint"></p>
+            </div>
+            <div><button type="button" class="ui-btn" data-deselect disabled>Deselect building</button></div>
+          </div>
+          <div class="demo-foot"><span>Interactive illustration, not a game screenshot.</span><span class="sr-only" role="status" aria-live="polite" data-status></span></div>
+        </figure>
+      </div>
     </div>
   </div>
 
-  <section id="features">
+  <section class="ruled" id="features">
     <div class="container">
       <div class="section-head">
-        <h2>What it does</h2>
-        <p>Timberborn normally shows a building's working area only while you have that building selected. This mod lets you keep the ones you care about on screen.</p>
+        <h2>Three things it does in game</h2>
+        <p>Timberborn draws a working area only while its building is selected. This mod keeps the ones you choose, and brings them back when you need them most.</p>
       </div>
-      <div class="cards">
-        <article class="card">
-          <h3><span class="ico" aria-hidden="true">1</span>Pin any working area</h3>
-          <p>Works on farms, foresters, lumberjack flags, gatherers and any other building that shows a terrain or road-spill working range when selected.</p>
-        </article>
-        <article class="card">
-          <h3><span class="ico" aria-hidden="true">2</span>Stays after you deselect</h3>
-          <p>Paint crops, mark trees for planting or place new buildings with the outline still on screen, instead of re-selecting the building every few seconds. Pick a crop or tree and the farmhouses or foresters that plant it are outlined for you.</p>
-        </article>
-        <article class="card">
-          <h3><span class="ico" aria-hidden="true">3</span>Pin as many as you like</h3>
-          <p>Overlapping pinned areas merge into one combined outline, and areas that are far apart all stay visible. Uncheck a building's box to drop just that pin.</p>
-        </article>
-        <article class="card">
-          <h3><span class="ico" aria-hidden="true">4</span>Clear everything at once</h3>
-          <p>A <strong>Clear pinned areas</strong> button appears at the top right whenever something is pinned. You can also bind a key to it in the game's key-binding settings.</p>
-        </article>
-        <article class="card">
-          <h3><span class="ico" aria-hidden="true">5</span>Looks like the real thing</h3>
-          <p>Outlines are drawn with the game's own outline renderer using the same navigation queries as selection, and they update as terrain, paths, visible level or construction mode change.</p>
-        </article>
-        <article class="card">
-          <h3><span class="ico" aria-hidden="true">6</span>Display only, safe in co-op</h3>
-          <p>No game methods are patched and nothing in the simulation, your saves or the multiplayer traffic is touched. Pins are local to each player.</p>
-        </article>
-      </div>
+      <ul class="moves">
+        <li class="move sheet taped">
+          <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><path class="draw-fill" d="M40 20H150V50H190V110H40Z"/><path class="draw-outline" d="M40 20H150V50H190V110H40Z"/><rect class="draw-bld" x="96" y="56" width="24" height="24" rx="2"/><circle class="draw-pin" cx="124" cy="56" r="6"/></svg>
+          <h3>Pin a working area</h3>
+          <p>Select a farmhouse, forester, lumberjack flag, gatherer or any building that shows a working range, and check <strong>Keep working area visible</strong>. Deselect it and the outline stays. Pin as many as you like; where they overlap they merge into one outline.</p>
+        </li>
+        <li class="move sheet taped">
+          <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><path class="draw-fill" d="M30 16H130V104H30Z"/><path class="draw-outline" d="M30 16H130V104H30Z"/><rect class="draw-bld" x="68" y="48" width="24" height="24" rx="2"/><g class="draw-label"><text x="146" y="44">pick a crop:</text><text x="146" y="62">its farmhouses</text><text x="146" y="80">are outlined</text></g></svg>
+          <h3>Plant with the planters in view</h3>
+          <p>Pick a crop or tree in the planting tools and every building that can plant it is outlined on its own: farmhouses for crops, aquatic farmhouses for aquatic crops, foresters for trees and bushes. They go away when you leave the tool. <span class="unplayed">Checked, not played in game yet.</span></p>
+        </li>
+        <li class="move sheet taped">
+          <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><rect x="20" y="40" width="200" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><text x="120" y="65" text-anchor="middle" class="draw-label draw-strong">Clear pinned areas (2)</text></svg>
+          <h3>Clear them all at once</h3>
+          <p><strong>Clear pinned areas (N)</strong> appears at the top right while anything is pinned. You can also bind a key to it. Uncheck one building to drop just its pin; deleting a pinned building drops its pin too.</p>
+        </li>
+      </ul>
     </div>
   </section>
 
-  <section class="band" id="how">
+  <section class="ruled" id="how">
     <div class="container">
       <div class="section-head">
         <h2>How it works</h2>
-        <p>Three clicks, no setup screens.</p>
+        <p>It draws with the game's own outline renderer and the same navigation queries the game uses for a selected building, so a pinned outline is the game's own outline, kept. It follows terrain, paths, the visible level and construction mode.</p>
       </div>
-      <ol class="steps">
-        <li>
-          <h3>Select a building</h3>
-          <p>Click a farm, forester or any other building with a working area. A <strong>WORKING AREA</strong> panel appears at the top of its info panel.</p>
-        </li>
-        <li>
-          <h3>Check "Keep working area visible"</h3>
-          <p>The whole row is the button. Its badge flips to <strong>ON</strong> and the panel's accent turns green, so the state is obvious at a glance.</p>
-        </li>
-        <li>
-          <h3>Deselect and keep working</h3>
-          <p>Use your planting, building and other tools as normal. The outline stays until you uncheck the building or press <strong>Clear pinned areas</strong>.</p>
-        </li>
-      </ol>
+      <div class="legend sheet taped">
+        <div><h3>What it outlines</h3><ul>
+          <li><span class="swatch" aria-hidden="true"></span><span>Working areas of buildings with a terrain or road-spill range</span></li>
+          <li><span class="swatch" aria-hidden="true"></span><span>Several pins at once, merged where they overlap</span></li>
+          <li><span class="swatch" aria-hidden="true"></span><span>The planters for the crop or tree you picked in the planting tools</span></li>
+        </ul></div>
+        <div><h3>What it doesn't</h3><ul>
+          <li><span class="swatch no" aria-hidden="true"></span><span>District road coloring</span></li>
+          <li><span class="swatch no" aria-hidden="true"></span><span>Effect-radius overlays that aren't navigation-based</span></li>
+          <li><span class="swatch no" aria-hidden="true"></span><span>Building-placement ghosts</span></li>
+          <li><span class="swatch no" aria-hidden="true"></span><span>Builder's Huts (the outline one shows when selected is the game's own)</span></li>
+        </ul></div>
+      </div>
     </div>
   </section>
 
-  <section id="details">
+  <section class="tight" id="details">
     <div class="container">
       <div class="section-head">
         <h2>Good to know</h2>
-        <p>The mod does one thing and stays out of the way. These are its edges.</p>
+        <p>The mod does one thing and stays out of the way.</p>
       </div>
-      <div class="two-col">
-        <div class="card">
-          <h3>Supported</h3>
-          <ul class="tick">
-            <li>Working-area outlines for buildings with a terrain or road-spill range</li>
-            <li>Several pins at once, merged where they overlap</li>
-            <li>Outlines that follow terrain, path, visible-level and construction-mode changes</li>
-            <li>Automatic cleanup when a pinned building is deleted</li>
-            <li>Planting tools that outline every farmhouse or forester able to plant the chosen crop or tree</li>
-            <li>Pins remembered for each settlement, in a small local file</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Not included</h3>
-          <ul class="tick no">
-            <li>District road coloring</li>
-            <li>Effect-radius overlays that are not navigation-based</li>
-            <li>Building-placement ghosts</li>
-            <li>Pin controls for Builder's Huts</li>
-            <li>Translations other than English (adding one takes a single CSV file)</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Pins are remembered, not saved</h3>
-          <p>Each settlement's pins are kept on your own computer, in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, and come back when you load that settlement. They are never written to your save file, so the mod can't affect a colony and each co-op player keeps their own.</p>
-        </div>
-        <div class="card">
-          <h3>Fails on its own</h3>
-          <p>If a future game update changes the internals the outline renderer relies on, pinning disables itself for that map and says so in the panel and the game log. Nothing else is affected.</p>
-        </div>
+      <div class="notes-sheet sheet taped">
+        <div><h3>Pins are remembered, not saved</h3><p>Each settlement's pins are kept on your computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load that settlement. They're never written to your save, so the mod can't affect a colony, and each co-op player keeps their own. <span class="unplayed">Checked, not played in game yet.</span></p></div>
+        <div><h3>Fails on its own</h3><p>If a game update changes the internals the outline renderer relies on, pinning turns itself off for that map and says so in the panel and the game log. Nothing else is affected.</p></div>
+        <div><h3>Light on a large colony</h3><p>A terrain or path change re-checks only the pinned buildings it can reach, at most five times a second. Nothing runs while nothing is pinned and no planting tool is open. <span class="unplayed">Checked, not played in game yet.</span></p></div>
+        <div><h3>English, translatable</h3><p>The panel text is English; a translation is one CSV file in the mod's <code>Localizations</code> folder. <span class="unplayed">Checked, not played in game yet.</span></p></div>
       </div>
-      <p style="margin-top:18px;color:var(--muted)">Running a large colony? A terrain or path change re-checks only the pinned buildings it can reach, at most five times per second. Nothing runs while nothing is pinned and no planting tool is open, and the meshes are released once nothing is drawn.</p>
     </div>
   </section>
 
-  <section class="band" id="compat">
+  <section class="tight" id="compat">
     <div class="container">
       <div class="section-head"><h2>Compatibility</h2></div>
-      <table>
-        <tbody>
-          <tr><th scope="row">Game version</th><td>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build. Built and tested on 1.1.2.4; later versions may change the internal renderer API.</td></tr>
-          <tr><th scope="row">Multiplayer</th><td>Works in single-player and in co-op. Designed for compatibility with the <strong>BeaverBuddies Stability Fork</strong>, but doesn't need any BeaverBuddies build. For co-op, every player installs the same version of the mod and runs the same game version; that's the tested setup. It sends nothing over the network and pins are always local.</td></tr>
-          <tr><th scope="row">Other mods</th><td>No required mods, not even Harmony or Mod Settings. No Harmony patches and no BeaverBuddies dependency.</td></tr>
-          <tr><th scope="row">Saves</th><td>Untouched. Pins live in their own small local file. You can remove the mod at any time.</td></tr>
-          <tr><th scope="row">Language</th><td>English UI text, translatable with one CSV file.</td></tr>
-        </tbody>
-      </table>
+      <div class="tb-sheet sheet taped">
+        <dl class="title-block">
+          <div><dt>Game version</dt><dd><p>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build. Built and tested on 1.1.2.4 on Windows; a later version may change the renderer the mod borrows.</p></dd></div>
+          <div><dt>Other mods</dt><dd><p>None required, not even Harmony or Mod Settings. It patches no game methods.</p></dd></div>
+          <div><dt>Co-op</dt><dd><p>Works in single player and co-op, and doesn't need any BeaverBuddies build. Every player installs the same version of the mod and runs the same game version: the tested setup, with the BeaverBuddies Stability Fork. It sends nothing over the network; pins stay on each player's computer.</p><p><em>Not played yet:</em> the mod on only one of the computers, the original BeaverBuddies, and BeaverBuddies MultiColony.</p></dd></div>
+          <div><dt>Saves</dt><dd><p>Untouched. You can remove the mod at any time.</p></dd></div>
+        </dl>
+      </div>
     </div>
   </section>
 
-  <section class="cta">
+  <section class="ruled" id="status">
     <div class="container">
-      <h2>Ready to try it?</h2>
-      <p>Installing takes a minute: extract one folder into your Timberborn Mods folder and enable it.</p>
+      <div class="section-head">
+        <h2>What is tested, and what isn't</h2>
+        <p>Stable means the evidence below, not that every situation has been tried.</p>
+      </div>
+      <div class="status-grid">
+        <div class="sheet taped">
+          <h3>Tested</h3>
+          <ul class="checks">
+            <li>Pinning, clearing and the outlines, played in game on 1.1.2.4: in single player and in a two-player Stability Fork co-op session with the mod on both computers.</li>
+            <li>142 automated checks: 77 that need no game (they also run on every change), and 65 against the installed game's own assemblies and blueprints.</li>
+          </ul>
+        </div>
+        <div class="sheet taped open-col">
+          <h3>Not played yet</h3>
+          <ul class="checks open">
+            <li>The newest additions: the planting-tool outlines, pins remembered in <code>Pins.txt</code>, the faster refresh and the translatable text. Automated checks cover them.</li>
+            <li>The mod on only one computer in a co-op game.</li>
+            <li>The original BeaverBuddies, and BeaverBuddies MultiColony.</li>
+            <li>Frame rate in a very large colony, and other mods alongside it.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ruled cta">
+    <div class="container">
+      <div>
+        <h2>A minute to install</h2>
+        <ol>
+          <li><b>The zip under Assets</b> on the release page, not <code>-source.zip</code> or Source code.</li>
+          <li><b>Close the game</b> and extract it into <code>Documents\Timberborn\Mods</code>: one <code>PersistentWorkAreas</code> folder.</li>
+          <li><b>Enable it</b> in the mod manager. Nothing else to install.</li>
+        </ol>
+      </div>
       <div class="btn-row">
         <a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/releases/latest" data-latest-zip>Download latest release</a>
         <a class="btn btn-secondary" href="install.html">Read the install guide</a>

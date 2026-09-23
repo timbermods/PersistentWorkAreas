@@ -7,7 +7,9 @@
 <meta name="description" content="How to install, enable, update and remove the Persistent Work Areas Timberborn mod.">
 <link rel="canonical" href="https://timbermods.github.io/PersistentWorkAreas/install.html">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0d1716">
+<meta name="theme-color" content="#ecebe3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17221f" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="assets/fonts/chivo-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -24,7 +26,7 @@
         <li><a href="install.html" aria-current="page">Install</a></li>
         <li><a href="troubleshooting.html">Troubleshooting</a></li>
         <li><a href="faq.html">FAQ</a></li>
-        <li><a class="btn btn-small" href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
+        <li><a href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
       </ul>
     </nav>
   </div>
@@ -90,7 +92,7 @@
         </li>
         <li>
           <h3>Start Timberborn and enable the mod</h3>
-          <p>Open the game's mod manager, enable <strong>Persistent Work Areas</strong>, and restart the game if it asks you to.</p>
+          <p>Open the game's mod manager, enable <strong>Persistent Work Areas</strong>. If the game asks to restart so the change takes effect, let it.</p>
         </li>
       </ol>
 
@@ -107,7 +109,8 @@
           <p class="hint">Click to pin this outline while planting or building.</p>
         </div>
       </div><div class="demo-foot"><span>Illustration of the panel, not a screenshot.</span></div></div>
-      <p style="margin-top:1.2em">You can also confirm the mod loaded by searching the game log for <code>[PersistentWorkAreas]</code>. See <a href="troubleshooting.html#log">where to find the log</a>.</p>
+      <p>You can also confirm the mod loaded in the game log: search it for <code>[PersistentWorkAreas]</code> and look for this line, with your version in place of <code>&lt;version&gt;</code>. See <a href="troubleshooting.html#log">where to find the log</a>.</p>
+<pre><code>[PersistentWorkAreas] &lt;version&gt; loaded.</code></pre>
       <p>If something doesn't look right, head to <a href="troubleshooting.html">Troubleshooting</a>.</p>
 
       <h2 id="keybinding">Optional key binding</h2>
@@ -129,10 +132,10 @@
       <ol>
         <li>Close Timberborn.</li>
         <li>Download the newest zip from the <a href="https://github.com/timbermods/PersistentWorkAreas/releases/latest">latest release</a>.</li>
-        <li>Extract it into the same <code>Mods</code> folder and choose <strong>Replace</strong> when asked about existing files.</li>
+        <li>Delete the old <code>Mods\PersistentWorkAreas</code> folder, then extract the new zip into <code>Mods</code> as before.</li>
         <li>Start the game and confirm <strong>Persistent Work Areas</strong> is still enabled in the mod manager.</li>
       </ol>
-      <p>Replace the whole folder rather than only the DLL: since 1.1.0 the mod reads its text from the <code>Localizations</code> folder beside it. Your pins are kept outside the mod folder, in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, so updating keeps them.</p>
+      <p>Replace the whole folder rather than only the DLL: the mod reads its text from the <code>Localizations</code> folder beside it. Your pins are kept outside the mod folder, in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, so updating keeps them.</p>
 
       <h2 id="uninstall">Uninstalling</h2>
       <p>Disable the mod in the mod manager, or close the game and delete <code>Documents\Timberborn\Mods\PersistentWorkAreas</code>. Your saves are unaffected because the mod never writes to them. To remove the remembered pins too, delete the <code>Documents\Timberborn\PersistentWorkAreas</code> folder.</p>

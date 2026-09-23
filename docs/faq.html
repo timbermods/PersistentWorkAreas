@@ -7,7 +7,9 @@
 <meta name="description" content="Answers about the Persistent Work Areas Timberborn mod: supported buildings, saves, multiplayer, Builder's Huts, performance and more.">
 <link rel="canonical" href="https://timbermods.github.io/PersistentWorkAreas/faq.html">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#0d1716">
+<meta name="theme-color" content="#ecebe3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17221f" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="assets/fonts/chivo-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -24,7 +26,7 @@
         <li><a href="install.html">Install</a></li>
         <li><a href="troubleshooting.html">Troubleshooting</a></li>
         <li><a href="faq.html" aria-current="page">FAQ</a></li>
-        <li><a class="btn btn-small" href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
+        <li><a href="https://github.com/timbermods/PersistentWorkAreas">GitHub</a></li>
       </ul>
     </nav>
   </div>
@@ -38,8 +40,8 @@
     </div>
   </div>
 
-  <div class="container" style="padding-top:34px;padding-bottom:60px">
-    <div class="prose" style="max-width:52em">
+  <div class="container faq-wrap">
+    <div class="prose">
       <div class="q-tools">
         <button type="button" class="btn btn-secondary btn-small" data-expand>Expand all</button>
         <button type="button" class="btn btn-secondary btn-small" data-collapse>Collapse all</button>
@@ -111,7 +113,7 @@
         <h2>Features and limits</h2>
         <details class="q" id="builder">
           <summary>Why can't I pin a Builder's Hut?</summary>
-          <div class="a"><p>The game attaches an internal road-spill range to every Builder's Hut, which is why the mod first offered a pin for them. It isn't a working area you'd want to keep on screen, so since version 0.1.2 the mod doesn't show the pin panel for Builder's Huts.</p></div>
+          <div class="a"><p>The game attaches an internal road-spill range to every Builder's Hut. It isn't a working area you'd want to keep on screen, so the mod doesn't show the pin panel for Builder's Huts.</p></div>
         </details>
         <details class="q" id="builder-outline">
           <summary>Then why does a Builder's Hut still show an outline when I select it?</summary>
@@ -119,11 +121,11 @@
         </details>
         <details class="q" id="persist">
           <summary>Do my pins survive saving and loading?</summary>
-          <div class="a"><p>Yes, since version 1.1.0. Each settlement's pins are remembered on your own computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load any save of that settlement. They are never written into the save itself, so the mod can't affect a saved colony. A different settlement starts with no pins, and a co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save. To forget every pin, delete that file.</p></div>
+          <div class="a"><p>Yes. Each settlement's pins are remembered on your own computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load any save of that settlement. They are never written into the save itself, so the mod can't affect a saved colony. A different settlement starts with no pins, and a co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save. To forget every pin, delete that file.</p></div>
         </details>
         <details class="q" id="planting">
           <summary>Why do farmhouse or forester outlines appear when I pick a crop or tree?</summary>
-          <div class="a"><p>Since version 1.1.0, picking a crop or tree in the planting tools outlines the working area of every building that can plant it: farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes, including ones still under construction. The outlines go away when you leave the planting tool. <strong>Clear pinned areas</strong> removes only your pins, not these.</p></div>
+          <div class="a"><p>Picking a crop or tree in the planting tools outlines the working area of every building that can plant it: farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes, including ones still under construction. The outlines go away when you leave the planting tool. <strong>Clear pinned areas</strong> removes only your pins, not these.</p></div>
         </details>
         <details class="q" id="overlays">
           <summary>Can it pin district road colors, effect radii or placement ghosts?</summary>
@@ -131,7 +133,7 @@
         </details>
         <details class="q" id="language">
           <summary>Is it translated?</summary>
-          <div class="a"><p>Not yet. The mod's text is English only, but since version 1.1.0 all of it lives in one file, <code>version-1.1/Localizations/enUS_PersistentWorkAreas.csv</code>. A translation is one more file there with the same keys, named for the game's language code, for example <code>deDE_PersistentWorkAreas.csv</code>.</p></div>
+          <div class="a"><p>Not yet. The mod's text is English only, but all of it lives in one file, <code>version-1.1/Localizations/enUS_PersistentWorkAreas.csv</code>. A translation is one more file there with the same keys, named for the game's language code, for example <code>deDE_PersistentWorkAreas.csv</code>.</p></div>
         </details>
         <details class="q" id="perf">
           <summary>Will it slow down my game?</summary>
