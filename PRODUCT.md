@@ -149,9 +149,9 @@ community range-overlay mods is on record; don't invent one.
   Timber Together, frame rate in a very large colony, every other mod. Say so plainly in the "What is tested, and what
   isn't" section, without alarm. A feature added later and not yet played carries "Checked, not played in game yet."
   next to it until it is.
-- **Describe the mod as it is now.** Version history belongs in the changelog: the README's "New in 1.1.0" / "Earlier
-  versions" and the GitHub release notes (there is no separate CHANGELOG file). The site has no "since version" or
-  "new in" lines; keep it that way. Keep only the upgrade facts players need:
+- **Describe the mod as it is now.** Version history belongs in the GitHub release notes (there is no separate
+  CHANGELOG file); the README links to them. The site and README have no "since version" or "new in" lines; keep it
+  that way. Keep only the upgrade facts players need:
   close the game, replace the whole `PersistentWorkAreas` folder (copying only the DLL shows raw text keys), pins are
   kept because they live outside the mod folder.
 - **Sources of truth:** `README.md`, `VALIDATION.md`, the localization CSV and the release notes. Where the site and
@@ -160,7 +160,8 @@ community range-overlay mods is on record; don't invent one.
 ## Brand Commitments
 
 - **Voice:** a fellow player explaining a small, useful mod. Clear, exact, friendly, never hype. Short sentences; the
-  exact names players see in game.
+  exact names players see in game. Short and plain: one idea per sentence, each thing said once, no internals and no
+  history (see CLAUDE.md, *Writing README and website text*).
 - **Native fidelity is the claim:** the outline is the game's own; the site's illustrations say they're illustrations
   ("Interactive illustration, not a game screenshot.") until real screenshots exist.
 - **No official Timberborn logos or key art.** The game's own item and building icons are allowed where used (none are

@@ -20,6 +20,25 @@ in `source/`, game assets and localization in `packaging/PersistentWorkAreas/ver
   (`packaging/PersistentWorkAreas/version-1.1/Localizations/enUS_PersistentWorkAreas.csv`), the release notes. Where
   the site and README disagree, the README wins (for example co-op: every player installs the same version).
 
+## Writing README and website text
+
+Kyler, 2026-09-24: "simplicity and elegance is effective and desirable." Every change to the README, the website
+text and the player docs follows these rules.
+
+- **Write for a Timberborn player** who wants to download, install and use the mod. Developer detail goes in
+  `DEVELOPING.md` (build, checks, how it works), `VALIDATION.md` (what is tested) or the GitHub release notes
+  (version history); link to it rather than repeating it.
+- **Short.** One idea per sentence, most under about 20 words. A paragraph or FAQ answer is one to three sentences,
+  a troubleshooting answer a few numbered steps.
+- **Lead with the action.** Menu paths as arrow chains; on-screen labels in bold, exactly as in game.
+- **Say each thing once**, where a player would look for it; link to it elsewhere.
+- **Plain words.** No internals (class names, ids, formats) unless the player needs them to act.
+- **Cut** filler, repeated caveats, edge cases a player won't meet, and history ("since …", "no longer", older
+  builds). Describe the mod as it is now.
+- **Check every fact against the code** before writing it; changelogs lag.
+- **Keep, briefly:** credits, the unofficial line, the status, and safety facts.
+- **Reread as a new player before publishing.** Every step works as written, and nothing is said twice.
+
 ## Website
 
 - **Where:** `docs/`: `index.html` (Overview), `install.html`, `troubleshooting.html`, `faq.html`, `404.html`,
@@ -81,10 +100,12 @@ in `source/`, game assets and localization in `packaging/PersistentWorkAreas/ver
 
 ### Content rules
 
-- Describe the mod as it is now. No "New in", "added in", "since version" on player pages; version history lives in
-  the README's "New in …" / "Earlier versions" and the GitHub release notes (no CHANGELOG file). Upgrade facts players
+- All text follows *Writing README and website text* above.
+- Describe the mod as it is now. No "New in", "added in", "since version" in the README or on player pages; version
+  history lives in the GitHub release notes (no CHANGELOG file), and the README links to them. Upgrade facts players
   need (replace the whole folder; pins are kept) are the exception.
-- Status matches README/VALIDATION exactly. Every current feature has been played extensively in game (1.1.0 on
+- Status matches README/VALIDATION exactly: the README's Status lists and the site's `#status` lists are word for
+  word the same, and "played extensively" is said there only. Every current feature has been played extensively in game (1.1.0 on
   1.1.2.4), so none carries the marker today. A new feature not yet played gets
   `<span class="unplayed">Checked, not played in game yet.</span>` after it, and loses it once played. Never invent numbers, reviews,
   screenshots, download counts. No og image exists; don't fake one.
@@ -111,7 +132,8 @@ in `source/`, game assets and localization in `packaging/PersistentWorkAreas/ver
 
 ### Update the website for a new release
 
-When asked to "update the website for the latest release, consistent with the design":
+When asked to "update the website for the latest release, consistent with the design" (write every change by
+*Writing README and website text* above):
 1. Read the release and the docs: `gh release list -R timbermods/PersistentWorkAreas -L 5`,
    `gh release view <tag> -R timbermods/PersistentWorkAreas`, README, VALIDATION.md, the localization CSV,
    `packaging/PersistentWorkAreas/version-1.1/manifest.json`. List every player-facing change.
@@ -119,7 +141,7 @@ When asked to "update the website for the latest release, consistent with the de
    `grep -rnE "1\.1\.2\.4|version-1\.1|142|\b77\b|\b65\b|unplayed|Not played|playtested" docs`. There is no version
    number in the static HTML (the badge is filled by site.js), and no `data-release-pinned`. The places:
    - `index.html`: `<meta name="description">` and `og:description`; hero `.facts` (three) and `.status-note`
-     ("Stable." + played summary); `#features` move sheets; `#how` legend (outlines / doesn't); `#details`
+     ("Stable.", the version badge and the link to `#status`); `#features` move sheets; `#how` legend (outlines / doesn't); `#details`
      notes sheet; `#compat` title block (Game version, Other mods, Co-op, Saves); `#status` Tested / Not played yet
      (check counts, game version); `.cta` install steps.
    - `install.html`: `#requirements` (game version), zip name pattern, the folder tree (`version-1.1` and its

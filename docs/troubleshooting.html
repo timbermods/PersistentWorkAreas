@@ -36,7 +36,7 @@
   <div class="page-head">
     <div class="container">
       <h1>Troubleshooting</h1>
-      <p>Find your symptom below. If nothing here helps, <a href="#report">send a report</a> with your game log and we'll dig in.</p>
+      <p>Find your symptom below. If nothing helps, <a href="#report">send a report</a> with your game log.</p>
     </div>
   </div>
 
@@ -45,7 +45,7 @@
       <strong>Problems</strong>
       <ul>
         <li><a href="#not-listed">Mod isn't in the mod manager</a></li>
-        <li><a href="#no-panel">No "Working area" panel</a></li>
+        <li><a href="#no-panel">No WORKING AREA section</a></li>
         <li><a href="#unavailable">"Pinning is unavailable"</a></li>
         <li><a href="#nothing-shows">Pinned, but no outline</a></li>
         <li><a href="#not-updating">Outline is out of date</a></li>
@@ -71,29 +71,29 @@
           <dd>
             <ol>
               <li>Close Timberborn.</li>
-              <li>Open <code>Documents\Timberborn\Mods</code> and check that this file exists: <code>PersistentWorkAreas\version-1.1\manifest.json</code>.</li>
-              <li>If it is at <code>PersistentWorkAreas\PersistentWorkAreas\version-1.1\manifest.json</code> instead, move the inner folder up a level.</li>
-              <li>Make sure you extracted the zip rather than opening it and dragging a single file out. <code>PersistentWorkAreas.dll</code> must sit next to <code>manifest.json</code>.</li>
-              <li>Start the game again. See the <a href="install.html#install">install steps</a> for the exact layout.</li>
+              <li>In <code>Documents\Timberborn\Mods</code>, check that <code>PersistentWorkAreas\version-1.1\manifest.json</code> exists, with <code>PersistentWorkAreas.dll</code> beside it.</li>
+              <li>If it's at <code>PersistentWorkAreas\PersistentWorkAreas\version-1.1</code> instead, move the inner folder up a level.</li>
+              <li>If files are missing, extract the whole zip again, as in the <a href="install.html#install">install steps</a>.</li>
+              <li>Start the game.</li>
             </ol>
           </dd>
         </dl>
       </article>
 
       <article class="issue" id="no-panel">
-        <h2>I select a building but there's no "Working area" panel</h2>
+        <h2>I select a building but there's no WORKING AREA section</h2>
         <dl>
           <dt>Likely causes</dt>
           <dd>
             <ul>
-              <li>The mod isn't enabled. Check the mod manager, and restart if it asked you to.</li>
-              <li>The building doesn't have a working area. The panel only appears for buildings that show a terrain or road-spill outline when selected in the base game, such as farms, foresters, lumberjack flags and gatherers.</li>
-              <li>It's a <strong>Builder's Hut</strong>. These are deliberately excluded. See <a href="#builder-hut">below</a>.</li>
-              <li>The building is only a placement preview (a ghost you haven't placed yet).</li>
+              <li>The mod isn't enabled. Check the mod manager, and restart if the game asks.</li>
+              <li>The building has no working area. The section appears only for buildings that show one when selected, such as farmhouses, foresters, lumberjack flags and gatherers.</li>
+              <li>It's a <strong>Builder's Hut</strong>, which can't be pinned (<a href="#builder-hut">why</a>).</li>
+              <li>It's a placement preview you haven't placed yet.</li>
             </ul>
           </dd>
           <dt>Fix</dt>
-          <dd>Try a farm or forester first. If the panel appears there, the mod is working and the other building has no pinnable area. If it doesn't appear on a farm either, <a href="#log">check the log</a>.</dd>
+          <dd>Try a farmhouse or forester. If the section shows there, the mod works and the other building has nothing to pin. If not, <a href="#log">check the log</a>.</dd>
         </dl>
       </article>
 
@@ -101,13 +101,13 @@
         <h2>The panel says "Working-area pinning is unavailable. Check the game log."</h2>
         <dl>
           <dt>What it means</dt>
-          <dd>The outline renderer failed for this map. This normally happens when a game update has changed the internal renderer the mod borrows. The mod turns pinning off for the map and leaves everything else in the game alone.</dd>
+          <dd>The outline failed on this map, usually because a game update changed something the mod relies on. Pinning is off for this map; nothing else in the game is affected.</dd>
           <dt>Fix</dt>
           <dd>
             <ol>
               <li>Look for a newer version on the <a href="https://github.com/timbermods/PersistentWorkAreas/releases/latest">releases page</a> and <a href="install.html#update">update</a>.</li>
-              <li>Otherwise <a href="#log">find the log</a>, search for <code>Outline disabled for this map</code>, and <a href="#report">report it</a> with that line and its stack trace.</li>
-              <li>Reloading the map resets the mod, but it will fail again if the cause is a game change.</li>
+              <li>Otherwise, <a href="#log">find the log</a>, search for <code>Outline disabled for this map</code>, and <a href="#report">report it</a> with that line and the error after it.</li>
+              <li>Reloading the map turns pinning back on, but it fails again if a game change is the cause.</li>
             </ol>
           </dd>
         </dl>
@@ -119,14 +119,20 @@
           <dt>Likely causes</dt>
           <dd>
             <ul>
-              <li><strong>The pin isn't on.</strong> The row should read <strong>ON</strong>, and a <strong>Clear pinned areas (N)</strong> button should be showing at the top right. If not, the pin was removed or never registered.</li>
-              <li><strong>It isn't connected to a path.</strong> The area is measured from the building's entrance, exactly as the game does for its own outline. A building with no reachable entrance has no area to draw.</li>
-              <li><strong>Visible level.</strong> Like the game's outline, pinned areas follow the visible-level setting. Parts above the level you're viewing are hidden.</li>
+              <li><strong>The pin isn't on.</strong> The row should read <strong>ON</strong>, and <strong>Clear pinned areas (N)</strong> should show at the top right.</li>
+              <li><strong>Its entrance can't be reached.</strong> The area is measured from the building's entrance, as the game does. With no reachable entrance, there's nothing to draw.</li>
+              <li><strong>Visible level.</strong> Parts of the area above the level you're viewing are hidden, as with the game's outline.</li>
               <li>Pinning is <a href="#unavailable">unavailable</a> on this map.</li>
             </ul>
           </dd>
           <dt>Fix</dt>
-          <dd>Make sure the pin reads ON, raise the visible level, and check the building has a working path to it. If it still doesn't show, uncheck and re-check the box to force a refresh. Note that while a pinned building is selected, the game draws its normal outline, and the pinned outline takes over when you deselect it.</dd>
+          <dd>
+            <ol>
+              <li>Check that the pin reads <strong>ON</strong>, then deselect the building.</li>
+              <li>Raise the visible level, and make sure a path reaches the building.</li>
+              <li>Still nothing? Uncheck and re-check the box to refresh it.</li>
+            </ol>
+          </dd>
         </dl>
       </article>
 
@@ -134,9 +140,15 @@
         <h2>The outline doesn't match my recent terrain or path changes</h2>
         <dl>
           <dt>What to expect</dt>
-          <dd>Outlines recalculate when terrain, paths or construction mode change near a pinned building, at most five times per second, so a change can take a moment to show. Selection and visible-level changes redraw from the last result right away.</dd>
+          <dd>Outlines update after terrain, path or construction-mode changes, at most five times a second. A change can take a moment to show.</dd>
           <dt>Fix</dt>
-          <dd>Wait a second. If it's still stale, uncheck and re-check the building's box to rebuild it, and <a href="#report">report it</a> if it keeps happening, saying what you changed.</dd>
+          <dd>
+            <ol>
+              <li>Wait a second.</li>
+              <li>Still out of date? Uncheck and re-check the building's box.</li>
+              <li>If it keeps happening, <a href="#report">report it</a> and say what you changed.</li>
+            </ol>
+          </dd>
         </dl>
       </article>
 
@@ -144,9 +156,16 @@
         <h2>My pins disappeared</h2>
         <dl>
           <dt>Why</dt>
-          <dd>Pins are remembered for each settlement in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, never in your save. A different settlement starts with none. A co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save. Deleting a pinned building removes its pin, <strong>Clear pinned areas</strong> removes all of them, and deleting <code>Pins.txt</code> forgets every settlement's pins. Outlines that appeared because a planting tool was open go away when you leave the tool; they were never pins.</dd>
+          <dd>
+            <ul>
+              <li>Pins belong to a settlement. A different settlement starts with none.</li>
+              <li>A co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save.</li>
+              <li>Deleting a pinned building removes its pin, and <strong>Clear pinned areas (N)</strong> removes them all.</li>
+              <li>Outlines from a planting tool go when you leave the tool; they were never pins.</li>
+            </ul>
+          </dd>
           <dt>Fix</dt>
-          <dd>Load a save of the same settlement, or pin the buildings again. If pins don't come back for the same settlement, look in <code>Player.log</code> for a <code>[PersistentWorkAreas] Pinned areas not</code> warning and <a href="#report">report it</a>.</dd>
+          <dd>Load a save of the same settlement, or pin the buildings again. If the same settlement's pins don't come back, search the log for <code>[PersistentWorkAreas] Pinned areas not</code> and <a href="#report">report it</a>.</dd>
         </dl>
       </article>
 
@@ -154,9 +173,9 @@
         <h2>I can't find the "Clear pinned areas" button</h2>
         <dl>
           <dt>Why</dt>
-          <dd>It sits at the top right of the screen and only appears while at least one building is pinned. Its label shows how many pins you have, for example <strong>Clear pinned areas (2)</strong>.</dd>
+          <dd>It's at the top right of the screen, and shows only while something is pinned. Its label counts your pins, for example <strong>Clear pinned areas (2)</strong>.</dd>
           <dt>Fix</dt>
-          <dd>Pin a building and look at the top right. To remove a single pin, select that building and uncheck its box.</dd>
+          <dd>Pin a building and look at the top right. To remove one pin, select its building and uncheck its box.</dd>
         </dl>
       </article>
 
@@ -166,14 +185,14 @@
           <dt>Likely causes</dt>
           <dd>
             <ul>
-              <li>It's unbound by default. Assign a key under <strong>Settings &gt; Key bindings &gt; Persistent Work Areas &gt; Clear all pinned working areas</strong>.</li>
-              <li>Nothing is pinned. The shortcut only acts when there's at least one pin.</li>
-              <li>Another game action uses the same key. Choose a different one.</li>
-              <li>You're holding an extra modifier key (Shift, Ctrl or Alt) that isn't part of the binding. The shortcut ignores presses with extra modifiers.</li>
+              <li>It starts unbound. Assign a key under Settings → Key bindings → Persistent Work Areas → <strong>Clear all pinned working areas</strong>.</li>
+              <li>Nothing is pinned. The key acts only when something is.</li>
+              <li>Another game action uses the same key.</li>
+              <li>You're holding an extra modifier key (Shift, Ctrl or Alt) that isn't part of the binding.</li>
             </ul>
           </dd>
           <dt>Fix</dt>
-          <dd>Pin a building, then press the key on its own. You can always use the top-right button instead.</dd>
+          <dd>Pin a building, then press the key on its own. If another action uses it, pick a different key. The top-right button always works.</dd>
         </dl>
       </article>
 
@@ -181,9 +200,9 @@
         <h2>A Builder's Hut shows an outline when I select it</h2>
         <dl>
           <dt>Why</dt>
-          <dd>That outline comes from Timberborn itself. The game gives every Builder's Hut a road-spill range and draws it while the hut is selected. Persistent Work Areas doesn't draw it and doesn't change it. The mod doesn't offer a pin for Builder's Huts.</dd>
+          <dd>That outline is the game's own: Timberborn draws it while a Builder's Hut is selected. The mod doesn't draw or change it, and Builder's Huts can't be pinned.</dd>
           <dt>Fix</dt>
-          <dd>Nothing to fix. To confirm, disable the mod, restart, and select a Builder's Hut: the same outline appears.</dd>
+          <dd>Nothing to fix. To check, disable the mod, restart and select a Builder's Hut: the same outline appears.</dd>
         </dl>
       </article>
 
@@ -191,9 +210,9 @@
         <h2>It stopped working after a Timberborn update</h2>
         <dl>
           <dt>Why</dt>
-          <dd>The mod is built and tested on Timberborn 1.1.2.4. It borrows the game's own outline renderer, so a later game version can change something it relies on. When that happens pinning disables itself for the map (see <a href="#unavailable">above</a>) and the rest of the game is unaffected.</dd>
+          <dd>The mod is tested on Timberborn 1.1.2.4. A later game version can change something the outline relies on. Pinning then turns off for the map (<a href="#unavailable">see above</a>), and the rest of the game is unaffected.</dd>
           <dt>Fix</dt>
-          <dd>Check the <a href="https://github.com/timbermods/PersistentWorkAreas/releases">releases page</a> for a build that supports your game version, or <a href="#report">open an issue</a> that says which game version you're on.</dd>
+          <dd>Check the <a href="https://github.com/timbermods/PersistentWorkAreas/releases">releases page</a> for a version that supports your game, or <a href="#report">open an issue</a> with your game version.</dd>
         </dl>
       </article>
 
@@ -203,10 +222,10 @@
           <dt>Things to know</dt>
           <dd>
             <ul>
-              <li>Pins are local. Pinning or clearing on your computer never changes what your partner sees.</li>
-              <li>The mod doesn't patch the game, run simulation code or send multiplayer events, so it shouldn't cause desyncs. If you suspect it, disable it on the affected computer and see if the problem goes away.</li>
-              <li>It's designed for compatibility with the BeaverBuddies Stability Fork but doesn't depend on it. For co-op, every player installs the same version of the mod and runs the same game version; that's the tested setup. Running it on only one computer hasn't been playtested.</li>
-              <li>A multiplayer resync reloads the map. The host's pins should come back. A guest's pins usually don't, because the guest's settlement is named after the host's save. That's expected.</li>
+              <li>Pins are local. Pinning or clearing never changes what other players see.</li>
+              <li>The mod changes nothing in the game and sends nothing over the network, so it shouldn't cause desyncs. If you suspect it, disable it on every computer and see if the problem goes away.</li>
+              <li>After a resync, the host's pins should come back. A guest's pins usually don't, because the guest's settlement is named after the host's save.</li>
+              <li>For the co-op setup, see the <a href="faq.html#multiplayer">FAQ</a>.</li>
             </ul>
           </dd>
         </dl>
@@ -216,31 +235,31 @@
         <h2>Slowdowns with many pins</h2>
         <dl>
           <dt>What to expect</dt>
-          <dd>A terrain or path change re-checks only the pinned buildings it can reach, at most five times per second. Nothing runs while nothing is pinned and no planting tool is open. All outlines share one combined mesh. Opening a planting tool works out every matching farmhouse's or forester's area at once, which can take a moment in a very large colony.</dd>
+          <dd>A terrain or path change re-checks only the pinned buildings it can reach. Opening a planting tool works out every matching building's area at once, which can take a moment in a very large colony.</dd>
           <dt>Fix</dt>
-          <dd>Clear pins you no longer need. If you still see a drop in frame rate, <a href="#report">report it</a> with roughly how many pins and how large your colony is.</dd>
+          <dd>Clear pins you no longer need. If the frame rate still drops, <a href="#report">report it</a> with roughly how many pins you have and how large your colony is.</dd>
         </dl>
       </article>
 
       <h2 id="log">Finding the game log</h2>
-      <p>Timberborn writes a log every time it runs. On Windows it is here:</p>
+      <p>On Windows, Timberborn writes its log here:</p>
 <pre><code>%USERPROFILE%\AppData\LocalLow\Mechanistry\Timberborn\Player.log</code></pre>
-      <p>Paste that into the File Explorer address bar to open it. <code>Player-prev.log</code> next to it is the previous session, which is useful if the game crashed. Search the file for <code>[PersistentWorkAreas]</code>. You'll see:</p>
+      <p>Paste that into the File Explorer address bar to open it. After a crash, open <code>Player-prev.log</code> beside it instead. Search the log for <code>[PersistentWorkAreas]</code>:</p>
       <ul>
-        <li><code>[PersistentWorkAreas] &lt;version&gt; loaded.</code> when the mod started normally.</li>
-        <li><code>Outline disabled for this map:</code> followed by an error, when the renderer failed.</li>
-        <li><code>Renderer cleanup failed:</code> followed by an error, if freeing the outline hit a problem.</li>
-        <li><code>Pinned areas not restored from</code> or <code>Pinned areas not saved to</code>, followed by the path of <code>Pins.txt</code> and an error, if the pin file couldn't be read or written.</li>
+        <li><code>[PersistentWorkAreas] &lt;version&gt; loaded.</code> The mod started normally.</li>
+        <li><code>Outline disabled for this map:</code> and an error. The outline failed.</li>
+        <li><code>Renderer cleanup failed:</code> and an error. Removing the outline hit a problem.</li>
+        <li><code>Pinned areas not restored from</code> or <code>Pinned areas not saved to</code>, the path of <code>Pins.txt</code> and an error. The pin file couldn't be read or written.</li>
       </ul>
-      <p>No <code>[PersistentWorkAreas]</code> lines at all means the game never loaded the mod, so go back to <a href="#not-listed">the first fix</a>.</p>
+      <p>No <code>[PersistentWorkAreas]</code> lines at all means the game never loaded the mod. Go back to <a href="#not-listed">the first fix</a>.</p>
 
       <h2 id="report">Reporting a problem</h2>
-      <p>Open an issue on GitHub and include as much of this as you can:</p>
+      <p>Open an issue on GitHub with as much of this as you can:</p>
       <ul>
-        <li>The mod version (from the mod manager, or the <code>[PersistentWorkAreas] ... loaded</code> log line) and your Timberborn version.</li>
-        <li>Whether you use BeaverBuddies, and which other mods are enabled.</li>
-        <li>What you did, what you expected, and what happened instead.</li>
-        <li>Any <code>[PersistentWorkAreas]</code> lines from <code>Player.log</code>, with the full error text.</li>
+        <li>The mod version (from the mod manager or the <code>loaded.</code> log line) and your Timberborn version.</li>
+        <li>Whether you use BeaverBuddies, and your other mods.</li>
+        <li>What you did, what you expected, and what happened.</li>
+        <li>Every <code>[PersistentWorkAreas]</code> line from <code>Player.log</code>, with the full error text.</li>
       </ul>
       <div class="btn-row"><a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/issues/new">Open an issue</a><a class="btn btn-secondary" href="faq.html">Read the FAQ</a></div>
     </div>

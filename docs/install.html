@@ -36,7 +36,7 @@
   <div class="page-head">
     <div class="container">
       <h1>Install guide</h1>
-      <p>Extract one folder, enable the mod, and you're done. It takes about a minute.</p>
+      <p>Extract one folder and enable the mod. It takes about a minute.</p>
     </div>
   </div>
 
@@ -58,26 +58,26 @@
       <h2 id="requirements">Requirements</h2>
       <ul>
         <li><strong>Timberborn 1.1.2.4</strong> or a compatible 1.1 build.</li>
-        <li>Nothing else. No other mods are required: not Harmony, Mod Settings or BeaverBuddies.</li>
-        <li>A <code>Mods</code> folder inside your Timberborn user folder, normally <code>Documents\Timberborn\Mods</code>. If it doesn't exist yet, start the game once or create it yourself.</li>
+        <li>No other mods: not Harmony, Mod Settings or BeaverBuddies.</li>
+        <li>A <code>Mods</code> folder in your Timberborn user folder, normally <code>Documents\Timberborn\Mods</code>. If it's missing, start the game once or create it.</li>
       </ul>
-      <p>The mod has been built and tested on Windows. If your Timberborn user folder is somewhere else, extract into the <code>Mods</code> folder there instead.</p>
+      <p>Tested on Windows. If your Timberborn user folder is elsewhere, use the <code>Mods</code> folder there.</p>
 
       <h2 id="install">Install</h2>
       <ol class="steps">
         <li>
           <h3>Close Timberborn</h3>
-          <p>Mods are loaded when the game starts, so quit it first.</p>
+          <p>Mods load when the game starts, so quit it first.</p>
         </li>
         <li>
           <h3>Download the zip</h3>
-          <p>Get the newest release from GitHub. Under <strong>Assets</strong>, choose the file named like <code>PersistentWorkAreas-vX.Y.Z.zip</code>. Don't use the one ending in <code>-source.zip</code> or the <strong>Source code</strong> archives, which contain only the source code.</p>
+          <p>Under <strong>Assets</strong> on the newest release, choose the file named like <code>PersistentWorkAreas-vX.Y.Z.zip</code>. Don't use the one ending in <code>-source.zip</code> or the <strong>Source code</strong> archives.</p>
           <div class="btn-row"><a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/releases/latest" data-latest-zip>Download the latest zip</a></div>
           <p class="file-name" data-zip-line hidden>File: <code data-zip-name></code></p>
         </li>
         <li>
           <h3>Extract it into your Mods folder</h3>
-          <p>Right-click the zip, choose <strong>Extract All</strong>, and pick <code>Documents\Timberborn\Mods</code>. The result must look exactly like this, with <code>manifest.json</code> and the DLL side by side inside <code>version-1.1</code>:</p>
+          <p>Right-click the zip, choose <strong>Extract All</strong>, and pick <code>Documents\Timberborn\Mods</code>. You should get this, with <code>manifest.json</code> and the DLL side by side in <code>version-1.1</code>:</p>
 <pre><code>Documents\Timberborn\Mods\
   PersistentWorkAreas\
     version-1.1\
@@ -88,19 +88,19 @@
       Localizations\
     README.md
     VALIDATION.md</code></pre>
-          <p>If you see <code>PersistentWorkAreas\PersistentWorkAreas\version-1.1</code>, the folder is nested one level too deep. Move the inner folder up.</p>
+          <p>If you see <code>PersistentWorkAreas\PersistentWorkAreas\version-1.1</code>, it's nested one level too deep. Move the inner folder up.</p>
         </li>
         <li>
           <h3>Start Timberborn and enable the mod</h3>
-          <p>Open the game's mod manager, enable <strong>Persistent Work Areas</strong>. If the game asks to restart so the change takes effect, let it.</p>
+          <p>In the mod manager, enable <strong>Persistent Work Areas</strong>. Restart if the game asks.</p>
         </li>
       </ol>
 
       <h2 id="verify">Check that it works</h2>
       <ol>
-        <li>Load a colony and select a farm, forester or lumberjack flag.</li>
-        <li>At the top of its info panel you should see a <strong>WORKING AREA</strong> section with a <strong>Keep working area visible</strong> row and an <strong>OFF</strong> badge.</li>
-        <li>Click the row so it reads <strong>ON</strong>, then deselect the building. Its outline should stay on screen, and a <strong>Clear pinned areas (1)</strong> button appears at the top right.</li>
+        <li>Load a colony and select a farmhouse, forester or lumberjack flag.</li>
+        <li>At the top of its panel, find the <strong>WORKING AREA</strong> section: a <strong>Keep working area visible</strong> row with an <strong>OFF</strong> badge.</li>
+        <li>Click the row so it reads <strong>ON</strong>, then deselect the building. The outline stays, and <strong>Clear pinned areas (1)</strong> appears at the top right.</li>
       </ol>
       <div class="demo ui-sample" aria-label="Illustration of the panel"><div class="demo-ui">
         <div class="ui-panel">
@@ -109,36 +109,31 @@
           <p class="hint">Click to pin this outline while planting or building.</p>
         </div>
       </div><div class="demo-foot"><span>Illustration of the panel, not a screenshot.</span></div></div>
-      <p>You can also confirm the mod loaded in the game log: search it for <code>[PersistentWorkAreas]</code> and look for this line, with your version in place of <code>&lt;version&gt;</code>. See <a href="troubleshooting.html#log">where to find the log</a>.</p>
+      <p>The game log also shows that the mod loaded. Search it for this line (<a href="troubleshooting.html#log">where to find the log</a>):</p>
 <pre><code>[PersistentWorkAreas] &lt;version&gt; loaded.</code></pre>
-      <p>If something doesn't look right, head to <a href="troubleshooting.html">Troubleshooting</a>.</p>
+      <p>Something wrong? See <a href="troubleshooting.html">Troubleshooting</a>.</p>
 
       <h2 id="keybinding">Optional key binding</h2>
-      <p>The mod adds one shortcut, <strong>Clear all pinned working areas</strong>. It starts unbound so it can't take over a key you already use.</p>
-      <ol>
-        <li>Open the game's <strong>Settings</strong> and go to <strong>Key bindings</strong>.</li>
-        <li>Find the <strong>Persistent Work Areas</strong> group.</li>
-        <li>Assign a key to <strong>Clear all pinned working areas</strong>. Pick one that isn't used by a tool you have active while planting.</li>
-      </ol>
+      <p>Go to Settings → Key bindings → Persistent Work Areas, and assign a key to <strong>Clear all pinned working areas</strong>. It starts unbound. Pick a key your planting tools don't use.</p>
 
       <h2 id="coop">Using it with BeaverBuddies</h2>
-      <p>The mod is designed for compatibility with the <strong>BeaverBuddies Stability Fork</strong>, but it doesn't need BeaverBuddies and works the same in single-player. Leave your existing BeaverBuddies installation as it is.</p>
+      <p>It works with the <strong>BeaverBuddies Stability Fork</strong>, but doesn't need it. Leave your BeaverBuddies install as it is.</p>
       <div class="callout note">
         <strong class="t">Pins are local</strong>
-        <p>Each player pins and clears on their own computer, and nothing is sent over the network. For co-op, every player installs the same version of the mod and runs the same game version; that's the setup that has been tested. Running it on only one computer hasn't been playtested.</p>
+        <p>Each player pins and clears on their own computer, and nothing is sent over the network. For co-op, every player installs the same version of the mod and runs the same game version; that's the tested setup.</p>
       </div>
 
       <h2 id="update">Updating</h2>
       <ol>
         <li>Close Timberborn.</li>
         <li>Download the newest zip from the <a href="https://github.com/timbermods/PersistentWorkAreas/releases/latest">latest release</a>.</li>
-        <li>Delete the old <code>Mods\PersistentWorkAreas</code> folder, then extract the new zip into <code>Mods</code> as before.</li>
-        <li>Start the game and confirm <strong>Persistent Work Areas</strong> is still enabled in the mod manager.</li>
+        <li>Delete the old <code>Mods\PersistentWorkAreas</code> folder, then extract the new zip into <code>Mods</code>.</li>
+        <li>Start the game and check that <strong>Persistent Work Areas</strong> is still enabled.</li>
       </ol>
-      <p>Replace the whole folder rather than only the DLL: the mod reads its text from the <code>Localizations</code> folder beside it. Your pins are kept outside the mod folder, in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>, so updating keeps them.</p>
+      <p>Replace the whole folder, not just the DLL: the DLL needs the files beside it. Your pins are kept, because they live outside the mod folder.</p>
 
       <h2 id="uninstall">Uninstalling</h2>
-      <p>Disable the mod in the mod manager, or close the game and delete <code>Documents\Timberborn\Mods\PersistentWorkAreas</code>. Your saves are unaffected because the mod never writes to them. To remove the remembered pins too, delete the <code>Documents\Timberborn\PersistentWorkAreas</code> folder.</p>
+      <p>Disable the mod in the mod manager, or close the game and delete <code>Documents\Timberborn\Mods\PersistentWorkAreas</code>. Your saves are unaffected. To forget the remembered pins too, delete the <code>Documents\Timberborn\PersistentWorkAreas</code> folder.</p>
     </div>
   </div>
 </main>

@@ -42,7 +42,7 @@
       <div>
         <h1>Persistent Work Areas</h1>
         <p class="pitch">Keep the outline. Keep planting.</p>
-        <p class="lede">A Timberborn mod. The game shows a building's working area only while it's selected, so the outline vanishes the moment you pick a planting tool. Pin the ones you care about and they stay on screen while you plant, build and plan.</p>
+        <p class="lede">A Timberborn mod. The game shows a building's working area only while it's selected. Pin the ones you care about, and they stay on screen while you plant, build and plan.</p>
         <ul class="facts">
           <li><b>The game's own outline, kept.</b> Check <strong>Keep working area visible</strong> on a farmhouse, forester or gatherer, then deselect it.</li>
           <li><b>The planting tools show their planters.</b> Pick a crop or tree and the buildings that can plant it are outlined for you.</li>
@@ -52,7 +52,7 @@
           <a class="btn" href="https://github.com/timbermods/PersistentWorkAreas/releases/latest" data-latest-zip><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2v10M4.5 7.5L9 12l4.5-4.5M3 15.5h12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download latest release</a>
           <a class="btn btn-secondary" href="install.html">Install guide</a>
         </div>
-        <p class="status-note"><strong>Stable.</strong> <span class="ver" data-latest-version hidden></span> Every feature has been played extensively in game, and pinning also in two-player co-op. <a href="#status">What is tested, and what isn't</a></p>
+        <p class="status-note"><strong>Stable.</strong> <span class="ver" data-latest-version hidden></span> <a href="#status">What is tested, and what isn't</a></p>
       </div>
 
       <div class="demo-sheet sheet taped">
@@ -89,23 +89,22 @@
     <div class="container">
       <div class="section-head">
         <h2>Three things it does in game</h2>
-        <p>Timberborn draws a working area only while its building is selected. This mod keeps the ones you choose, and brings them back when you need them most.</p>
       </div>
       <ul class="moves">
         <li class="move sheet taped">
           <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><path class="draw-fill" d="M40 20H150V50H190V110H40Z"/><path class="draw-outline" d="M40 20H150V50H190V110H40Z"/><rect class="draw-bld" x="96" y="56" width="24" height="24" rx="2"/><circle class="draw-pin" cx="124" cy="56" r="6"/></svg>
           <h3>Pin a working area</h3>
-          <p>Select a farmhouse, forester, lumberjack flag, gatherer or any building that shows a working range, and check <strong>Keep working area visible</strong>. Deselect it and the outline stays. Pin as many as you like; where they overlap they merge into one outline.</p>
+          <p>Select a farmhouse, forester, gatherer or other building that shows a working area. Check <strong>Keep working area visible</strong> and deselect it: the outline stays. Pin as many as you like; overlapping areas merge into one outline.</p>
         </li>
         <li class="move sheet taped">
           <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><path class="draw-fill" d="M30 16H130V104H30Z"/><path class="draw-outline" d="M30 16H130V104H30Z"/><rect class="draw-bld" x="68" y="48" width="24" height="24" rx="2"/><g class="draw-label"><text x="146" y="44">pick a crop:</text><text x="146" y="62">its farmhouses</text><text x="146" y="80">are outlined</text></g></svg>
           <h3>Plant with the planters in view</h3>
-          <p>Pick a crop or tree in the planting tools and every building that can plant it is outlined on its own: farmhouses for crops, aquatic farmhouses for aquatic crops, foresters for trees and bushes. They go away when you leave the tool.</p>
+          <p>Pick a crop or tree in the planting tools, and every building that can plant it is outlined. That's farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes. The outlines go when you leave the tool.</p>
         </li>
         <li class="move sheet taped">
           <svg viewBox="0 0 240 120" aria-hidden="true"><g class="draw-grid"><path d="M0 30H240M0 60H240M0 90H240M60 0V120M120 0V120M180 0V120"/></g><rect x="20" y="40" width="200" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><text x="120" y="65" text-anchor="middle" class="draw-label draw-strong">Clear pinned areas (2)</text></svg>
           <h3>Clear them all at once</h3>
-          <p><strong>Clear pinned areas (N)</strong> appears at the top right while anything is pinned. You can also bind a key to it. Uncheck one building to drop just its pin; deleting a pinned building drops its pin too.</p>
+          <p>Click <strong>Clear pinned areas (N)</strong> at the top right, or <a href="install.html#keybinding">bind a key</a> to it. To drop one pin, uncheck its building. Deleting a pinned building drops its pin too.</p>
         </li>
       </ul>
     </div>
@@ -115,7 +114,7 @@
     <div class="container">
       <div class="section-head">
         <h2>How it works</h2>
-        <p>It draws with the game's own outline renderer and the same navigation queries the game uses for a selected building, so a pinned outline is the game's own outline, kept. It follows terrain, paths, the visible level and construction mode.</p>
+        <p>A pinned outline is the game's own outline for that building, drawn the same way. It follows terrain, paths, the visible level and construction mode.</p>
       </div>
       <div class="legend sheet taped">
         <div><h3>What it outlines</h3><ul>
@@ -137,13 +136,12 @@
     <div class="container">
       <div class="section-head">
         <h2>Good to know</h2>
-        <p>The mod does one thing and stays out of the way.</p>
       </div>
       <div class="notes-sheet sheet taped">
-        <div><h3>Pins are remembered, not saved</h3><p>Each settlement's pins are kept on your computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load that settlement. They're never written to your save, so the mod can't affect a colony, and each co-op player keeps their own.</p></div>
-        <div><h3>Fails on its own</h3><p>If a game update changes the internals the outline renderer relies on, pinning turns itself off for that map and says so in the panel and the game log. Nothing else is affected.</p></div>
-        <div><h3>Light on a large colony</h3><p>A terrain or path change re-checks only the pinned buildings it can reach, at most five times a second. Nothing runs while nothing is pinned and no planting tool is open.</p></div>
-        <div><h3>English, translatable</h3><p>The panel text is English; a translation is one CSV file in the mod's <code>Localizations</code> folder.</p></div>
+        <div><h3>Pins are remembered, not saved</h3><p>Each settlement's pins are kept on your computer and come back when you load that settlement. They're never written to your save, and each co-op player keeps their own. <a href="faq.html#persist">Where they're kept</a></p></div>
+        <div><h3>Fails on its own</h3><p>If a game update breaks the outline, pinning turns off for that map. The panel and the game log say so; nothing else is affected.</p></div>
+        <div><h3>Light on a large colony</h3><p>A terrain or path change re-checks only the pinned buildings it can reach. Nothing runs while nothing is pinned and no planting tool is open.</p></div>
+        <div><h3>English, translatable</h3><p>The text is English. A translation is one CSV file in the mod's <code>Localizations</code> folder (<a href="faq.html#language">how</a>).</p></div>
       </div>
     </div>
   </section>
@@ -153,9 +151,9 @@
       <div class="section-head"><h2>Compatibility</h2></div>
       <div class="tb-sheet sheet taped">
         <dl class="title-block">
-          <div><dt>Game version</dt><dd><p>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build. Built and tested on 1.1.2.4 on Windows; a later version may change the renderer the mod borrows.</p></dd></div>
-          <div><dt>Other mods</dt><dd><p>None required, not even Harmony or Mod Settings. It patches no game methods.</p></dd></div>
-          <div><dt>Co-op</dt><dd><p>Works in single player and co-op, and doesn't need any BeaverBuddies build. Every player installs the same version of the mod and runs the same game version: the tested setup, with the BeaverBuddies Stability Fork. It sends nothing over the network; pins stay on each player's computer.</p><p><em>Not played yet:</em> the mod on only one of the computers, the original BeaverBuddies, and Timber Together.</p></dd></div>
+          <div><dt>Game version</dt><dd><p>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build. Tested on 1.1.2.4 on Windows.</p></dd></div>
+          <div><dt>Other mods</dt><dd><p>None required: not Harmony, Mod Settings or BeaverBuddies.</p></dd></div>
+          <div><dt>Co-op</dt><dd><p>Works in single player and co-op. Every player installs the same version of the mod and runs the same game version.</p></dd></div>
           <div><dt>Saves</dt><dd><p>Untouched. You can remove the mod at any time.</p></dd></div>
         </dl>
       </div>
@@ -172,7 +170,7 @@
         <div class="sheet taped">
           <h3>Tested</h3>
           <ul class="checks">
-            <li>Every feature, played extensively in game on 1.1.2.4: pinning and clearing, the pinned outlines, the planting-tool outlines, pins remembered between sessions, the refresh and the panel text.</li>
+            <li>Every feature, played extensively in game on 1.1.2.4: pinning and clearing, the pinned outlines, the planting-tool outlines, pins remembered between sessions, outlines keeping up with terrain and path changes, and the panel text.</li>
             <li>Pinning, clearing and the outlines in a two-player Stability Fork co-op session, with the mod on both computers.</li>
             <li>142 automated checks: 77 that need no game (they also run on every change), and 65 against the installed game's own assemblies and blueprints.</li>
           </ul>
