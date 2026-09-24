@@ -36,7 +36,7 @@
   <div class="page-head">
     <div class="container">
       <h1>Frequently asked questions</h1>
-      <p>Quick answers about what the mod does, what it doesn't, and how safe it is. Something not working? Try <a href="troubleshooting.html">Troubleshooting</a>.</p>
+      <p>Quick answers about what the mod does and doesn't do. Something not working? Try <a href="troubleshooting.html">Troubleshooting</a>.</p>
     </div>
   </div>
 
@@ -51,15 +51,15 @@
         <h2>The basics</h2>
         <details class="q" id="what">
           <summary>What does Persistent Work Areas do?</summary>
-          <div class="a"><p>Timberborn normally shows a building's working-area outline only while you have that building selected. This mod adds a <strong>Keep working area visible</strong> checkbox to the building's panel. Turn it on and the outline stays on screen after you deselect, so you can plant crops, place trees or build with the boundary in view.</p></div>
+          <div class="a"><p>Timberborn shows a building's working area only while it's selected. This mod adds a <strong>Keep working area visible</strong> checkbox to the building's panel. Turn it on, and the outline stays after you deselect, so you can plant and build with it in view.</p></div>
         </details>
         <details class="q" id="how">
           <summary>How do I pin a working area?</summary>
-          <div class="a"><p>Select a building such as a farm or forester, click the <strong>Keep working area visible</strong> row in the <strong>WORKING AREA</strong> section so it reads <strong>ON</strong>, then deselect. Full steps are on the <a href="index.html#how">overview</a>.</p></div>
+          <div class="a"><p>Select a building such as a farmhouse or forester. In its <strong>WORKING AREA</strong> section, click <strong>Keep working area visible</strong> so it reads <strong>ON</strong>, then deselect it.</p></div>
         </details>
         <details class="q" id="which">
           <summary>Which buildings can I pin?</summary>
-          <div class="a"><p>Any building that shows a terrain or road-spill working range when selected in the base game, for example farms, foresters, lumberjack flags and gatherers. Builder's Huts are excluded on purpose (<a href="#builder">see below</a>).</p></div>
+          <div class="a"><p>Any building that shows a working area when selected, such as farmhouses, foresters, lumberjack flags and gatherers. Builder's Huts are the exception (<a href="#builder">why</a>).</p></div>
         </details>
         <details class="q" id="multiple">
           <summary>Can I pin more than one building?</summary>
@@ -70,14 +70,14 @@
           <div class="a">
             <ul>
               <li><strong>One pin:</strong> select the building and uncheck its box.</li>
-              <li><strong>All pins:</strong> click <strong>Clear pinned areas (N)</strong> at the top right, or press the key you assigned under <strong>Settings &gt; Key bindings &gt; Persistent Work Areas</strong>.</li>
+              <li><strong>All pins:</strong> click <strong>Clear pinned areas (N)</strong> at the top right, or press the key you <a href="install.html#keybinding">assigned</a>.</li>
               <li>Deleting a pinned building also removes its pin.</li>
             </ul>
           </div>
         </details>
         <details class="q" id="selected-look">
           <summary>Why does the building I'm selecting look the same whether or not it's pinned?</summary>
-          <div class="a"><p>A selected building always uses the game's normal outline. The pinned outline takes over when you deselect it, which is the point of the mod. The ON/OFF badge in the panel shows the pin state.</p></div>
+          <div class="a"><p>A selected building always shows the game's normal outline. The pinned outline takes over when you deselect it. The <strong>ON</strong>/<strong>OFF</strong> badge in the panel shows whether it's pinned.</p></div>
         </details>
       </div>
 
@@ -85,27 +85,27 @@
         <h2>Safety and compatibility</h2>
         <details class="q" id="version">
           <summary>Which Timberborn version do I need?</summary>
-          <div class="a"><p>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build. It was built and tested on 1.1.2.4. A later game version could change the internal outline renderer the mod borrows. If that happens, pinning disables itself for the map, the panel says so, and nothing else is affected.</p></div>
+          <div class="a"><p>Timberborn <strong>1.1.2.4</strong> or a compatible 1.1 build; it's tested on 1.1.2.4. If a later game version breaks the outline, pinning turns off for that map and the panel says so. Nothing else is affected.</p></div>
         </details>
         <details class="q" id="saves">
           <summary>Is it safe for my saves? Can I remove it mid-game?</summary>
-          <div class="a"><p>Yes. The mod never writes to your save files and doesn't change buildings, beavers or the simulation. Pins are kept in their own small file outside your saves. You can disable or delete the mod at any time and your colony loads as normal.</p></div>
+          <div class="a"><p>Yes. The mod never writes to your saves and doesn't change buildings, beavers or the simulation. You can disable or delete it at any time, and your colony loads as normal.</p></div>
         </details>
         <details class="q" id="multiplayer">
           <summary>Does it work in multiplayer? Do both players need it?</summary>
-          <div class="a"><p>Yes. It's designed for compatibility with the <strong>BeaverBuddies Stability Fork</strong>, but it doesn't need BeaverBuddies and works the same in single-player. The mod sends nothing over the network and pins are purely local, so what one player pins never appears for another. For co-op, every player installs the same version of the mod and runs the same game version. That's the setup tested in a two-player co-op session. Because the mod only draws on your own screen, it shouldn't strictly need to be installed by both players, but using it on only one hasn't been playtested. It hasn't been tested with the original BeaverBuddies or Timber Together.</p></div>
+          <div class="a"><p>Yes. It works with the <strong>BeaverBuddies Stability Fork</strong>, and the same in single-player. For co-op, every player installs the same version of the mod and runs the same game version (<a href="index.html#status">what's been played</a>). Pins are local, so what you pin never shows for anyone else.</p></div>
         </details>
         <details class="q" id="advantage">
           <summary>Does it change gameplay or give an advantage?</summary>
-          <div class="a"><p>No. It only draws an outline the game already knows how to compute for a selected building, using the same navigation queries. It doesn't alter what buildings can reach or do.</p></div>
+          <div class="a"><p>No. It only draws the outline the game already shows for a selected building. It doesn't change what buildings can reach or do.</p></div>
         </details>
         <details class="q" id="deps">
           <summary>Does it need other mods, Harmony or BeaverBuddies?</summary>
-          <div class="a"><p>No. It's standalone and uses no Harmony patches, so it doesn't rewrite game methods. It has no required mods.</p></div>
+          <div class="a"><p>No. It has no required mods and uses no Harmony patches.</p></div>
         </details>
         <details class="q" id="conflicts">
           <summary>Will it conflict with other mods?</summary>
-          <div class="a"><p>Because it patches nothing, conflicts are unlikely, but it hasn't been tested against every mod. If you hit a problem, <a href="troubleshooting.html#report">report it</a> along with your mod list.</p></div>
+          <div class="a"><p>Unlikely, since it patches nothing, but it hasn't been tested with every mod. If you hit a problem, <a href="troubleshooting.html#report">report it</a> with your mod list.</p></div>
         </details>
       </div>
 
@@ -113,31 +113,31 @@
         <h2>Features and limits</h2>
         <details class="q" id="builder">
           <summary>Why can't I pin a Builder's Hut?</summary>
-          <div class="a"><p>The game attaches an internal road-spill range to every Builder's Hut. It isn't a working area you'd want to keep on screen, so the mod doesn't show the pin panel for Builder's Huts.</p></div>
+          <div class="a"><p>The game gives every Builder's Hut a road-spill range, but it isn't a working area you'd want to keep on screen. So Builder's Huts get no pin.</p></div>
         </details>
         <details class="q" id="builder-outline">
           <summary>Then why does a Builder's Hut still show an outline when I select it?</summary>
-          <div class="a"><p>That outline is drawn by Timberborn itself, not by this mod. It appears for the same internal range mentioned above. To check, disable the mod and select a Builder's Hut: you'll see the same outline. The mod doesn't change it.</p></div>
+          <div class="a"><p>That outline is Timberborn's own, for the same range. To check, disable the mod and select a Builder's Hut: the outline is still there.</p></div>
         </details>
         <details class="q" id="persist">
           <summary>Do my pins survive saving and loading?</summary>
-          <div class="a"><p>Yes. Each settlement's pins are remembered on your own computer in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code> and come back when you load any save of that settlement. They are never written into the save itself, so the mod can't affect a saved colony. A different settlement starts with no pins, and a co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save. To forget every pin, delete that file.</p></div>
+          <div class="a"><p>Yes. Each settlement's pins are kept on your computer, never in the save, and come back when you load any save of that settlement. They live in <code>Documents\Timberborn\PersistentWorkAreas\Pins.txt</code>; delete it to forget every pin. <a href="troubleshooting.html#pins-vanish">Pins gone?</a></p></div>
         </details>
         <details class="q" id="planting">
           <summary>Why do farmhouse or forester outlines appear when I pick a crop or tree?</summary>
-          <div class="a"><p>Picking a crop or tree in the planting tools outlines the working area of every building that can plant it: farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes, including ones still under construction. The outlines go away when you leave the planting tool. <strong>Clear pinned areas</strong> removes only your pins, not these.</p></div>
+          <div class="a"><p>Picking a crop or tree in the planting tools outlines every building that can plant it, even one still under construction. That's farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes. The outlines go when you leave the tool, and <strong>Clear pinned areas (N)</strong> doesn't remove them.</p></div>
         </details>
         <details class="q" id="overlays">
           <summary>Can it pin district road colors, effect radii or placement ghosts?</summary>
-          <div class="a"><p>No. It supports navigation-based working areas only. Those other overlays aren't included.</p></div>
+          <div class="a"><p>No. It pins working areas only.</p></div>
         </details>
         <details class="q" id="language">
           <summary>Is it translated?</summary>
-          <div class="a"><p>Not yet. The mod's text is English only, but all of it lives in one file, <code>version-1.1/Localizations/enUS_PersistentWorkAreas.csv</code>. A translation is one more file there with the same keys, named for the game's language code, for example <code>deDE_PersistentWorkAreas.csv</code>.</p></div>
+          <div class="a"><p>Not yet: the text is English, all in <code>version-1.1/Localizations/enUS_PersistentWorkAreas.csv</code>. A translation is one more file there with the same keys, named for the game's language code, for example <code>deDE_PersistentWorkAreas.csv</code>. Keep <code>{0}</code> in the clear-button text: it becomes the pin count.</p></div>
         </details>
         <details class="q" id="perf">
           <summary>Will it slow down my game?</summary>
-          <div class="a"><p>It's designed not to. A terrain or path change re-checks only the pinned buildings it can reach, at most five times per second, and selecting a building redraws from what was already worked out. All outlines share one combined mesh, nothing runs while there are no pins and no planting tool is open, and the mesh is released once nothing is drawn. If you notice a drop in a very large colony, <a href="troubleshooting.html#performance">let us know</a>.</p></div>
+          <div class="a"><p>It's built not to. A terrain or path change re-checks only the pinned buildings it can reach, and nothing runs while nothing is pinned and no planting tool is open. If you notice a drop in a very large colony, <a href="troubleshooting.html#performance">let us know</a>.</p></div>
         </details>
       </div>
 
@@ -149,11 +149,11 @@
         </details>
         <details class="q" id="bugs">
           <summary>How do I report a bug or suggest a feature?</summary>
-          <div class="a"><p>Open an <a href="https://github.com/timbermods/PersistentWorkAreas/issues/new">issue on GitHub</a>. For bugs, include your mod and game versions and any <code>[PersistentWorkAreas]</code> lines from your game log; <a href="troubleshooting.html#report">here's what helps</a>.</p></div>
+          <div class="a"><p>Open an <a href="https://github.com/timbermods/PersistentWorkAreas/issues/new">issue on GitHub</a>. For a bug, <a href="troubleshooting.html#report">here's what helps</a>.</p></div>
         </details>
         <details class="q" id="source">
           <summary>Can I build it from source?</summary>
-          <div class="a"><p>Yes. Install the .NET 8 SDK and Timberborn, clone the <a href="https://github.com/timbermods/PersistentWorkAreas">repository</a>, and run <code>.\build.ps1</code> from PowerShell. It builds the mod, runs its checks and produces a zip. Game and Unity DLLs are used only as build references and are never redistributed. The source is available under the <a href="https://github.com/timbermods/PersistentWorkAreas/blob/main/LICENSE">MIT license</a>.</p></div>
+          <div class="a"><p>Yes. See <a href="https://github.com/timbermods/PersistentWorkAreas/blob/main/DEVELOPING.md">DEVELOPING.md</a> in the repository. The source is under the <a href="https://github.com/timbermods/PersistentWorkAreas/blob/main/LICENSE">MIT license</a>.</p></div>
         </details>
         <details class="q" id="affiliation">
           <summary>Is this an official mod?</summary>

@@ -1,85 +1,77 @@
 # Persistent Work Areas
 
-Keep a building's working-area outline visible after deselecting it, including while painting crops, planting trees, or using other tools.
+A Timberborn mod that keeps a building's working-area outline on screen after you deselect it. Plant, build and plan with the outline in view.
 
-**Website:** <https://timbermods.github.io/PersistentWorkAreas/> has the feature overview, an install guide, troubleshooting, and an FAQ.
-
-## New in 1.1.0
-
-- **Planting tools show their planters.** Pick a crop or tree in the planting tools and the working areas of every building that can plant it appear on their own: farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes, including ones still under construction. They disappear when you leave the tool. **Clear pinned areas** clears only your pins.
-- **Pins are remembered.** Each settlement's pins are kept on your own computer in `PersistentWorkAreas\Pins.txt`, next to your Timberborn `Saves` folder, and come back when you load that settlement. They are never written into the save, so each co-op player keeps their own.
-- **Faster refreshes with many pins.** A path or terrain change now re-checks only the pinned buildings it can reach, and selecting a pinned building no longer recalculates every pin.
-- **Translatable text.** All UI text now comes from `Localizations/enUS_PersistentWorkAreas.csv`, so a translation is one more CSV. The English text is unchanged.
-
-When updating, replace the whole `PersistentWorkAreas` folder. The new DLL reads its text from the CSV, so copying only the DLL over 1.0.0 shows raw keys.
-
-1.1.0 passes 142 automated checks and has been playtested extensively in game.
-
-### Earlier versions
-
-- **1.0.0:** First stable release, with no behavior changes from 0.1.3, tested in game single-player and in a two-player BeaverBuddies Stability Fork session. The game-log line reads its version number from the mod itself, and the release zip uses standard `/` folder separators.
-- **0.1.3:** Documentation correction only. The game itself draws a Builder's Hut's range outline while it is selected; that is vanilla behavior, not something this mod adds or changes.
-- **0.1.2:** Builder's Huts can no longer be pinned, so they no longer show a "Working area" panel.
-- **0.1.1:** The pin control gained a clearly drawn checkbox, an ON/OFF badge, a bordered panel, and hover/keyboard-focus highlighting.
-- **0.1.0:** First preview.
+**Website:** <https://timbermods.github.io/PersistentWorkAreas/>: overview, install guide, troubleshooting and FAQ.
 
 ## Install
 
 1. Close Timberborn.
 2. Download `PersistentWorkAreas-v1.1.0.zip` from **Assets** on the [latest release](https://github.com/timbermods/PersistentWorkAreas/releases/latest). Don't use the `-source.zip` or the **Source code** archives. <!-- latest -->
-3. Extract it into your Timberborn `Mods` folder (normally `Documents\Timberborn\Mods`). The result should be `Mods\PersistentWorkAreas\version-1.1\manifest.json` with `PersistentWorkAreas.dll` beside it.
-4. Start Timberborn and enable **Persistent Work Areas** in the mod manager. Restart if prompted.
+3. Extract it into your Timberborn `Mods` folder, normally `Documents\Timberborn\Mods`. You should get `Mods\PersistentWorkAreas\version-1.1\manifest.json`, with `PersistentWorkAreas.dll` beside it.
+4. Start Timberborn and enable **Persistent Work Areas** in the mod manager. Restart if asked.
 
-Requires Timberborn **1.1.2.4** or a compatible 1.1 build. Built and tested on Timberborn 1.1.2.4. Later versions may change the internal renderer API.
+You need Timberborn **1.1.2.4** or a compatible 1.1 build. No other mods are needed: not Harmony, Mod Settings or BeaverBuddies.
 
-No other mods are required: not Harmony, Mod Settings or BeaverBuddies. The mod works the same in single-player and in co-op. If you play co-op with the BeaverBuddies Stability Fork, keep that installation as it is. For co-op, every player installs the same version of the mod and runs the same game version; that is the tested setup. Pins are always local to each player. The mod sends nothing over the network, so a player without it shouldn't cause a desync, but running it on only one computer has not been playtested.
+**To update,** close the game and replace the whole `PersistentWorkAreas` folder, not just the DLL. Your pins are kept.
 
-## Use
+## Pin a working area
 
-- Select a farm, forester, lumberjack flag, gatherer, or another building with a terrain/road-spill working range.
-- Check **Keep working area visible**.
-- Deselect it and use your planting/building tools. The outline remains.
-- Pick a crop or tree in the planting tools and the working areas of the buildings that plant it appear on their own: every farmhouse for crops (aquatic farmhouses for aquatic crops) and every forester for trees and bushes, including ones still under construction. They disappear when you leave the planting tool; your pins stay.
-- Pin additional buildings as needed. Overlapping pinned areas merge into a combined outline.
-- Click **Clear pinned areas (N)** at the top right to remove every pin, without finding or selecting any building. Areas the planting tool shows stay until you leave that tool.
-- For a keyboard shortcut, assign **Clear all pinned working areas** under **Persistent Work Areas** in the game's key-binding settings. It starts unbound to avoid taking an existing shortcut.
-- To remove just one pin, select its building and uncheck the checkbox.
+1. Select a farmhouse, forester, lumberjack flag, gatherer or another building that shows a working area.
+2. In its **WORKING AREA** section, click **Keep working area visible** so it reads **ON**.
+3. Deselect the building. The outline stays while you plant, build or use other tools.
 
-The currently selected building still uses its normal game outline. After you clear the pins, deselecting a building hides its outline again, as in the base game. Deleting a pinned building removes its pin.
+Pin as many buildings as you like. Overlapping areas merge into one outline. Deleting a pinned building removes its pin.
 
-### Where pins are kept
+## Planting tools
 
-Pins are remembered for each settlement on your own computer, in `PersistentWorkAreas\Pins.txt` next to your Timberborn `Saves` folder (on Windows, `Documents\Timberborn\PersistentWorkAreas\Pins.txt`). When you load any save of that settlement, the latest pins you set there come back. A different settlement starts with none.
+Pick a crop or tree in the planting tools, and every building that can plant it is outlined. That's farmhouses for crops, aquatic farmhouses for aquatic crops, and foresters for trees and bushes. The outlines go when you leave the tool; they aren't pins.
 
-- Pins are never written into the save, so co-op players each keep their own.
-- A co-op guest's game names the settlement after the host's save, which changes with every resync, so a guest's pins usually do not come back. The host's should come back.
-- The file keeps the 100 settlements you loaded or changed most recently.
-- To forget every pin, delete that file.
+## Clear pins
 
-### Limits and translations
+- **One pin:** select the building and click **Keep working area visible** again, so it reads **OFF**.
+- **All pins:** click **Clear pinned areas (N)** at the top right. It shows while anything is pinned.
+- **With a key:** Settings → Key bindings → Persistent Work Areas → **Clear all pinned working areas**. It starts unbound.
 
-The mod supports navigation-based working areas. It does not pin district road coloring, effect-radius overlays that are not navigation-based, or building-placement ghosts.
+## Pins are remembered
 
-UI text is currently English. The panel, button and key-binding text is all in `version-1.1/Localizations/enUS_PersistentWorkAreas.csv` (in the repository, under `packaging/PersistentWorkAreas/`), so a translation is one more file in that folder with the same keys, named for the game's language code (for example `deDE_PersistentWorkAreas.csv`). Keep `{0}` in the clear-button text: it becomes the pin count.
+Each settlement's pins are kept on your computer in `Documents\Timberborn\PersistentWorkAreas\Pins.txt`, never in the save. They come back when you load any save of that settlement. To forget every pin, delete that file.
 
-## Compatibility and validation
+## Co-op
 
-Designed for compatibility with the **BeaverBuddies Stability Fork**, but it doesn't depend on any BeaverBuddies build and works in single-player without one. It is a local display only. It does not patch game methods, change simulation or building data, send multiplayer events, or modify saves; the pins live in their own small local file. It uses the same navigation queries as the game's selected-building visualizer and a separate instance of its outline renderer. The Stability Fork's co-op join check compares only the game and BeaverBuddies builds, so this mod doesn't affect joining. Co-op has been tested only with the Stability Fork, not with the original [BeaverBuddies](https://github.com/thomaswp/BeaverBuddies) or Timber Together.
+The mod works the same in single-player and co-op. For co-op, every player installs the same version of the mod and runs the same game version.
 
-The release build passes 142 automated checks. 77 of them test the pin, refresh-planning, planting-tool and pin-file logic without the game, and 65 check the mod against the installed game's assemblies and blueprints. Version 1.0.0 was tested in game on Timberborn 1.1.2.4, both single-player and in a two-player BeaverBuddies Stability Fork session with the mod installed on both computers. The features new in 1.1.0 have not been playtested in game yet. See `VALIDATION.md` for what was checked and how.
+Pins are local: each player keeps their own, and nothing is sent over the network. A co-op guest's pins usually don't come back after a resync, because the guest's settlement is named after the host's save.
 
-## Build from source
+## Good to know
 
-Install the .NET 8 SDK and have Timberborn installed, then run:
+- **Display only.** It changes nothing in the game and never writes to your save, so you can remove it at any time.
+- **If a game update breaks the outline,** pinning turns off for that map and the panel says so. Nothing else is affected.
+- **Working areas only.** It doesn't pin district road coloring, effect-radius overlays, building-placement ghosts or Builder's Huts. The outline a selected Builder's Hut shows is the game's own.
+- **English text.** A translation is one more CSV in `version-1.1\Localizations`, with the keys of `enUS_PersistentWorkAreas.csv` and named for the game's language code (for example `deDE_PersistentWorkAreas.csv`). Keep `{0}` in the clear-button text: it becomes the pin count.
 
-```powershell
-.\build.ps1 -GameDir 'C:\Program Files (x86)\Steam\steamapps\common\Timberborn'
-```
+Something not working? See [Troubleshooting](https://timbermods.github.io/PersistentWorkAreas/troubleshooting.html), or [open an issue](https://github.com/timbermods/PersistentWorkAreas/issues/new) with your game log.
 
-The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.1.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references. <!-- latest -->
+## Status
 
-Without the game, `dotnet run --project tests/Checks.csproj -c Release` runs only the checks that need no game files (pin, refresh-planning, planting-tool and pin-file logic) and reports the rest as skipped. GitHub Actions runs them for pull requests and pushes to `main`.
+The mod is **stable**.
+
+**Tested**
+
+- Every feature, played extensively in game on 1.1.2.4: pinning and clearing, the pinned outlines, the planting-tool outlines, pins remembered between sessions, outlines keeping up with terrain and path changes, and the panel text.
+- Pinning, clearing and the outlines in a two-player Stability Fork co-op session, with the mod on both computers.
+- 142 automated checks: 77 that need no game (they also run on every change), and 65 against the installed game's own assemblies and blueprints.
+
+**Not played yet**
+
+- The mod on only one computer in a co-op game.
+- The original BeaverBuddies, and Timber Together.
+- Frame rate in a very large colony, and other mods alongside it.
+
+What changed in each version is in the [release notes](https://github.com/timbermods/PersistentWorkAreas/releases). To build from source or run the checks, see [DEVELOPING.md](DEVELOPING.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). Maintained by [Timbermods](https://github.com/timbermods).
+
+An unofficial community mod for Timberborn. Not affiliated with or endorsed by Mechanistry.
