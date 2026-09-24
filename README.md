@@ -26,7 +26,7 @@ When updating, replace the whole `PersistentWorkAreas` folder. The new DLL reads
 ## Install
 
 1. Close Timberborn.
-2. Download `PersistentWorkAreas-v1.1.0.zip` from **Assets** on the [latest release](https://github.com/timbermods/PersistentWorkAreas/releases/latest). Don't use the `-source.zip` or the **Source code** archives.
+2. Download `PersistentWorkAreas-v1.1.0.zip` from **Assets** on the [latest release](https://github.com/timbermods/PersistentWorkAreas/releases/latest). Don't use the `-source.zip` or the **Source code** archives. <!-- latest -->
 3. Extract it into your Timberborn `Mods` folder (normally `Documents\Timberborn\Mods`). The result should be `Mods\PersistentWorkAreas\version-1.1\manifest.json` with `PersistentWorkAreas.dll` beside it.
 4. Start Timberborn and enable **Persistent Work Areas** in the mod manager. Restart if prompted.
 
@@ -76,7 +76,7 @@ Install the .NET 8 SDK and have Timberborn installed, then run:
 .\build.ps1 -GameDir 'C:\Program Files (x86)\Steam\steamapps\common\Timberborn'
 ```
 
-The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.1.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references.
+The script builds the mod, runs checks, and creates `dist\PersistentWorkAreas-v1.1.0.zip`. No game, Unity, Harmony, or BeaverBuddies DLLs are redistributed. The game DLLs are used only as build references. <!-- latest -->
 
 Without the game, `dotnet run --project tests/Checks.csproj -c Release` runs only the checks that need no game files (pin, refresh-planning, planting-tool and pin-file logic) and reports the rest as skipped. GitHub Actions runs them for pull requests and pushes to `main`.
 
