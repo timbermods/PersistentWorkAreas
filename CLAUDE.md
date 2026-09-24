@@ -14,7 +14,7 @@ in `source/`, game assets and localization in `packaging/PersistentWorkAreas/ver
 ## Standing rules
 
 - Never launch or drive Timberborn, and never touch installed mods or saves. The maintainer (Kyler) playtests himself.
-- Commit on a branch and open a PR. Merge only when Kyler says so in the chat.
+- Commit on a branch and open a PR. Kyler has said to merge PRs automatically: merge, then check the page live.
 - Assume fresh games: no old-save compatibility notes. Player-facing text never says which version added what.
 - Sources of truth for facts: `README.md`, `VALIDATION.md`, the localization CSV
   (`packaging/PersistentWorkAreas/version-1.1/Localizations/enUS_PersistentWorkAreas.csv`), the release notes. Where
@@ -27,6 +27,11 @@ in `source/`, game assets and localization in `packaging/PersistentWorkAreas/ver
   HTML/CSS/JS, no build step. Live at https://timbermods.github.io/PersistentWorkAreas/.
 - **Published:** GitHub Pages serves `main:/docs` (legacy build), so merging to main publishes; a build takes about a
   minute. No deploy script, no `gh-pages` branch.
+- **Latest releases update themselves:** when a release becomes GitHub's Latest, `.github/workflows/latest-release.yml`
+  (the shared timbermods workflow) appends the standard footer to its notes, sets the site's
+  `data-release="version|tag|asset-name"` fallback text and the README lines ending in `<!-- latest -->` to the new
+  version, runs the site checks and commits to main. Pre-releases change nothing. Descriptions, status lists and FAQs
+  stay manual (the checklist below). Dry run: Actions → Latest release → Run workflow.
 - **Look:** "The Tracing Overlay". A drafting table: warm plan paper with a surveyed grid, and every block of reading
   taped onto it as a translucent vellum sheet, the way a pinned outline stays on tracing paper while you work below.
   The look is fixed: updates extend it and never restyle it.
