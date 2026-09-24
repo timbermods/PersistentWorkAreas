@@ -55,7 +55,7 @@ coloring, not effect-radius overlays that aren't navigation-based, not building-
 Huts (the outline a Builder's Hut shows when selected is the base game's own, not this mod's).
 
 Among Timbermods it is the small, standalone one: it needs neither Harmony nor Mod Settings nor BeaverBuddies, unlike
-MixedStorage (Harmony) or the BeaverBuddies Stability Fork and MultiColony (co-op mods). No comparison with other
+MixedStorage (Harmony) or the BeaverBuddies Stability Fork and Timber Together (co-op mods). No comparison with other
 community range-overlay mods is on record; don't invent one.
 
 ## Operating Context
@@ -78,7 +78,7 @@ community range-overlay mods is on record; don't invent one.
   that is the tested setup. Pins are always local to each player, and the mod sends nothing over the network, so a
   player without it shouldn't cause a desync, but running it on only one computer has not been played. The Stability
   Fork's join check compares only the game and BeaverBuddies builds, so this mod doesn't affect joining. Not tested
-  with the original BeaverBuddies or with BeaverBuddies MultiColony. (The v1.1.0 release notes say players "don't need
+  with the original BeaverBuddies or with Timber Together. (The v1.1.0 release notes say players "don't need
   to update together"; the README and site, written after, use the same-version rule above. Follow the README.)
 - **Where pins live:** `Documents\Timberborn\PersistentWorkAreas\Pins.txt` (next to the `Saves` folder), per
   settlement, the 100 most recently loaded or changed settlements. Loading any save of a settlement brings back its
@@ -111,7 +111,7 @@ community range-overlay mods is on record; don't invent one.
   `make_textures.py`). GitHub Pages serves `main:/docs` (legacy build) at
   https://timbermods.github.io/PersistentWorkAreas/, so a change is live once it's merged to `main`; there is no deploy
   script and no `gh-pages` branch. It must stay fast, light and mobile-friendly. It's one of the timbermods sites
-  (MixedStorage, the BeaverBuddies Stability Fork and MultiColony are siblings; the org catalog is
+  (MixedStorage, the BeaverBuddies Stability Fork and Timber Together are siblings; the org catalog is
   https://timbermods.github.io/).
 - **Site-test / CI contracts: none.** The only workflow, `.github/workflows/tests.yml`, runs the mod's game-free checks
   (`dotnet run --project tests/Checks.csproj -c Release`) on pushes to `main` and pull requests; `tests/Program.cs`
@@ -146,7 +146,7 @@ community range-overlay mods is on record; don't invent one.
   additions (the planting-tool outlines, pins remembered in `Pins.txt`, the faster per-pin refresh and the
   translatable text). Pinning, clearing and the outlines were also played in a two-player Stability Fork co-op session
   with the mod on both computers. Not played: the mod on only one co-op computer, the original BeaverBuddies or
-  MultiColony, frame rate in a very large colony, every other mod. Say so plainly in the "What is tested, and what
+  Timber Together, frame rate in a very large colony, every other mod. Say so plainly in the "What is tested, and what
   isn't" section, without alarm. A feature added later and not yet played carries "Checked, not played in game yet."
   next to it until it is.
 - **Describe the mod as it is now.** Version history belongs in the changelog: the README's "New in 1.1.0" / "Earlier
